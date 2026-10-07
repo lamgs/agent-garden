@@ -1,6 +1,7 @@
+import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { basename, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import type { Agent, HarnessVersion, LoopTier, Run, Step } from '@garden/core';
 import { HEURISTIC_VERSION, scoreSignals } from '@garden/core';
 import type { Adapter, AdapterContext, Census, NormalizedRecord } from '../../adapter';
@@ -124,7 +125,7 @@ export class ClaudeCodeAdapter implements Adapter {
   private family(cwd: string): Family {
     let root = this.rootByCwd.get(cwd);
     if (!root) {
-      root = (existsSync(cwd) ? gitRoot(cwd) : undefined) ?? cwd;
+      root = canonicalProjectRoot(cwd);
       this.rootByCwd.set(cwd, root);
     }
     let fam = this.families.get(root);
@@ -419,6 +420,32 @@ export class ClaudeCodeAdapter implements Adapter {
     census.warnings.push(...user.warnings);
     return census;
   }
+}
+
+/**
+ * The project a cwd belongs to. Linked git worktrees (incl. Claude Code's `.claude/worktrees/<name>`,
+ * which may already be deleted) fold into their main repository so they share one bed.
+ */
+export function canonicalProjectRoot(cwd: string): string {
+  const wt = /^(.*?)\/\.claude\/worktrees\/[^/]+(?:\/.*)?$/.exec(cwd);
+  if (wt?.[1]) return canonicalProjectRoot(wt[1]);
+  if (!existsSync(cwd)) return cwd;
+  const top = gitRoot(cwd);
+  if (!top) return cwd;
+  try {
+    const common = execFileSync(
+      'git',
+      ['-C', cwd, 'rev-parse', '--path-format=absolute', '--git-common-dir'],
+      {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      },
+    ).trim();
+    if (basename(common) === '.git' && dirname(common) !== top) return dirname(common);
+  } catch {
+    // fall through: use the worktree's own top level
+  }
+  return top;
 }
 
 function harnessRecord(

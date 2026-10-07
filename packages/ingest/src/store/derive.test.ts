@@ -112,6 +112,41 @@ describe('deriveAll', () => {
     s.close();
   });
 
+  it('keeps one season chain per agent, so subagent harnesses do not interleave with main', () => {
+    const s = seed();
+    s.putAgent({
+      id: agentId('Explore'),
+      name: 'Explore',
+      kind: 'subagent',
+      firstSeenAt: 'x',
+      lastSeenAt: 'x',
+    });
+    s.putHarnessVersion({
+      id: 'hvSub',
+      familyId: 'fam',
+      validFrom: 'x',
+      provenance: 'observed',
+      bundle: bundle('claude-haiku-5-5', 0),
+    });
+    const r = s.getRun('r1')!;
+    s.putRun({
+      ...r,
+      id: 'sub1',
+      agentId: agentId('Explore'),
+      harnessVersionId: 'hvSub',
+      startedAt: '2026-09-01T12:00:00.000Z',
+    });
+    deriveAll(s, EMPTY_GARDEN_CONFIG);
+    const get = (id: string) =>
+      s.db.prepare('SELECT valid_to, diff_json FROM harness_versions WHERE id = ?').get(id) as {
+        valid_to: string | null;
+        diff_json: string | null;
+      };
+    expect(get('hvSub')).toEqual({ valid_to: null, diff_json: null });
+    expect(get('hvA').valid_to).toBe('2026-09-03T02:00:00.000Z');
+    s.close();
+  });
+
   it('fixes agent seen ranges from runs', () => {
     const s = seed();
     deriveAll(s, EMPTY_GARDEN_CONFIG);

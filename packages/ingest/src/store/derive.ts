@@ -39,21 +39,33 @@ export function deriveAll(store: Store, garden: GardenConfig): DeriveReport {
         first_seen_at = COALESCE((SELECT MIN(started_at) FROM runs WHERE runs.agent_id = agents.id), first_seen_at),
         last_seen_at  = COALESCE((SELECT MAX(ended_at)   FROM runs WHERE runs.agent_id = agents.id), last_seen_at)`);
 
-    // 2. Harness validity windows and diffs, per family, ordered by first use.
+    // 2. Harness validity windows and diffs. A harness is the environment one agent runs inside,
+    //    so seasons form one chain per (family, primary agent): the agent with most runs on a version.
+    //    Otherwise main-thread and subagent harnesses (which list different tools) would interleave.
     const versions = db
       .prepare(
         `SELECT hv.id, hv.family_id, hv.bundle_json,
-                COALESCE((SELECT MIN(started_at) FROM runs r WHERE r.harness_version_id = hv.id), hv.valid_from) AS first_use
-           FROM harness_versions hv ORDER BY hv.family_id, first_use, hv.id`,
+                COALESCE((SELECT MIN(started_at) FROM runs r WHERE r.harness_version_id = hv.id), hv.valid_from) AS first_use,
+                COALESCE((SELECT r.agent_id FROM runs r WHERE r.harness_version_id = hv.id
+                           GROUP BY r.agent_id ORDER BY COUNT(*) DESC, MIN(r.started_at) LIMIT 1), '') AS primary_agent
+           FROM harness_versions hv ORDER BY hv.family_id, primary_agent, first_use, hv.id`,
       )
-      .all() as { id: string; family_id: string; bundle_json: string; first_use: string }[];
+      .all() as {
+      id: string;
+      family_id: string;
+      bundle_json: string;
+      first_use: string;
+      primary_agent: string;
+    }[];
     const update = db.prepare(
       'UPDATE harness_versions SET valid_from = ?, valid_to = ?, diff_json = ? WHERE id = ?',
     );
+    const sameChain = (a?: (typeof versions)[number], b?: (typeof versions)[number]) =>
+      !!a && !!b && a.family_id === b.family_id && a.primary_agent === b.primary_agent;
     for (let i = 0; i < versions.length; i++) {
       const v = versions[i]!;
-      const prev = versions[i - 1]?.family_id === v.family_id ? versions[i - 1] : undefined;
-      const next = versions[i + 1]?.family_id === v.family_id ? versions[i + 1] : undefined;
+      const prev = sameChain(versions[i - 1], v) ? versions[i - 1] : undefined;
+      const next = sameChain(versions[i + 1], v) ? versions[i + 1] : undefined;
       const diff = prev
         ? JSON.stringify(
             diffBundles(
