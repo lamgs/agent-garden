@@ -2,6 +2,7 @@
 /** `garden` CLI. Everything stays local: reads ~/.claude, writes ~/.agent-garden. */
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { OUTCOME_LABELS, type OutcomeLabel } from '@garden/core';
 import { ClaudeCodeAdapter } from './adapters/claude-code/adapter';
 import { ingest } from './pipeline';
@@ -9,12 +10,12 @@ import { Redactor } from './redact';
 import { deriveAll } from './store/derive';
 import { Store } from './store/store';
 
-interface Opts {
+export interface Opts {
   flags: Record<string, string | true>;
   positional: string[];
 }
 
-function parseArgs(argv: string[]): Opts {
+export function parseArgs(argv: string[]): Opts {
   const flags: Record<string, string | true> = {};
   const positional: string[] = [];
   for (let i = 0; i < argv.length; i++) {
@@ -27,11 +28,12 @@ function parseArgs(argv: string[]): Opts {
   return { flags, positional };
 }
 
-const str = (o: Opts, k: string): string | undefined =>
+export const str = (o: Opts, k: string): string | undefined =>
   typeof o.flags[k] === 'string' ? (o.flags[k] as string) : undefined;
-const dataDir = (o: Opts) =>
+export const dataDir = (o: Opts) =>
   str(o, 'data') ?? process.env.GARDEN_HOME ?? join(homedir(), '.agent-garden');
-const dbPath = (o: Opts) => str(o, 'db') ?? process.env.GARDEN_DB ?? join(dataDir(o), 'garden.db');
+export const dbPath = (o: Opts) =>
+  str(o, 'db') ?? process.env.GARDEN_DB ?? join(dataDir(o), 'garden.db');
 
 function adapter(o: Opts): ClaudeCodeAdapter {
   const claudeHome = str(o, 'claude-home');
@@ -50,7 +52,12 @@ const table = (rows: Record<string, number>, indent = '  ') =>
     .map(([k, v]) => `${indent}${k.padEnd(46)} ${v}`)
     .join('\n');
 
-const commands: Record<string, { help: string; run: (o: Opts) => Promise<void> | void }> = {
+export interface Command {
+  help: string;
+  run: (o: Opts) => Promise<void> | void;
+}
+
+export const commands: Record<string, Command> = {
   inspect: {
     help: 'Census of local Claude Code data: shapes and counts only, never content',
     run: async (o) => {
@@ -169,9 +176,9 @@ const commands: Record<string, { help: string; run: (o: Opts) => Promise<void> |
   },
 };
 
-function usage(): void {
+function usage(all: Record<string, Command>): void {
   console.log('garden <command> [options]\n');
-  for (const [name, c] of Object.entries(commands)) console.log(`  ${name.padEnd(10)} ${c.help}`);
+  for (const [name, c] of Object.entries(all)) console.log(`  ${name.padEnd(10)} ${c.help}`);
   console.log(`
 Options:
   --claude-home <dir>    Claude Code data dir (default ~/.claude)
@@ -181,17 +188,25 @@ Options:
   --db <file>            store path (default <data>/garden.db)`);
 }
 
-const opts = parseArgs(process.argv.slice(2));
-const [cmd] = opts.positional.splice(0, 1);
-const command = cmd ? commands[cmd] : undefined;
-if (!command) {
-  usage();
-  process.exitCode = cmd && cmd !== 'help' ? 1 : 0;
-} else {
+/** Run the CLI with the ingest commands plus any extra ones (the server package adds serve/export). */
+export async function main(argv: string[], extra: Record<string, Command> = {}): Promise<void> {
+  const all = { ...commands, ...extra };
+  const opts = parseArgs(argv);
+  const [cmd] = opts.positional.splice(0, 1);
+  const command = cmd ? all[cmd] : undefined;
+  if (!command) {
+    usage(all);
+    process.exitCode = cmd && cmd !== 'help' ? 1 : 0;
+    return;
+  }
   try {
     await command.run(opts);
   } catch (e) {
     console.error(`garden ${cmd}: ${(e as Error).message}`);
     process.exitCode = 1;
   }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  await main(process.argv.slice(2));
 }

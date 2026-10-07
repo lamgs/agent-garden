@@ -227,7 +227,10 @@ export function buildLoops(
 
     // Dry: expected cadence missed by DRY_FACTOR×.
     if (l.expectedIntervalSec) {
-      const last = runs.at(-1);
+      const last = runs.reduce<RunRow | undefined>(
+        (m, r) => (!m || r.startedAt > m.startedAt ? r : m),
+        undefined,
+      );
       const gapSec = last ? (now - Date.parse(last.startedAt)) / 1000 : Infinity;
       if (gapSec > DRY_FACTOR * l.expectedIntervalSec) {
         state = 'dry';

@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./derive": "./src/store/derive.ts"
+    "./derive": "./src/store/derive.ts",
+    "./cli": "./src/cli.ts"
   },
   "bin": {
     "garden": "./src/cli.ts"
