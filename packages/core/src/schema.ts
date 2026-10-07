@@ -178,6 +178,11 @@ export interface Run {
   models: string[];
   /** Deduped by API message id. */
   tokens: TokenUsage;
+  /**
+   * 'output_estimated': the source only had stream-start usage snapshots, so tokens.output is a
+   * lower-bound estimate from visible output length. The UI must label costs from such runs.
+   */
+  tokenQuality: 'reported' | 'output_estimated';
   stepCount: number;
   toolCallCount: number;
   errorCount: number;

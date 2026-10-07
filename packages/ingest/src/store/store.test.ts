@@ -43,6 +43,7 @@ function seed(store: Store): void {
     taskPreview: red.text('fix the flaky test'),
     models: ['claude-opus-5-5'],
     tokens: { ...ZERO_USAGE, input: 10, output: 5 },
+    tokenQuality: 'reported',
     stepCount: 1,
     toolCallCount: 1,
     errorCount: 0,

@@ -90,6 +90,32 @@ error records, user interrupts.
   requestShape, requestNonInteractive}`. `toolUseId` joins it to the parent `tool_use.id`.
 - `~/.claude/projects/<project-dir>/<sessionId>/` also contained `ccr-tip.json` (cloud-specific, ignored).
 
+## Additional transcript facts [observed, CC v2.1.293, 2026-10-07, M2 real-data ingest]
+
+- **Subagent transcripts carry stream-start usage only.** In every subagent file observed (5 files),
+  every assistant line has `stop_reason: null` and `output_tokens` of 2–43, for a total of 130–335
+  output tokens against 80K–105K characters of visible text and tool input. Input and cache numbers
+  look right. The main transcript reports real values (`stop_reason` `tool_use`/`end_turn`, output
+  up to 19K per message). → The parser keeps recorded step tokens, sets a lower-bound run estimate
+  (visible chars ÷ 4), and marks the run `tokenQuality: 'output_estimated'`. The UI must label any
+  cost that includes such runs.
+- The parent learns a subagent finished through a `queued_command` attachment containing a
+  `<task-notification>` with `<usage><subagent_tokens>N</subagent_tokens><tool_uses>…</tool_uses>
+  <duration_ms>…</duration_ms></usage>`. The meaning of `subagent_tokens` is unverified, so it is not
+  used for cost.
+- Subagent files contain their own harness attachments (`skill_listing`, `deferred_tools_delta`,
+  `mcp_instructions_delta`). A subagent's observed harness is its own.
+- Harness attachments arrive after the prompt line of a turn, so the observed harness is snapshotted
+  at the run's first assistant line.
+- New sidecar `agent-<id>.prefix.json` (`state.toolNames`, `model`, `systemHash`), ignored. Meta files
+  may also carry `worktreePath`, `spawnedWithWorktree`, `worktreeBranch`.
+- `system` line with `subtype: "stop_hook_summary"` (`hookCount`, `hookInfos[].command`,
+  `preventedContinuation`) → parsed as a `hook` step (command text dropped).
+- More attachment types: `silent_turn_reminder`, `task_reminder`, `command_permissions`,
+  `queued_command`, `edited_text_file`, `deferred_tools_record`.
+- Subagents spawned with worktree isolation run with `cwd` = `<repo>/.claude/worktrees/<name>`. → These
+  fold into the repository's bed (`canonicalProjectRoot`), including after the worktree is deleted.
+
 ## Skills [observed]
 
 - `~/.claude/skills/<dir>/SKILL.md` with YAML frontmatter `name`, `description`.

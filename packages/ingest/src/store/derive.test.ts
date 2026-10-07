@@ -78,6 +78,7 @@ function seed(): Store {
       taskPreview: red.text(prompt),
       models: [],
       tokens: { ...ZERO_USAGE },
+      tokenQuality: 'reported',
       stepCount: 0,
       toolCallCount: 0,
       errorCount: 0,

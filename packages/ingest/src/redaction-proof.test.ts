@@ -122,6 +122,7 @@ function fakeAdapter(): Adapter {
         taskPreview: all,
         models: ['claude-opus-5-5'],
         tokens: { ...ZERO_USAGE },
+        tokenQuality: 'reported',
         stepCount: 3,
         toolCallCount: 1,
         errorCount: 1,

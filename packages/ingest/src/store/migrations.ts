@@ -85,4 +85,8 @@ export const MIGRATIONS: readonly string[] = [
     byte_offset INTEGER NOT NULL, ingested_at TEXT NOT NULL
   );
   `,
+  /* 2 */ `
+  ALTER TABLE runs ADD COLUMN token_quality TEXT NOT NULL DEFAULT 'reported'
+    CHECK (token_quality IN ('reported','output_estimated'));
+  `,
 ];

@@ -110,7 +110,16 @@ export interface ParsedRun {
   finalStopReason?: string;
   /** User interrupted the run ("[Request interrupted by user" or equivalent). */
   interrupted: boolean;
+  /**
+   * true when `tokens.output` is an estimate: the thread only carried stream-start usage snapshots
+   * (no stop_reason on any line, implausibly few output tokens — observed in CC 2.1.293 subagent
+   * transcripts). Step-level tokens stay as recorded.
+   */
+  outputTokensEstimated?: boolean;
 }
+
+/** Characters per output token used for the estimate above (a lower bound: thinking is not visible). */
+export const CHARS_PER_OUTPUT_TOKEN = 4;
 
 export interface TranscriptCensus {
   /** e.g. 'line.type=assistant', 'attachment.type=skill_listing', 'block.type=tool_use' */

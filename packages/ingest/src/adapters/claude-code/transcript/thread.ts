@@ -4,6 +4,7 @@
  */
 import type { ToolCategory } from '@garden/core';
 import {
+  CHARS_PER_OUTPUT_TOKEN,
   SUBAGENT_TOOL_NAMES,
   type ObservedHarness,
   type ParsedRun,
@@ -112,6 +113,10 @@ class RunBuilder {
     return step;
   }
 
+  /** Uncapped length of visible assistant output (text + tool_use inputs), for the token estimate. */
+  visibleOutputChars = 0;
+  sawStopReason = false;
+
   build(): ParsedRun {
     const tokens = zeroUsage();
     let toolCallCount = 0;
@@ -150,6 +155,17 @@ class RunBuilder {
     };
     if (this.init.gitBranch) run.gitBranch = this.init.gitBranch;
     if (this.lastStopReason) run.finalStopReason = this.lastStopReason;
+    // Stream-start usage snapshots: no stop_reason anywhere and far fewer output tokens than the
+    // visible output implies. Estimate (lower bound) and flag it rather than under-price the run.
+    const estimate = Math.ceil(this.visibleOutputChars / CHARS_PER_OUTPUT_TOKEN);
+    if (
+      !this.sawStopReason &&
+      this.visibleOutputChars > 0 &&
+      tokens.output * 8 < this.visibleOutputChars
+    ) {
+      tokens.output = Math.max(tokens.output, estimate);
+      run.outputTokensEstimated = true;
+    }
     return run;
   }
 }
@@ -402,11 +418,19 @@ export class ThreadParser {
     }
     if (model) run.addModel(model);
     const stopReason = msg.stop_reason ?? undefined;
-    if (stopReason) run.lastStopReason = stopReason;
+    if (stopReason) {
+      run.lastStopReason = stopReason;
+      run.sawStopReason = true;
+    }
 
     const uuid = this.uuidOf(line);
     const at = line.timestamp ?? this.lastAt;
     const blocks = this.parseBlocks(msg.content);
+    for (const b of blocks) {
+      if (b.type === 'text' && typeof b.text === 'string') run.visibleOutputChars += b.text.length;
+      else if (b.type === 'tool_use')
+        run.visibleOutputChars += JSON.stringify(b.input ?? {}).length;
+    }
     let usageAttached = false;
     const base = (): StepInput => {
       const s: StepInput = { kind: 'assistant_message', raw: {} };

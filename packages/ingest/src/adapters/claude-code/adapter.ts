@@ -511,6 +511,7 @@ function runRecord(run: ParsedRun, famId: string, hvId: string): Unredacted<Run>
     taskPreview: run.taskText,
     models: run.models,
     tokens: run.tokens,
+    tokenQuality: run.outputTokensEstimated ? 'output_estimated' : 'reported',
     stepCount: run.stepCount,
     toolCallCount: run.toolCallCount,
     errorCount: run.errorCount,

@@ -87,9 +87,13 @@ describe.skipIf(!existsSync(ROOT))('real transcripts in ~/.claude/projects', () 
           sum.cacheRead += u.cacheRead;
           sum.cacheCreate += u.cacheCreate;
         }
+        // Estimated runs (stream-start usage snapshots) carry a lower-bound output estimate at run
+        // level; their recorded step tokens must still match the dedupe exactly.
+        const stepOutput = run.steps.reduce((n, st) => n + (st.tokens?.output ?? 0), 0);
+        if (run.outputTokensEstimated) expect(run.tokens.output).toBeGreaterThan(stepOutput);
         expect({
           input: run.tokens.input,
-          output: run.tokens.output,
+          output: run.outputTokensEstimated ? stepOutput : run.tokens.output,
           cacheRead: run.tokens.cacheRead,
           cacheCreate: run.tokens.cacheWrite5m + run.tokens.cacheWrite1h,
         }).toEqual(sum);

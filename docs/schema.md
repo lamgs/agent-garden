@@ -130,6 +130,7 @@ Subagent: one invocation.
 | taskPreview | RedactedText | First prompt |
 | models | string[] | |
 | tokens | TokenUsage | Deduped by API message id |
+| tokenQuality | `reported` \| `output_estimated` | `output_estimated`: the source only had stream-start usage snapshots (no `stop_reason` on any line, implausibly few output tokens; seen in CC 2.1.293 subagent transcripts), so `tokens.output` is a lower bound of about 4 visible characters per token. Step tokens stay as recorded. The UI must label costs that include such runs |
 | stepCount, toolCallCount, errorCount, compactionCount | number | |
 | peakContextTokens | number | Max prompt size across API calls |
 
