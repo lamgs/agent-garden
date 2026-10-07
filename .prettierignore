@@ -6,3 +6,5 @@ coverage
 .claude/worktrees
 .garden-demo
 apps/web/src/fixtures/*.json
+test-results
+playwright-report
