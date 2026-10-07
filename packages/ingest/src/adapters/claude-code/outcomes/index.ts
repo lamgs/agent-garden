@@ -1,13 +1,25 @@
-import type { LoopTier } from '@garden/core';
-import type { ParsedSession, SessionOutcomes, TierInput } from '../contracts';
-
-/** Which of the four nested loops a step belongs to (rules in docs/schema.md). */
-export function classifyTier(step: TierInput): LoopTier {
-  void step;
-  return 'agent';
-}
-
-/** Run every heuristic signal (packages/core SIGNALS) for every run in the session. */
-export function detectSessionOutcomes(session: ParsedSession): SessionOutcomes {
-  throw new Error(`detectSessionOutcomes not implemented (${session.id})`);
-}
+export { classifyTier, isHarnessPath, EDIT_TOOLS, VERIFIER_SUBAGENT } from './tier';
+export { isTestCommand, isShipCommand, isCommitOrPrCommand, commandWritesTo } from './commands';
+export { parseShell, type SimpleCommand } from './shell';
+export {
+  similarity,
+  tokenSet,
+  isCorrection,
+  isAcknowledgement,
+  truncate,
+  CORRECTION_START,
+  CORRECTION_ANYWHERE,
+  ACKNOWLEDGEMENT_START,
+} from './text';
+export {
+  detectSessionOutcomes,
+  detectRunOutcomes,
+  runContext,
+  FAILING_OUTPUT,
+  TAIL_STEPS,
+  RETRY_WINDOW_MS,
+  RETRY_SIMILARITY,
+  MOVED_ON_SIMILARITY,
+  RESPAWN_SIMILARITY,
+  type RunContext,
+} from './signals';
