@@ -8,7 +8,13 @@
  * Everything here is PRE-redaction: plain strings, possibly containing secrets. Nothing in this
  * file is ever written to the store directly. The pipeline redacts every record first.
  */
-import type { LoopTier, OutcomeSignalResult, StepKind, TokenUsage, ToolCategory } from '@garden/core';
+import type {
+  LoopTier,
+  OutcomeSignalResult,
+  StepKind,
+  TokenUsage,
+  ToolCategory,
+} from '@garden/core';
 
 // ---------------------------------------------------------------------------------------------
 // Transcripts
