@@ -2,7 +2,16 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['**/node_modules/**', '**/dist/**', '.tsbuild/**', 'coverage/**'] },
+  {
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '.tsbuild/**',
+      'coverage/**',
+      '.claude/**',
+      '.garden-demo/**',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

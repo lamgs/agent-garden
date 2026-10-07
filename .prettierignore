@@ -3,3 +3,5 @@ pnpm-lock.yaml
 dist
 coverage
 *.md
+.claude/worktrees
+.garden-demo
