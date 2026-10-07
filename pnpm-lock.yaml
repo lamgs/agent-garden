@@ -47,6 +47,15 @@ importers:
         specifier: ^4.6.5
         version: 4.6.5
 
+  scripts/demo:
+    dependencies:
+      '@garden/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      yaml:
+        specifier: ^2.9.1
+        version: 2.9.1
+
 packages:
 
   '@cacheable/memory@2.2.0':
