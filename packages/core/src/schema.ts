@@ -78,6 +78,8 @@ export interface HarnessDiff {
   mcpAdded: string[];
   mcpRemoved: string[];
   hooksChanged: boolean;
+  /** Merged settings changed (hash differs). Detail is not stored: settings may hold secrets. */
+  settingsChanged: boolean;
   instructionBytesDelta: number;
 }
 

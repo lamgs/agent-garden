@@ -59,6 +59,13 @@ export function parseFrontmatter(text: string, path: string, warnings: string[])
   try {
     const doc = parseDocument(yamlText, { uniqueKeys: false });
     if (doc.errors.length > 0) {
+      // Hand-written frontmatter often has unquoted ': ' inside values (e.g. a description), which
+      // strict YAML rejects. Fall back to flat `key: value` lines rather than losing the definition.
+      const loose = looseFrontmatter(yamlText);
+      if (loose) {
+        warnings.push(`non-strict YAML frontmatter in ${path} (read as flat key: value lines)`);
+        return loose;
+      }
       warnings.push(`invalid YAML frontmatter in ${path}`);
       return undefined;
     }
@@ -73,6 +80,22 @@ export function parseFrontmatter(text: string, path: string, warnings: string[])
     warnings.push(`invalid YAML frontmatter in ${path}`);
     return undefined;
   }
+}
+
+/** Flat `key: value` lines (value = everything after the first ': '). undefined if any line doesn't fit. */
+export function looseFrontmatter(text: string): Rec | undefined {
+  const out: Rec = {};
+  for (const line of text.split(/\r?\n/)) {
+    if (!line.trim() || line.trimStart().startsWith('#')) continue;
+    const m = /^([A-Za-z_][\w-]*):(?:\s+(.*))?$/.exec(line);
+    if (!m) return undefined;
+    const v = (m[2] ?? '').trim();
+    // Flow collections and stray colons must be valid YAML; a plain-text fallback would misread them.
+    if (/^[[{:]/.test(v)) return undefined;
+    if (/^["']/.test(v) && !/^(["']).*\1$/.test(v)) return undefined; // unbalanced quote
+    out[m[1]!] = /^(["']).*\1$/.test(v) ? v.slice(1, -1) : v;
+  }
+  return Object.keys(out).length ? out : undefined;
 }
 
 function toolsList(v: unknown): string[] | undefined {

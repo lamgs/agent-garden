@@ -9,5 +9,8 @@
   "dependencies": {
     "@garden/core": "workspace:*",
     "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@garden/ingest": "workspace:*"
   }
 }

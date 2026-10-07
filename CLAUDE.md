@@ -88,7 +88,8 @@ pnpm install
 pnpm typecheck        # tsc across workspaces
 pnpm lint             # eslint + prettier --check
 pnpm test             # vitest (unit + golden + redaction proof)
-pnpm garden <cmd>     # CLI (M1: db:init; later: inspect | ingest | serve | label | export)
+pnpm garden <cmd>     # CLI: inspect | ingest | label | stats | db:init (serve, export arrive in M3)
+pnpm demo:data        # generate the demo dataset into .garden-demo/ and ingest it
 # later milestones: pnpm build, pnpm demo (http://127.0.0.1:4310), pnpm e2e (playwright)
 ```
 

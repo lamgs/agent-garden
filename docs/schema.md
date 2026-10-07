@@ -70,7 +70,7 @@ A versioned harness bundle. Its id is a hash of the canonical bundle, so identic
 | provenance | `git` \| `observed` \| `snapshot` | git = a commit to a harness file; observed = fingerprint change seen in transcripts; snapshot = current files only |
 | bundle | HarnessBundle | see below |
 | commit? | `{ sha, message: RedactedText }` | |
-| diffFromPrevious? | HarnessDiff | model/effort/permission changes, tools/skills/MCP added and removed, hooks changed, instruction byte delta |
+| diffFromPrevious? | HarnessDiff | model/effort/permission changes, tools/skills/MCP added and removed, hooks changed, settings changed (hash only), instruction byte delta |
 
 **HarnessBundle**: `model?`, `effort?`, `permissionMode?`, `entrypoint?`,
 `instructions[] { path, hash, bytes }` (CLAUDE.md chain, content not stored), `tools[]`, `skills[]`,

@@ -116,6 +116,10 @@ describe('bundles', () => {
     expect(d.modelChanged).toEqual({ from: 'claude-opus-5-5', to: 'claude-sonnet-5-5' });
     expect(d.instructionBytesDelta).toBe(-28000);
     expect(d.mcpAdded).toEqual(['linear']);
+    expect(d.settingsChanged).toBe(false);
+    expect(
+      diffBundles({ ...a, settingsHash: 'x' }, { ...a, settingsHash: 'y' }).settingsChanged,
+    ).toBe(true);
     expect(summarizeDiff(d)).toEqual([
       'model claude-opus-5-5 → claude-sonnet-5-5',
       'instructions −28,000 bytes',

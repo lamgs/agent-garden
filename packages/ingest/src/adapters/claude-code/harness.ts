@@ -142,6 +142,7 @@ export function diffBundles(prev: RawBundle, next: RawBundle): HarnessDiff {
     mcpAdded: added(prev.mcpServers, next.mcpServers),
     mcpRemoved: added(next.mcpServers, prev.mcpServers),
     hooksChanged: canonicalJson(prev.hooks) !== canonicalJson(next.hooks),
+    settingsChanged: (prev.settingsHash ?? '') !== (next.settingsHash ?? ''),
     instructionBytesDelta:
       next.instructions.reduce((n, i) => n + i.bytes, 0) -
       prev.instructions.reduce((n, i) => n + i.bytes, 0),
@@ -170,6 +171,7 @@ export function summarizeDiff(d: HarnessDiff): string[] {
       `instructions ${d.instructionBytesDelta > 0 ? '+' : '−'}${Math.abs(d.instructionBytesDelta).toLocaleString('en-US')} bytes`,
     );
   if (d.hooksChanged) out.push('hooks changed');
+  if (d.settingsChanged) out.push('settings changed');
   if (d.toolsAdded.length || d.toolsRemoved.length)
     out.push(`tools +${d.toolsAdded.length} −${d.toolsRemoved.length}`);
   if (d.skillsAdded.length || d.skillsRemoved.length)

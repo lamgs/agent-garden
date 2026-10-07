@@ -520,3 +520,29 @@ describe('gitHarnessHistory', () => {
     expect(ms).toBeLessThan(Math.max(8000, setupMs));
   }, 60_000);
 });
+
+describe('lenient frontmatter', () => {
+  it('reads unquoted ": " inside values (common in hand-written agent files)', async () => {
+    const { parseFrontmatter } = await import('./parse');
+    const warnings: string[] = [];
+    const fm = parseFrontmatter(
+      '---\nname: release-manager\ndescription: Prepares a release: bump, changelog, tag.\ntools: Read, Bash\n---\nbody',
+      'x.md',
+      warnings,
+    );
+    expect(fm).toEqual({
+      name: 'release-manager',
+      description: 'Prepares a release: bump, changelog, tag.',
+      tools: 'Read, Bash',
+    });
+    expect(warnings[0]).toMatch(/non-strict/);
+  });
+  it('still rejects frontmatter that is not flat key: value', async () => {
+    const { parseFrontmatter } = await import('./parse');
+    const warnings: string[] = [];
+    expect(
+      parseFrontmatter('---\nname: x: y\n  - [broken\n---\n', 'y.md', warnings),
+    ).toBeUndefined();
+    expect(warnings[0]).toMatch(/invalid YAML/);
+  });
+});

@@ -12,7 +12,8 @@
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "test": "vitest run",
-    "garden": "tsx --disable-warning=ExperimentalWarning packages/ingest/src/cli.ts"
+    "garden": "tsx --disable-warning=ExperimentalWarning packages/ingest/src/cli.ts",
+    "demo:data": "tsx scripts/demo/src/cli.ts --out .garden-demo && pnpm -s garden ingest --data .garden-demo/data --claude-home .garden-demo/home/.claude --claude-json .garden-demo/home/.claude.json --garden-yaml .garden-demo/garden.yaml"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",
