@@ -88,21 +88,22 @@ pnpm install
 pnpm typecheck        # tsc across workspaces
 pnpm lint             # eslint + prettier --check
 pnpm test             # vitest (unit + golden + redaction proof)
-pnpm build            # build all packages and the web app
-pnpm demo             # generate demo data, ingest it, serve at http://127.0.0.1:4310
-pnpm garden <cmd>     # CLI: inspect | ingest | serve | label | export
-pnpm e2e              # playwright screenshots of each view (uses /opt/pw-browsers if present)
+pnpm garden <cmd>     # CLI (M1: db:init; later: inspect | ingest | serve | label | export)
+# later milestones: pnpm build, pnpm demo (http://127.0.0.1:4310), pnpm e2e (playwright)
 ```
 
 ## Code style
 
-- TypeScript strict, ESM, named exports. No `any`. Use `unknown` plus a zod parse at IO boundaries.
+- TypeScript 6.0.x (typescript-eslint does not support 7.x yet), strict, ESM, named exports. No `any`. Use `unknown` plus a zod parse at IO boundaries.
 - Heuristics, encodings, and view-model builders are pure functions with unit tests.
 - Renderer: imperative PixiJS in `apps/web/src/garden`. React owns DOM chrome (panels, legend,
   router box, tables). Do not put per-frame state in React.
 - Colocate tests as `*.test.ts`. Golden fixtures live under `fixtures/`.
-- Schema changes update `packages/core` types, zod, the SQLite migration, and `docs/schema.md`
-  in the same commit.
+- Schema changes update `packages/core/src/schema.ts`, the SQLite migration, and `docs/schema.md`
+  in the same commit (`schema-doc.test.ts` enforces the doc). zod is for parsing raw inputs
+  (transcript lines, config files, API request bodies), not for internal entities.
+- Planted secrets in tests are assembled from fragments at runtime (`redact/planted-secrets.ts`).
+  Never write a literal secret-shaped string into the repo.
 
 ## Milestone protocol
 

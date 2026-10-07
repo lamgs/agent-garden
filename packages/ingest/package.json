@@ -1,0 +1,16 @@
+{
+  "name": "@garden/ingest",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "bin": {
+    "garden": "./src/cli.ts"
+  },
+  "dependencies": {
+    "@garden/core": "workspace:*",
+    "zod": "^4.6.5"
+  }
+}

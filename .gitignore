@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.tsbuild/
+coverage/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+.garden/
+test-results/
+playwright-report/

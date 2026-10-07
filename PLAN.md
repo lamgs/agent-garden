@@ -250,7 +250,7 @@ otherwise partial. No signal fired → `unknown`, which is excluded from rates a
 |---|---|---|
 | `tests_passed_after_last_edit` | +0.35 | A test command (configurable patterns: vitest, jest, pytest, go test, cargo test, …) ran after the last Edit/Write and returned without error |
 | `tests_failing_at_end` | −0.35 | The last test command in the run errored |
-| `clean_finish` | +0.15 | The final assistant message ended normally (`end_turn`), with no interrupt |
+| `clean_finish` | +0.10 | The final assistant message ended normally (`end_turn`), with no interrupt |
 | `errors_in_tail` | −0.20 | A tool or API error in the last 5 steps was never followed by a success of the same tool |
 | `user_retried` | −0.30 | The next human prompt came within 10 min and is a correction (lexicon + similarity ≥ 0.6 to the previous prompt), or the user interrupted |
 | `user_moved_on` | +0.10 | The next human prompt is an acknowledgement or a new topic (similarity < 0.3) |

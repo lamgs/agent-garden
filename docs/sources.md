@@ -106,6 +106,71 @@ error records, user interrupts.
   No `mcpServers` key was present here. **This file contains account identifiers. Ingestion reads only
   `mcpServers` / `projects.*.mcpServers` names and never stores other keys.**
 
-## Official documentation
+## Pricing [bundled claude-api skill reference, cached 2026-10-06]
 
-See the "Docs check" section below.
+Used for `packages/core/src/pricing.ts` (`PRICING_VERSION = '2026-10-06'`). Source: the Claude API
+reference bundled with Claude Code 2.1.293 ("Current Models" table and `shared/prompt-caching.md`).
+I did not fetch the live pricing page, so re-verify before quoting dollar figures externally.
+
+| Model | Input $/MTok | Output $/MTok | Cache read $/MTok | Context |
+|---|---|---|---|---|
+| claude-fable-5-1 | 10 | 50 | 0.25 | 1M |
+| claude-fable-5 | 10 | 50 | 1.00 | 1M |
+| claude-opus-5-5 | 4 | 20 | 0.20 | 1M |
+| claude-opus-5 / 4-8 / 4-7 / 4-6 | 5 | 25 | 0.50 (0.1×) | 1M |
+| claude-sonnet-5-5 / sonnet-5 | 2 | 10 | 0.20 | 1M |
+| claude-sonnet-4-6 | 3 | 15 | 0.30 (0.1×) | 1M |
+| claude-haiku-5-5 | 0.10 (≤100K prompt; 0.50 beyond) | 0.50 (2.50 beyond) | 0.01 (0.1×, assumed) | 1M |
+| claude-haiku-4-5 | 1 | 5 | 0.10 (0.1×) | 200K |
+
+- Cache writes: **1.25× input for the 5-minute TTL, 2× for the 1-hour TTL** (prompt-caching reference).
+- Cache reads are "~0.1× base input" except where stated per model (Fable 5.1 0.025×, Opus 5.5 0.05×).
+  Rows marked (0.1×) apply that default.
+- Not modeled yet: Haiku 5.5 long-prompt tier, fast mode ($8/$40 on Opus 5.5), batch discounts.
+  Users can override via `garden.yaml`.
+
+## Official documentation (docs check, 2026-10-07)
+
+A research subagent tried to verify the Claude Code file formats against the official docs. **The
+official docs sites (code.claude.com, docs.claude.com, platform.claude.com) were blocked by this
+container's network policy**, so its findings come from secondary sources. The tags give confidence:
+**[SDK]** Anthropic Agent SDK source (`claude-agent-sdk-python` types), **[CL]** `anthropics/claude-code`
+CHANGELOG.md, **[COM]** community/third-party, **[ND]** not documented anywhere reachable. Where these
+agree with **[observed]** facts above, the observation wins.
+
+- Transcript path: `~/.claude/projects/<cwd with non-alphanumerics → '->/<sessionId>.jsonl`. The
+  mapping is lossy, so always read `cwd` from the records [COM, consistent with observed].
+- Retention: `cleanupPeriodDays` (default 30) deletes inactive sessions at startup. Since v2.1.89, `0` is
+  a validation error [CL]. → Ingestion keeps history in `garden.db`, and the README should advise
+  raising retention.
+- Subagent transcripts: separate `subagents/agent-<agentId>.jsonl` + `.meta.json` [COM; matches observed].
+  The `SubagentStop` hook input has `agent_id`, `agent_transcript_path`, `agent_type` [SDK].
+- Compaction: a `system` record with `subtype: "compact_boundary"` [COM, cited in a v2.1.237 bug
+  report]. `isCompactSummary` / `compactMetadata` [COM only]. Official format [ND]. → Parser must
+  treat these as hypotheses until a real fixture exists.
+- Subagent definitions: `.claude/agents/*.md` (project), `~/.claude/agents/*.md` (user), plugin
+  `agents/*.md`. YAML frontmatter: `name`, `description` (required), `tools`, `disallowedTools`,
+  `model` (`sonnet|opus|haiku|<id>|inherit`), `permissionMode`, `maxTurns`, `skills`, `mcpServers`,
+  `hooks`, `memory`, `effort`, `background`, `isolation`, `color`, … [COM / docs search excerpts]. →
+  Parse `name`, `description`, `tools`, `model` and keep other keys as opaque metadata.
+- Skills: `~/.claude/skills/<name>/SKILL.md`, `.claude/skills/<name>/SKILL.md`, plugin `skills/`.
+  **Canonical identifier is the frontmatter `name`** (CHANGELOG v2.1.290 fixed lookup "by the name in
+  SKILL.md when their folder has a different name") [CL; matches observed name ≠ dir].
+- Settings precedence (highest first): managed > command line > local (`.claude/settings.local.json`)
+  > project (`.claude/settings.json`) > user (`~/.claude/settings.json`) [COM, consistent across sources].
+- Hooks shape: `{"hooks": {"<Event>": [{"matcher": "Write|Edit", "hooks": [{"type": "command",
+  "command": "...", "timeout": 60}]}]}}` [SDK + plugin docs]. Events include PreToolUse, PostToolUse,
+  PostToolUseFailure, UserPromptSubmit, Stop, SubagentStop, SubagentStart, PreCompact, Notification,
+  PermissionRequest, SessionStart, SessionEnd [SDK enum + plugin docs]. Handler types: `command`,
+  `prompt` (others unverified).
+- MCP: project `.mcp.json` `{"mcpServers": {name: {command, args, env}}}`. Local scope in
+  `~/.claude.json` `projects["<abs path>"].mcpServers`, user scope in `~/.claude.json` top-level
+  `mcpServers` [COM]. → Read server names only. `env` values are always redacted.
+- Hook input common fields: `session_id`, `transcript_path`, `cwd`, `permission_mode?`,
+  `hook_event_name`. Stop has `stop_hook_active` [SDK].
+- Entrypoints: `sdk-py` set by the Python Agent SDK [SDK]. `cli`, `sdk-cli` (for `claude -p`) [COM].
+  `remote_desktop` [observed]. `/loop` and cron markers in transcripts: [ND].
+- OpenTelemetry: `CLAUDE_CODE_ENABLE_TELEMETRY=1`. Metrics such as `claude_code.token.usage`,
+  `claude_code.cost.usage`, `claude_code.session.count`. Events such as `claude_code.api_request`,
+  `claude_code.tool_result`. Prompt text only with `OTEL_LOG_USER_PROMPTS=1` [COM, partly from docs
+  excerpts]. → Basis for a future OTel adapter.
