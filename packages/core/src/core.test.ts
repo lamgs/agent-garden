@@ -23,6 +23,7 @@ import {
 const plant = (over: Partial<PlantSummary> = {}): PlantSummary => ({
   id: 'p',
   agentId: 'a',
+  agentKind: 'main',
   bedId: 'b',
   name: 'main',
   runs: 10,
@@ -30,6 +31,8 @@ const plant = (over: Partial<PlantSummary> = {}): PlantSummary => ({
   recentFailureShare: 0.1,
   costPerRunUsd: 0.3,
   totalCostUsd: 3,
+  costEstimated: false,
+  unpricedRuns: 0,
   lastRunAt: null,
   staleDays: 2,
   skillIds: [],

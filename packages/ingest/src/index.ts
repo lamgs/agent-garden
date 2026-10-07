@@ -5,3 +5,7 @@ export * from './redact';
 export { Store, type FileState } from './store/store';
 export { MIGRATIONS } from './store/migrations';
 export { ClaudeCodeAdapter, type ClaudeCodeOptions } from './adapters/claude-code/adapter';
+export { deriveAll, promptFingerprint } from './store/derive';
+export { loadGardenConfig, type GardenConfig } from './adapters/claude-code/garden-yaml';
+export { similarity, isTestCommand } from './adapters/claude-code/outcomes';
+export { summarizeDiff } from './adapters/claude-code/harness';

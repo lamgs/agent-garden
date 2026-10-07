@@ -93,8 +93,9 @@ export const plantHue: Encoding<PlantSummary> = {
   element: 'plant',
   channel: 'Foliage color',
   metric: 'Median cost per run (USD)',
-  howComputed: 'Median of per-run cost; tokens deduped per API message × pricing table.',
-  action: 'Warm foliage is expensive per run. Consider a cheaper model or a tighter prompt.',
+  howComputed:
+    'Median of per-run cost; tokens deduped per API message × pricing table. Marked “estimated” when some runs only had stream-start usage.',
+  action: 'Darker foliage costs more per run. Consider a cheaper model or a tighter prompt.',
   levels: ['Unknown price', '< $0.05', '$0.05–0.25', '$0.25–1', '$1–5', '≥ $5'],
   level: (p) => (p.costPerRunUsd === null ? 0 : 1 + binIndex(p.costPerRunUsd, [0.05, 0.25, 1, 5])),
 };
@@ -104,7 +105,7 @@ export const SOIL_FAMILIES = ['fable', 'opus', 'sonnet', 'haiku', 'other'] as co
 export const bedTone: Encoding<BedSummary> = {
   id: 'bed.tone',
   element: 'bed',
-  channel: 'Soil tone',
+  channel: 'Bed edging color + label',
   metric: 'Model family of the current harness',
   howComputed: 'Most-used model in the current harness version.',
   action: 'Compare harnesses at a glance.',

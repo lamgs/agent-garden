@@ -38,6 +38,7 @@ export interface PlantSummary {
   /** Planting id: agent within bed. */
   id: ID;
   agentId: ID;
+  agentKind: 'main' | 'subagent';
   bedId: ID;
   name: string;
   runs: number;
@@ -46,6 +47,10 @@ export interface PlantSummary {
   recentFailureShare: number | null;
   costPerRunUsd: number | null;
   totalCostUsd: number | null;
+  /** Some runs have estimated output tokens (tokenQuality 'output_estimated'); label costs as estimates. */
+  costEstimated: boolean;
+  /** Runs whose model has no price; excluded from cost. */
+  unpricedRuns: number;
   lastRunAt: ISO | null;
   staleDays: number | null;
   skillIds: ID[];

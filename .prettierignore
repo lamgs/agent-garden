@@ -5,3 +5,4 @@ coverage
 *.md
 .claude/worktrees
 .garden-demo
+apps/web/src/fixtures/*.json

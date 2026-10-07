@@ -1,8 +1,17 @@
 {
   "files": [],
   "references": [
-    { "path": "packages/core" },
-    { "path": "packages/ingest" },
-    { "path": "scripts/demo" }
+    {
+      "path": "packages/core"
+    },
+    {
+      "path": "packages/ingest"
+    },
+    {
+      "path": "scripts/demo"
+    },
+    {
+      "path": "packages/server"
+    }
   ]
 }
