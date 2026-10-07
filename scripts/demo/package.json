@@ -1,0 +1,13 @@
+{
+  "name": "@garden/demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@garden/core": "workspace:*",
+    "yaml": "^2.9.1"
+  }
+}
