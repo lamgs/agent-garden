@@ -70,7 +70,10 @@ export interface LoopChannel {
   name: string;
   tier: LoopTier;
   targetPlantIds: ID[];
+  /** 0 when executions are not observed (see `observed`). */
   runsPerDay: number;
+  /** false for loops whose executions are not recorded in the data (e.g. configured hooks). */
+  observed: boolean;
   state: LoopState;
   evidence: string[];
 }

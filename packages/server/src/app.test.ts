@@ -1,4 +1,4 @@
-import { cpSync, mkdtempSync, rmSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { AddressInfo } from 'node:net';
@@ -76,5 +76,18 @@ describe('static export', () => {
       '/data/garden.json',
       '/data/legend.json',
     ]);
+  });
+  it('copies the web app and marks index.html as a static export', () => {
+    const web = join(dir, 'fake-dist');
+    mkdirSync(web, { recursive: true });
+    writeFileSync(
+      join(web, 'index.html'),
+      '<!doctype html><html><head><title>x</title></head></html>',
+    );
+    const out = join(dir, 'export2');
+    exportStatic({ store, webDist: web }, out);
+    expect(readFileSync(join(out, 'index.html'), 'utf8')).toContain(
+      'name="agent-garden-source" content="static"',
+    );
   });
 });

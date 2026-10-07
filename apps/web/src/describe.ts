@@ -9,6 +9,7 @@ import {
   beeCount,
   careCardSize,
   irrigationFlow,
+  irrigationObserved,
   irrigationState,
   plantBloom,
   plantDroop,
@@ -233,15 +234,21 @@ export function describe(view: GardenView, t: HoverTarget): Description | null {
             value: l.state,
             level: lv(irrigationState.levels, irrigationState.level(l)),
           },
-          {
-            label: 'Runs per day',
-            value: `${l.runsPerDay.toFixed(2)}/day`,
-            level: lv(irrigationFlow.levels, irrigationFlow.level(l)),
-          },
+          l.observed === false
+            ? {
+                label: 'Runs per day',
+                value: 'not recorded (configured hook)',
+                level: lv(irrigationObserved.levels, 1),
+              }
+            : {
+                label: 'Runs per day',
+                value: `${l.runsPerDay.toFixed(2)}/day`,
+                level: lv(irrigationFlow.levels, irrigationFlow.level(l)),
+              },
           { label: 'Waters', value: targets },
           ...l.evidence.map((e, i) => ({ label: i === 0 ? 'Evidence' : '', value: e })),
         ],
-        how: [irrigationFlow, irrigationState].map((e) => ({
+        how: [irrigationFlow, irrigationState, irrigationObserved].map((e) => ({
           channel: `${e.channel}: ${e.metric}`,
           text: e.howComputed,
         })),

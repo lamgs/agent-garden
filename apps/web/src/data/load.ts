@@ -57,7 +57,12 @@ export async function loadGarden(days: number, search = window.location.search):
       detail: 'synthetic, 500 plants',
     };
   }
-  const live = await attempt(`/api/garden?days=${days}`);
+  // `garden export` marks its index.html, so a static host never probes a non-existent /api.
+  const isStatic =
+    document.querySelector('meta[name="agent-garden-source"][content="static"]') !== null;
+  const live = isStatic
+    ? new Error('static export (no API)')
+    : await attempt(`/api/garden?days=${days}`);
   if (live instanceof Error === false) return { view: live, source: 'api', detail: `${days} days` };
   const exported = await attempt('./data/garden.json');
   if (exported instanceof Error === false)

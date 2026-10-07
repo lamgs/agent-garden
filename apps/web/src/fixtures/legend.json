@@ -157,6 +157,18 @@
   ]
  },
  {
+  "id": "irrigation.observed",
+  "element": "irrigation",
+  "channel": "Solid vs dotted channel",
+  "metric": "Whether loop executions are recorded",
+  "howComputed": "Dotted: the loop is configured (e.g. a settings.json hook) but its executions are not recorded in transcripts, so no flow rate is claimed.",
+  "action": "Dotted channels are wired but unmeasured. Check the hook itself if you rely on it.",
+  "levels": [
+   "Solid: executions recorded",
+   "Dotted: configured, not recorded"
+  ]
+ },
+ {
   "id": "bee.count",
   "element": "bee",
   "channel": "Bees on a path",

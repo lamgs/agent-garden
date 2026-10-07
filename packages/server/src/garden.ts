@@ -211,13 +211,16 @@ export function buildLoops(
         .filter((id) => plantIds.has(id));
     }
     let runsPerDay = runs.length / windowDays;
+    let observed = true;
     let state: LoopChannel['state'] = 'flowing';
 
     if (l.triggerKind === 'hook' && runs.length === 0) {
       const bedRuns = data.runs.filter((r) => l.targets.familyIds.includes(r.familyId)).length;
-      runsPerDay = bedRuns / windowDays;
+      runsPerDay = 0;
+      observed = false;
       evidence.push(
-        `Configured hook (${l.triggerDetail}). Individual executions are not recorded in transcripts, so flow = runs per day in the beds where it is active (an upper bound).`,
+        `Configured hook (${l.triggerDetail}). Its executions are not recorded in transcripts, so no flow rate is claimed. ` +
+          `Upper bound: at most ${(bedRuns / windowDays).toFixed(1)} runs/day happen in the beds where it is active.`,
       );
     } else {
       evidence.push(
@@ -269,6 +272,7 @@ export function buildLoops(
       tier: l.tier as LoopChannel['tier'],
       targetPlantIds: targets,
       runsPerDay,
+      observed,
       state,
       evidence,
     });

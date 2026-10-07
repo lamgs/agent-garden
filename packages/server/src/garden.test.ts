@@ -253,7 +253,9 @@ describe('loop health', () => {
       opts,
     ).loops[0]!;
     expect(l.state).toBe('flowing');
-    expect(l.evidence[0]).toMatch(/upper bound/);
+    expect(l.observed).toBe(false);
+    expect(l.runsPerDay).toBe(0);
+    expect(l.evidence[0]).toMatch(/Upper bound/);
   });
 });
 

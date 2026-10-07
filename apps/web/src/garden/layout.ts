@@ -1,7 +1,8 @@
 /**
- * Pure garden layout. Beds are allotment plots in a grid; every agent has ONE global slot index
- * (main first, then alphabetical) and occupies that slot in every bed, so the same agent sits in the
- * same place in each bed. Beds leave empty slots for agents they don't have.
+ * Pure garden layout. Beds are allotment plots in a grid. Agents planted in two or more beds get ONE
+ * global slot index (main first, then alphabetical) and occupy that slot in every bed, so the same
+ * agent sits in the same place wherever it grows (the cross-bed comparison). Agents unique to a bed
+ * pack in after the shared slots, so beds don't fill up with empty soil.
  */
 import { plantHeight, type GardenView, type ID, type PlantSummary } from '@garden/core';
 import { BED_FACE, STEM_LENGTH } from './draw';
@@ -130,6 +131,32 @@ export function agentOrder(plants: readonly PlantSummary[]): AgentSlot[] {
   return list.map((p, slot) => ({ agentId: p.agentId, name: p.name, slot }));
 }
 
+/**
+ * Slot per plant: shared agents (in ≥ 2 beds) keep their global shared index in every bed; agents
+ * unique to a bed follow, packed, in global order.
+ */
+export function plantSlots(plants: readonly PlantSummary[]): Map<ID, number> {
+  const bedsPerAgent = new Map<ID, Set<ID>>();
+  for (const p of plants)
+    bedsPerAgent.set(p.agentId, (bedsPerAgent.get(p.agentId) ?? new Set()).add(p.bedId));
+  const order = agentOrder(plants);
+  const shared = order.filter((a) => (bedsPerAgent.get(a.agentId)?.size ?? 0) >= 2);
+  const sharedIdx = new Map(shared.map((a, i) => [a.agentId, i]));
+  const rank = new Map(order.map((a) => [a.agentId, a.slot]));
+  const out = new Map<ID, number>();
+  const byBed = new Map<ID, PlantSummary[]>();
+  for (const p of plants) byBed.set(p.bedId, [...(byBed.get(p.bedId) ?? []), p]);
+  for (const ps of byBed.values()) {
+    let next = shared.length;
+    for (const p of [...ps].sort(
+      (a, b) => (rank.get(a.agentId) ?? 0) - (rank.get(b.agentId) ?? 0),
+    )) {
+      out.set(p.id, sharedIdx.get(p.agentId) ?? next++);
+    }
+  }
+  return out;
+}
+
 export function columnsFor(nAgents: number): number {
   return Math.max(
     1,
@@ -146,9 +173,9 @@ export function stemTop(p: PlantSummary): number {
 }
 
 export function computeLayout(view: GardenView): GardenLayout {
-  const agents = agentOrder(view.plants);
-  const slotOf = new Map(agents.map((a) => [a.agentId, a.slot]));
-  const cols = columnsFor(agents.length);
+  const slotOfPlant = plantSlots(view.plants);
+  const maxSlots = Math.max(1, ...slotOfPlant.values()) + 1;
+  const cols = columnsFor(maxSlots);
   const plantById = new Map(view.plants.map((p) => [p.id, p]));
   const plantsByBed = new Map<ID, PlantSummary[]>();
   for (const p of view.plants) {
@@ -164,7 +191,7 @@ export function computeLayout(view: GardenView): GardenLayout {
   const bedW = BED_PAD_X * 2 + cols * SLOT_W;
   const sizes = view.beds.map((b) => {
     const ps = plantsByBed.get(b.id) ?? [];
-    const maxSlot = ps.reduce((m, p) => Math.max(m, slotOf.get(p.agentId) ?? 0), 0);
+    const maxSlot = ps.reduce((m, p) => Math.max(m, slotOfPlant.get(p.id) ?? 0), 0);
     const rows = Math.max(1, Math.ceil((maxSlot + 1) / cols));
     const weeds = weedsByBed.get(b.id) ?? 0;
     const weedRows = weeds === 0 ? 0 : Math.ceil(weeds / Math.max(1, Math.floor((bedW - 40) / 20)));
@@ -224,10 +251,10 @@ export function computeLayout(view: GardenView): GardenLayout {
   const focusOrder: ID[] = [];
   for (const bed of beds) {
     const ps = [...(plantsByBed.get(bed.bedId) ?? [])].sort(
-      (a, b) => (slotOf.get(a.agentId) ?? 0) - (slotOf.get(b.agentId) ?? 0),
+      (a, b) => (slotOfPlant.get(a.id) ?? 0) - (slotOfPlant.get(b.id) ?? 0),
     );
     for (const p of ps) {
-      const slot = slotOf.get(p.agentId) ?? 0;
+      const slot = slotOfPlant.get(p.id) ?? 0;
       const col = slot % cols;
       const row = Math.floor(slot / cols);
       const x = bed.x + BED_PAD_X + col * SLOT_W + SLOT_W / 2;
@@ -375,7 +402,7 @@ export function computeLayout(view: GardenView): GardenLayout {
   const width = (compost ? compost.x + compost.w : gridRight) + MARGIN_RIGHT;
   const height = Math.max(y, compost ? compost.y + compost.h : 0) + MARGIN_BOTTOM;
   return {
-    agents,
+    agents: agentOrder(view.plants),
     cols,
     beds,
     plants,

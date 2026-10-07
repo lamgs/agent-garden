@@ -318,8 +318,9 @@ Every row exists in the encodings registry, and therefore in the legend.
 | Playbook | Stepping stones + gates | Gate open/closed from runs | — | Where the playbook breaks |
 | Season | Background tint band (Seasons view) | Harness version boundary | categorical | Correlate change with outcome |
 
-Layout rules: beds are allotment plots in a grid. **Each agent occupies the same slot in every bed**, so
-the same agent in two beds is in the same place in each and easy to compare. Semantic zoom: at the
+Layout rules: beds are allotment plots in a grid. **Every agent planted in two or more beds occupies the
+same slot in each of them**, so the same agent in two beds is easy to compare; agents unique to a bed
+pack in after the shared slots (changed in M3 to avoid beds of empty soil, see PROGRESS.md). Semantic zoom: at the
 far level beds show aggregate bloom, at the middle level individual plants, and at the near level labels and care cards.
 
 ---

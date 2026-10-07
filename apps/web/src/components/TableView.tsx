@@ -173,7 +173,7 @@ export function TableView({
                   <span className={`state state-${l.state}`}>{l.state}</span>
                 </td>
                 <td>
-                  {l.runsPerDay.toFixed(2)}/day{' '}
+                  {l.observed === false ? 'not recorded' : `${l.runsPerDay.toFixed(2)}/day`}{' '}
                   <span className="level-chip">
                     {irrigationFlow.levels[irrigationFlow.level(l)]}
                   </span>

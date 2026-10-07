@@ -47,7 +47,7 @@ export function PlantPanel({
             {loops.map((l) => (
               <li key={l.loopId}>
                 <span className={`state state-${l.state}`}>{l.state}</span> {l.name} ·{' '}
-                {l.runsPerDay.toFixed(2)}/day
+                {l.observed === false ? 'not recorded' : `${l.runsPerDay.toFixed(2)}/day`}
               </li>
             ))}
           </ul>

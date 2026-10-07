@@ -621,8 +621,20 @@ export function drawStone(pen: Pen, x: number, y: number, r: number): void {
 }
 
 /** Static channel for a loop by irrigation.flow and irrigation.state levels (0 flowing, 1 flooding, 2 dry). */
-export function drawChannel(pen: Pen, pts: Pt[], flowLevel: number, stateLevel: number): void {
+export function drawChannel(
+  pen: Pen,
+  pts: Pt[],
+  flowLevel: number,
+  stateLevel: number,
+  observed = true,
+): void {
   const w = CHANNEL_WIDTH[flowLevel] ?? CHANNEL_WIDTH[0];
+  if (!observed) {
+    // configured but unmeasured: a thin dotted water line, no flow claimed
+    dashPolyline(pen, pts, 2, 4);
+    pen.stroke({ color: WATER.flow, width: 1.6, alpha: 0.85, cap: 'round' });
+    return;
+  }
   if (stateLevel === 2) {
     // dry: an empty, cracked ditch with no water
     strokePolyline(pen, pts);

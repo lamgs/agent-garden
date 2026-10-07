@@ -90,6 +90,17 @@ export const SWATCHES: Record<string, Swatch> = {
       if (l > 0) drawIcon(pen, 62, -6, l === 1 ? 'flood' : 'dry');
     },
   },
+  'irrigation.observed': {
+    frame: { x: 0, y: -10, w: 64, h: 20 },
+    draw: (pen, l) => {
+      const pts = [
+        { x: 4, y: 0 },
+        { x: 60, y: 0 },
+      ];
+      drawChannel(pen, pts, 1, 0, l === 0);
+      if (l === 0) drawFlow(pen, pts, 1, 0);
+    },
+  },
   'bee.count': {
     frame: { x: 0, y: -22, w: 70, h: 30 },
     draw: (pen, l) => {

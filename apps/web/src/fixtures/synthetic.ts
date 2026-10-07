@@ -188,6 +188,7 @@ export function syntheticGarden(opts: { plants?: number; seed?: number } = {}): 
       tier: pick(['agent', 'verification', 'application', 'hill_climbing'] as const),
       targetPlantIds: targets,
       runsPerDay: Math.pow(10, -1.2 + rnd() * 2.2),
+      observed: true,
       state: states[l % states.length]!,
       evidence: ['Synthetic loop.'],
     });

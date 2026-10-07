@@ -378,7 +378,7 @@ export class GardenRenderer {
       const flow = irrigationFlow.level(loop);
       const state = irrigationState.level(loop);
       const g = new Graphics();
-      for (const path of route.paths) drawChannel(g, path, flow, state);
+      for (const path of route.paths) drawChannel(g, path, flow, state, loop.observed !== false);
       for (const s of route.sources) {
         g.circle(s.x, s.y, 4.5).fill({ color: state === 2 ? SOIL.fill : WATER.flow });
         g.stroke({ color: INK.primary, width: 1, alpha: 0.6 });
@@ -406,7 +406,8 @@ export class GardenRenderer {
         }
       }
       this.layers.water.addChild(box);
-      if (state !== 2) this.flowNodes.push({ paths: route.paths, level: flow });
+      if (state !== 2 && loop.observed !== false)
+        this.flowNodes.push({ paths: route.paths, level: flow });
 
       // Flooding: overflow puddle at each target + icon + label. Dry: icon + label.
       if (state > 0) {

@@ -7,7 +7,7 @@ Status log per milestone. A milestone is marked done only when its verification 
 | M0 Plan & conventions | ✅ done (approved 2026-10-07) | PLAN.md, CLAUDE.md, docs/sources.md |
 | M1 Contracts & foundations | ✅ done | 75 tests green, typecheck + lint clean; see below |
 | M2 Ingestion + demo data | ✅ done | 343 tests green; demo story gate + real-data ingest; see below |
-| M3 Server + Garden view | ⬜ not started | |
+| M3 Server + Garden view | ✅ done | 382 tests + 6 e2e green; screenshots in docs/screenshots/m3-*; see below |
 | M4 Plant + Bed views | ⬜ not started | |
 | M5 Time-lapse replay | ⬜ not started | |
 | M6 Router | ⬜ not started | |
@@ -151,3 +151,89 @@ Known gaps carried forward:
   tests do.
 - Loop health (flowing/flooding/dry) and weeds are view-level computations in M3, over the data
   verified above.
+
+## M3: Server + Garden view (2026-10-07)
+
+How it was built: I wrote the view-model layer, the local server, and the palette (validated with the
+dataviz validator, see docs/design.md), and exported a real demo GardenView as a fixture. A
+renderer subagent built `apps/web` against that fixture in a worktree. I then merged it, reviewed the
+screenshots against PLAN.md §8, and fixed what the review found.
+
+Done:
+- `packages/server`: SQL loaders plus a pure `buildGardenView`:
+  - Wilson-interval rates (partial = 0.5, unknown excluded, manual counted).
+  - Median cost per run with the `costEstimated` / `unpricedRuns` flags.
+  - Staleness and recent-failure share.
+  - Bees (subagent handoffs).
+  - Weeds: orphan or undescribed agents/skills, duplicate descriptions, and MCP servers connected but
+    never called (aggregated across beds).
+  - Loop health: flowing / flooding (a day ≥ max(4, 3× baseline)) / dry (3× the expected interval).
+  - Playbook gates (step_success, tests_pass, command_ok, manual).
+- Hono app on **127.0.0.1 only** with a strict CSP (no remote origins, no eval). `/api/garden`,
+  `/api/legend`, `/api/health`, and SPA static serving.
+- `garden serve` (with `--as-of` for the demo) and `garden export` (static site; marks index.html so
+  the app reads `data/` without probing `/api`). `pnpm demo` is one command: build + data + serve.
+- `apps/web` (React 19 + Vite 8 + PixiJS 8 imperative renderer):
+  - Procedural ink-line plants cached by genotype (the tuple of encoding levels).
+  - Allotment beds with edging color + direct label, soil texture, and strata.
+  - Seed packets, irrigation channels, bees, weeds, playbook stepping stones with gates.
+  - Semantic zoom (far/mid/near), pan, keyboard focus, hover tooltips with "How computed", plant side panel.
+  - Legend drawer generated from the registry, with swatches drawn by the garden's own code.
+  - Table view, reduced-motion support.
+
+Verification:
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm test`: 382 tests, all green.
+- [x] `pnpm e2e`: 6 Playwright tests against the built app served with the production CSP: no console
+  errors, no CSP violations, no request to any host but 127.0.0.1; legend lists every registry
+  entry; reduced motion freezes ambient animation.
+- [x] Screenshots checked by me against §8: `docs/screenshots/m3-garden-{far,mid,near}.png`,
+  `m3-legend.png`, `m3-table.png`, `m3-tooltip.png`, `m3-live-api.png`, `m3-synthetic500.png`.
+
+| §8 row | Where visible | Result |
+|---|---|---|
+| Plant height = runs | mid/near (main tall, release-manager a seedling); legend | ✅ |
+| Bloom = success (hollow bud n<5) | flowers at mid/near; far view pools per bed (legacy-monolith 2 blooms, 43%) | ✅ |
+| Droop = 14-day failure share | legacy-monolith test-writer bends over; tooltip "Drooping (≥50%)" | ✅ |
+| Fade = days since last run | straw foliage + brown tips on stale plants | ✅ |
+| Foliage = median cost/run | validated green ramp; hatched when unpriced; "estimated" in tooltip/table | ✅ |
+| Bed edging + label = model family | `legacy-monolith · opus 5.5 · xhigh` at every zoom | ✅ |
+| Soil texture / strata = tools / CLAUDE.md size | speck density; strata on bed face (legacy has 3) | ✅ (strata subtle) |
+| Care cards = skill invocations | seed packets at near, max 3 + "+n" | ✅ |
+| Irrigation flow / state | solid animated water for recorded loops; flooding puddle + ⚠ label; dry cracked ditch + label | ✅ |
+| Irrigation observed (new) | configured hooks drawn thin and dotted; no rate claimed | ✅ |
+| Bees = subagent calls | 1–3 bees on arcs parent → child | ✅ |
+| Weeds | legacy bed corner + compost corner; reasons on hover | ✅ |
+| Playbook gates | shop-api: changelog ✓, tests ×, tag ? (not reached) | ✅ |
+| Season band | Seasons view (M7) | n/a in M3 |
+| Ambient sway | legend: "ambient, no meaning"; off under reduced motion | ✅ |
+- [x] Encodings registry ↔ legend: unit test plus e2e count, both derived from the registry.
+- [x] Bind address: test asserts `server.address()` is 127.0.0.1. Live check: `garden serve` sends the CSP header.
+- [x] No external URLs: `build-output.test.ts` scans `dist` (allowlist of inert namespace/doc strings).
+  A negative control with a planted CDN URL fails it. CI now builds before testing.
+- [x] Live end-to-end in Chromium against `garden serve` (demo store): 25 plants, "live API · 90 days",
+  0 console errors, 0 remote page requests. Static export served from a plain file server: 25 plants,
+  0 errors, no `/api` probe, 0 remote requests.
+- [x] Perf smoke (500 synthetic plants, headless SwiftShader, 1440×900): our CPU work ≈ 8 ms/frame
+  avg (p95 18 ms); frames ≈ 90 ms apart, bound by the software GPU (a blank page runs at 60 fps).
+  296 cached textures. A smoke check, not a gate; a real GPU is needed for true numbers.
+
+Found in review and fixed:
+- Configured hooks drew the widest channels from an upper-bound proxy rate, so they dominated the
+  view while the real flooding loop looked minor. Added `LoopChannel.observed` and the
+  `irrigation.observed` encoding: unrecorded loops claim no rate and are drawn thin and dotted. The
+  proxy appears only in the evidence text.
+- Global fixed slots for ~14 agents left beds mostly empty soil. Agents planted in ≥ 2 beds keep a
+  fixed slot (cross-bed comparison preserved, test enforced); bed-only agents pack after them.
+  **This narrows PLAN §8's "each agent in the same slot in every bed" to shared agents**, which
+  are the only ones a cross-bed comparison applies to.
+- The builder's dry-loop check used the array's last run instead of the latest one.
+- Static exports logged a 404 probing `/api`. Exports now mark their index.html.
+
+Known gaps:
+- Beds are still roomy where a bed lacks several shared agents. Plants are small at "fit" on a laptop.
+- At mid zoom, playbook gates and the compost corner are small (fine at near).
+- Hover needs a pointer move to trigger (a Pixi pointer-events detail).
+- In this container the Chromium binary itself attempts Google background connections (blocked by the
+  proxy) even with background networking disabled. Page-level requests are 0, which is what the
+  app controls and what the e2e test asserts.
+- Real-GPU performance is unmeasured here.

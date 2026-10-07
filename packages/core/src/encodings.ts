@@ -158,6 +158,18 @@ export const irrigationFlow: Encoding<LoopChannel> = {
   level: (l) => binIndex(l.runsPerDay, [0.2, 1, 5]),
 };
 
+export const irrigationObserved: Encoding<LoopChannel> = {
+  id: 'irrigation.observed',
+  element: 'irrigation',
+  channel: 'Solid vs dotted channel',
+  metric: 'Whether loop executions are recorded',
+  howComputed:
+    'Dotted: the loop is configured (e.g. a settings.json hook) but its executions are not recorded in transcripts, so no flow rate is claimed.',
+  action: 'Dotted channels are wired but unmeasured. Check the hook itself if you rely on it.',
+  levels: ['Solid: executions recorded', 'Dotted: configured, not recorded'],
+  level: (l) => (l.observed ? 0 : 1),
+};
+
 const LOOP_STATES = ['flowing', 'flooding', 'dry'] as const;
 export const irrigationState: Encoding<LoopChannel> = {
   id: 'irrigation.state',
@@ -242,6 +254,7 @@ export const ENCODINGS = [
   careCardSize,
   irrigationFlow,
   irrigationState,
+  irrigationObserved,
   beeCount,
   weedKind,
   playbookGate,

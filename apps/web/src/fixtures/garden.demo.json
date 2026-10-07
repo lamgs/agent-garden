@@ -854,6 +854,7 @@
     "plt_32694e53104271b2"
    ],
    "runsPerDay": 1.4333333333333333,
+   "observed": true,
    "state": "flooding",
    "evidence": [
     "129 runs in the window (1.43/day), inferred loop, trigger headless_repeat.",
@@ -902,10 +903,11 @@
     "plt_6598b12d6125172a",
     "plt_6598b12d6125172a"
    ],
-   "runsPerDay": 22.677777777777777,
+   "runsPerDay": 0,
+   "observed": false,
    "state": "flowing",
    "evidence": [
-    "Configured hook (user PostToolUse matcher=Edit|Write (command)). Individual executions are not recorded in transcripts, so flow = runs per day in the beds where it is active (an upper bound)."
+    "Configured hook (user PostToolUse matcher=Edit|Write (command)). Its executions are not recorded in transcripts, so no flow rate is claimed. Upper bound: at most 22.7 runs/day happen in the beds where it is active."
    ]
   },
   {
@@ -920,10 +922,11 @@
     "plt_ff3cf3eb8c753cda",
     "plt_ff3cf3eb8c753cda"
    ],
-   "runsPerDay": 8.033333333333333,
+   "runsPerDay": 0,
+   "observed": false,
    "state": "flowing",
    "evidence": [
-    "Configured hook (project PostToolUse matcher=Edit|Write (command)). Individual executions are not recorded in transcripts, so flow = runs per day in the beds where it is active (an upper bound)."
+    "Configured hook (project PostToolUse matcher=Edit|Write (command)). Its executions are not recorded in transcripts, so no flow rate is claimed. Upper bound: at most 8.0 runs/day happen in the beds where it is active."
    ]
   },
   {
@@ -934,6 +937,7 @@
     "plt_7f307d08a4720190"
    ],
    "runsPerDay": 0.08888888888888889,
+   "observed": true,
    "state": "dry",
    "evidence": [
     "8 runs in the window (0.09/day), declared loop, trigger cron.",
@@ -948,6 +952,7 @@
     "plt_ff3cf3eb8c753cda"
    ],
    "runsPerDay": 1,
+   "observed": true,
    "state": "flowing",
    "evidence": [
     "90 runs in the window (1.00/day), declared loop, trigger cron."

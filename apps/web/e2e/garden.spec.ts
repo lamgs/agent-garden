@@ -1,3 +1,4 @@
+import { ENCODINGS } from '@garden/core';
 import { resolve } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 
@@ -90,7 +91,7 @@ test('legend (L) lists every encoding with swatches; table (T) shows the same nu
   await page.keyboard.press('l');
   const legend = page.getByRole('complementary', { name: 'Legend' });
   await expect(legend).toBeVisible();
-  expect(await legend.locator('[data-encoding-id]').count()).toBe(16);
+  expect(await legend.locator('[data-encoding-id]').count()).toBe(ENCODINGS.length);
   await expect(legend).toContainText('ambient, no meaning');
   await page.waitForTimeout(300);
   await page.screenshot({ path: `${SHOTS}/m3-legend.png` });
