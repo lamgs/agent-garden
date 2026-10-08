@@ -81,6 +81,8 @@ export interface RendererCallbacks {
   onSelect: (t: HoverTarget) => void;
   onZoomLevel: (z: ZoomLevel) => void;
   onCamera: () => void;
+  /** A bed's label plaque was clicked (opens the "Compare beds" picker). */
+  onBedLabel?: (bedId: ID) => void;
 }
 
 const FONT_UI = '"Source Sans 3", "Source Sans Pro", system-ui, sans-serif';
@@ -141,6 +143,7 @@ export class GardenRenderer {
   private frameStart = 0;
   private time = 0;
   private destroyed = false;
+  private plaqueByBed = new Map<ID, Container>();
   private cleanup: (() => void)[] = [];
 
   constructor(private readonly cb: RendererCallbacks) {}
@@ -259,6 +262,7 @@ export class GardenRenderer {
     this.beeNodes = [];
     this.flowNodes = [];
     this.counterScaled = [];
+    this.plaqueByBed.clear();
     this.buildBeds(view, layout);
     this.buildWater(view, layout);
     this.buildPlaybooks(view, layout);
@@ -345,6 +349,11 @@ export class GardenRenderer {
       label.position.set(23, 1.5);
       plaque.addChild(bg, chip, label);
       plaque.position.set(bp.x + 12, bp.y + bp.h - BED_FACE - 1);
+      this.interactive(plaque, { kind: 'bed', id: bed.id });
+      plaque.on('pointertap', () => {
+        if (!this.dragMoved) this.cb.onBedLabel?.(bed.id);
+      });
+      this.plaqueByBed.set(bed.id, plaque);
       this.layers.plaques.addChild(plaque);
       this.counterScaled.push({ obj: plaque, base: 0.95, max: 1.5 });
     }
@@ -769,6 +778,14 @@ export class GardenRenderer {
     if (far || !r || r.x < 20 || r.y < 20 || r.x + r.w > w - 20 || r.y + r.h > h - 20) {
       this.centerOn(pp.x, pp.y - 40, far ? ZOOM_SCALE.mid : this.scale);
     }
+  }
+
+  /** Center of a bed's label plaque in canvas (CSS px) coordinates, if visible. */
+  bedLabelScreenPoint(id: ID): { x: number; y: number } | null {
+    const plaque = this.plaqueByBed.get(id);
+    if (!plaque || !plaque.visible || !this.layers.plaques.visible) return null;
+    const b = plaque.getBounds();
+    return { x: b.x + b.width / 2, y: b.y + b.height / 2 };
   }
 
   /** Plant bounds in canvas (CSS px) coordinates. */

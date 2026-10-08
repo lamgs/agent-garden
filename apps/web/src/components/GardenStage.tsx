@@ -25,6 +25,8 @@ export interface GardenTestApi {
     agentName: string,
     level?: ZoomLevel,
   ): { x: number; y: number } | null;
+  /** Client point of a bed's label plaque (by bed name), or null when hidden. */
+  bedLabelPoint(bedName: string): { x: number; y: number } | null;
 }
 
 declare global {
@@ -44,10 +46,11 @@ interface Props {
   selectedId: ID | null;
   onSelect: (id: ID) => void;
   onZoomLevel: (z: ZoomLevel) => void;
+  onBedLabel: (bedId: ID) => void;
 }
 
 export const GardenStage = forwardRef<GardenStageHandle, Props>(function GardenStage(
-  { view, selectedId, onSelect, onZoomLevel },
+  { view, selectedId, onSelect, onZoomLevel, onBedLabel },
   ref,
 ) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -57,8 +60,8 @@ export const GardenStage = forwardRef<GardenStageHandle, Props>(function GardenS
   const focusedRef = useRef<ID | null>(null);
   const [ready, setReady] = useState(false);
   const [hover, setHover] = useState<HoverTarget | null>(null);
-  const cbRef = useRef({ onSelect, onZoomLevel });
-  cbRef.current = { onSelect, onZoomLevel };
+  const cbRef = useRef({ onSelect, onZoomLevel, onBedLabel });
+  cbRef.current = { onSelect, onZoomLevel, onBedLabel };
 
   const placeRing = () => {
     const r = rendererRef.current;
@@ -105,6 +108,7 @@ export const GardenStage = forwardRef<GardenStageHandle, Props>(function GardenS
       },
       onZoomLevel: (z) => cbRef.current.onZoomLevel(z),
       onCamera: placeRing,
+      onBedLabel: (id) => cbRef.current.onBedLabel(id),
     });
     rendererRef.current = r;
     const fontsReady = document.fonts?.ready ?? Promise.resolve();
@@ -157,6 +161,13 @@ export const GardenStage = forwardRef<GardenStageHandle, Props>(function GardenS
         const rect = r.plantScreenRect(p!.id)!;
         const hr = hostRef.current!.getBoundingClientRect();
         return { x: hr.left + rect.x + rect.w / 2, y: hr.top + rect.y + rect.h * 0.45 };
+      },
+      bedLabelPoint: (bedName) => {
+        const bed = view.beds.find((b) => b.name === bedName);
+        const pt = bed ? r.bedLabelScreenPoint(bed.id) : null;
+        if (!pt) return null;
+        const hr = hostRef.current!.getBoundingClientRect();
+        return { x: hr.left + pt.x, y: hr.top + pt.y };
       },
     };
   }, [ready, view]);
