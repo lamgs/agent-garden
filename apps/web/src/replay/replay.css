@@ -1,0 +1,204 @@
+/* M5 replay page. Same paper, ink, and palette vars as styles.css / pages.css. */
+.replay-head {
+  margin-bottom: 12px;
+}
+.replay-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1.2;
+  margin: 2px 0 6px;
+}
+.replay-facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13.5px;
+}
+.replay-timeline {
+  border: 1px solid rgb(43 42 38 / 0.18);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.22);
+  padding: 10px 0 12px;
+  margin-bottom: 16px;
+}
+.replay-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 0 18px 8px;
+  font-size: 13px;
+}
+.replay-controls button {
+  font: inherit;
+  border: 1px solid rgb(43 42 38 / 0.3);
+  background: var(--paper);
+  border-radius: 5px;
+  padding: 3px 10px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.replay-controls button.play {
+  min-width: 82px;
+  font-weight: 600;
+}
+.replay-controls button.on {
+  background: var(--ink);
+  color: var(--paper);
+}
+.replay-controls .speeds {
+  display: inline-flex;
+  gap: 2px;
+}
+.replay-controls .clock {
+  margin-left: 8px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.replay-controls .compress-note {
+  margin-left: auto;
+  color: var(--ink-3);
+  font-style: italic;
+}
+.replay-stage {
+  position: relative;
+}
+.replay-stage canvas {
+  display: block;
+  cursor: pointer;
+}
+.lane-label,
+.band-label {
+  position: absolute;
+  left: 10px;
+  width: 172px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.band-label {
+  flex-direction: column;
+  gap: 0;
+  padding-left: 8px;
+  color: var(--ink-2);
+}
+.lane-label .lane-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lane-label.depth-0 .lane-name {
+  font-family: var(--serif);
+  font-size: 15px;
+}
+.lane-meta {
+  color: var(--ink-3);
+  font-size: 11.5px;
+}
+.lane-err {
+  color: var(--critical);
+}
+.lane-toggle {
+  font: inherit;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  gap: 4px;
+  min-width: 0;
+}
+.scrubber {
+  display: block;
+  margin-top: 2px;
+  accent-color: var(--ink);
+}
+.replay-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 16px;
+}
+.step-label {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 18px;
+  margin: 4px 0 10px;
+  overflow-wrap: anywhere;
+}
+.step-label.is-error,
+dd.is-error,
+.err-glyph {
+  color: var(--critical);
+}
+.step-facts dd [data-tip],
+.step-facts dd[data-tip] {
+  text-decoration: underline dotted var(--ink-3);
+  text-underline-offset: 3px;
+  cursor: help;
+}
+.linkish {
+  font: inherit;
+  border: 0;
+  background: none;
+  padding: 0;
+  text-decoration: underline;
+  color: var(--ink);
+  cursor: pointer;
+}
+.gauge {
+  position: relative;
+  height: 18px;
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+  background: var(--paper);
+  margin: 6px 0 8px;
+}
+.gauge-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  opacity: 0.8;
+}
+.gauge-mark,
+.gauge-peak {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 0;
+  border-left: 1px dashed var(--ink-3);
+}
+.gauge-mark.m50 {
+  left: 50%;
+}
+.gauge-mark.m80 {
+  left: 80%;
+}
+.gauge-peak {
+  border-left: 2px solid var(--ink);
+}
+.gauge-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+  margin: 0 0 8px;
+}
+.replay-btn {
+  font: inherit;
+  font-size: 12px;
+  border: 1px solid rgb(43 42 38 / 0.3);
+  border-radius: 4px;
+  padding: 1px 7px;
+  background: var(--paper);
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}

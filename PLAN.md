@@ -3,7 +3,7 @@
 > "See every AI agent you run as a living garden: what's thriving, what's wilting, and which one to call."
 > Prompts are seeds. Harnesses are soil. Loops are seasons.
 
-Status: **M0 (this plan), waiting for approval.** No application code is written until you approve.
+Status: approved 2026-10-07; M0–M4 done. Direction changes from 2026-10-08 are in §10a.
 Verified external facts are in [`docs/sources.md`](docs/sources.md). Conventions are in [`CLAUDE.md`](CLAUDE.md).
 
 ---
@@ -353,7 +353,15 @@ far level beds show aggregate bloom, at the middle level individual plants, and 
 | M5 | Time-lapse replay | Replay builder; growth animation (leaf per tool call, brown leaf per error, pruning per compaction, runners for subagent forks, context gauge); scrubber + step panel | Deterministic builder tests. Context-fill values equal the deduped usage math. Screenshots at start/middle/end for a demo run and for this container's real session |
 | M6 | Router | `Embedder` interface (TF-IDF+LSA default, MiniLM opt-in), BM25, outcome kNN, confidence, reasons, garden highlight | Eval: top-3 ≥ 80% on the demo query set. Ablation table. Screenshot |
 | M7 | Seasons v1 | Season segmentation (git + observed), per-season metrics with Wilson intervals, harness diff summaries, scrub-to-date garden | Segmentation and attribution tests. Numbers cross-checked against direct SQL. Screenshot with a visible before/after |
+| L | Live layer | Transcript tailer (no settings changes), live state machine with inference evidence, SSE `/api/live/stream`, deterministic demo live source | Tailer and reducer tests; planted secrets absent from every SSE payload; measured line → event latency on real data |
+| K | Knowledge map | Where each run's knowledge comes from: CLAUDE.md chain, `@` imports, rules, MEMORY.md and memory files, skills; always-loaded vs on-demand budgets; bloat and provenance checks shown as weeds | Format facts verified in docs/sources.md; redaction proof covers instruction files; screenshot |
 | M8 | Deliverables & polish | README (one-liner, GIF, ≤ 5-command setup), docs/PRD.md, docs/demo-script.md, docs/schema.md (final), docs/sources.md; fresh-clone check; optional static hosted demo | Script clones into a temp dir, runs the README commands, and confirms the server responds and the garden renders. All tests and the build green |
+
+## 10a. Direction decisions (2026-10-08)
+
+- **Live, but not a pixel office.** The user likes seeing agents work in real time (as in Pixel Agents), not the office imagery. The live layer (L) is identity-neutral; the garden keeps its imagery, and the replay stage is an abstract timeline rather than a growing plant. Research: docs/research/visual-identity.md, docs/research/live-signals.md.
+- **Time matters more than place.** Tracking and verifying what was built over time is the priority. Seasons (M7) and replay (M5) carry this; a fuller time-axis view is a candidate after M8, mocked up before it is built.
+- **No central "playbook vault".** Playbook keeps its v1 meaning (gated skill chains in `garden.yaml`). Knowledge efficiency is handled by milestone K instead: CLAUDE.md per project, mapped to the right memory files, with clear provenance and bloat checks.
 
 **Parallel workstreams after M1.** Subagents work in isolated worktrees and code only against the M1 contracts:
 A) Claude Code adapter, B) demo generator, C) Pixi renderer against fixture view-contract JSON,

@@ -9,3 +9,4 @@ export { deriveAll, promptFingerprint } from './store/derive';
 export { loadGardenConfig, type GardenConfig } from './adapters/claude-code/garden-yaml';
 export { similarity, isTestCommand } from './adapters/claude-code/outcomes';
 export { summarizeDiff } from './adapters/claude-code/harness';
+export * from './live';

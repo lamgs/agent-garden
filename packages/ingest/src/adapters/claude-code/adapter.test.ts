@@ -37,6 +37,17 @@ describe('canonicalProjectRoot', () => {
     expect(canonicalProjectRoot(join(repo, 'src'))).toBe(repo);
     expect(canonicalProjectRoot(join(dir, 'not-a-repo-' + Date.now()))).toMatch(/not-a-repo/);
   });
+  it('keeps an independent repo nested under a worktree path as its own project', () => {
+    // e.g. demo projects generated inside `.claude/worktrees/<name>/.garden-demo/`
+    const nested = join(dir, 'outer', '.claude', 'worktrees', 'agent-9', 'demo', 'shop-api');
+    mkdirSync(nested, { recursive: true });
+    git(nested, 'init', '-q');
+    writeFileSync(join(nested, 'README.md'), 'x');
+    git(nested, 'add', '.');
+    git(nested, 'commit', '-qm', 'init');
+    expect(canonicalProjectRoot(nested)).toBe(nested);
+    expect(canonicalProjectRoot(join(nested, 'src'))).toBe(join(dir, 'outer'));
+  });
 });
 
 describe('ClaudeCodeAdapter end to end (synthetic fixtures)', () => {

@@ -8,6 +8,8 @@
  *   #/replant?agent=&from=&to=          replant
  *   #/seasons/:bedId                    seasons of a bed
  *   #/?asOf=<ISO>                       the garden as of a past date (scrub-to-date)
+ *   #/replay/:runId                     time-lapse replay of one run
+ *   #/replay?plant=<plantId>            replay of a plant's latest run
  */
 import type { ID, ISO } from '@garden/core';
 
@@ -17,6 +19,7 @@ export type Route =
   | { view: 'plant'; plantId: ID }
   | { view: 'compare'; left: ID; right: ID }
   | { view: 'replant'; agent: ID; from: ID; to: ID }
+  | { view: 'replay'; runId: ID | null; plantId: ID | null }
   | { view: 'unknown'; hash: string };
 
 export function parseRoute(hash: string): Route {
@@ -47,6 +50,12 @@ export function parseRoute(hash: string): Route {
     const to = q.get('to');
     if (agent && from && to) return { view: 'replant', agent, from, to };
   }
+  if (parts[0] === 'replay' && parts.length === 2 && parts[1]) {
+    return { view: 'replay', runId: decodeURIComponent(parts[1]), plantId: null };
+  }
+  if (parts[0] === 'replay' && parts.length === 1 && q.get('plant')) {
+    return { view: 'replay', runId: null, plantId: q.get('plant') };
+  }
   return { view: 'unknown', hash: raw };
 }
 
@@ -62,6 +71,10 @@ export function formatRoute(r: Route): string {
       return `#/compare?${new URLSearchParams({ left: r.left, right: r.right }).toString()}`;
     case 'replant':
       return `#/replant?${new URLSearchParams({ agent: r.agent, from: r.from, to: r.to }).toString()}`;
+    case 'replay':
+      return r.runId
+        ? `#/replay/${encodeURIComponent(r.runId)}`
+        : `#/replay?${new URLSearchParams({ plant: r.plantId ?? '' }).toString()}`;
     case 'unknown':
       return `#${r.hash}`;
   }
@@ -73,6 +86,9 @@ export const replantHref = (agent: ID, from: ID, to: ID) =>
   formatRoute({ view: 'replant', agent, from, to });
 export const seasonsHref = (bedId: ID) => formatRoute({ view: 'seasons', bedId });
 export const gardenAsOfHref = (asOf: ISO) => formatRoute({ view: 'garden', asOf });
+export const replayHref = (runId: ID) => formatRoute({ view: 'replay', runId, plantId: null });
+export const latestReplayHref = (plantId: ID) =>
+  formatRoute({ view: 'replay', runId: null, plantId });
 
 /** Navigate by setting the hash: the browser records history, so back/forward just work. */
 export function navigate(r: Route | string): void {

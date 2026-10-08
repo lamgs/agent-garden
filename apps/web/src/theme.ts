@@ -1,5 +1,5 @@
 /** Exposes the validated palette (packages/core palette.ts) to CSS as custom properties. */
-import { BLOOM, INK, PAPER, SOIL, STATUS, WATER } from '@garden/core';
+import { BLOOM, HIGHLIGHT, INK, PAPER, SOIL, STATUS, WATER } from '@garden/core';
 import { hexToRgb } from './garden/color';
 import { mulberry32 } from './garden/draw';
 
@@ -18,6 +18,7 @@ export const CSS_VARS: Record<string, string> = {
   '--serious': STATUS.serious,
   '--critical': STATUS.critical,
   '--petal': BLOOM.petal,
+  '--glow': HIGHLIGHT.glow,
 };
 
 /** Subtle paper grain: deterministic ink-colored noise rendered once into a data URL. */

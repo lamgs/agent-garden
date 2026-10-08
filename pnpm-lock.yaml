@@ -84,6 +84,12 @@ importers:
         specifier: ^4.6.5
         version: 4.6.5
 
+  packages/router:
+    dependencies:
+      '@garden/core':
+        specifier: workspace:*
+        version: link:../core
+
   packages/server:
     dependencies:
       '@garden/core':
@@ -92,6 +98,9 @@ importers:
       '@garden/ingest':
         specifier: workspace:*
         version: link:../ingest
+      '@garden/router':
+        specifier: workspace:*
+        version: link:../router
       '@hono/node-server':
         specifier: ^2.1.3
         version: 2.1.3(hono@4.13.13)
@@ -101,6 +110,10 @@ importers:
       zod:
         specifier: ^4.6.5
         version: 4.6.5
+    devDependencies:
+      '@garden/demo':
+        specifier: workspace:*
+        version: link:../../scripts/demo
 
   scripts/demo:
     dependencies:

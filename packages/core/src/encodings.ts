@@ -4,18 +4,30 @@
  * cannot be drawn without a legend entry. See PLAN.md §8.
  */
 import { modelFamily } from './pricing';
+import type { StepKind } from './schema';
 import type {
   BedSummary,
   BeeFlow,
   GateState,
   LoopChannel,
   PlantSummary,
+  ReplayFrame,
   SkillCard,
   WeedKind,
 } from './views';
 
 export type GardenElement =
-  'plant' | 'bed' | 'care_card' | 'irrigation' | 'bee' | 'weed' | 'playbook' | 'season' | 'ambient';
+  | 'plant'
+  | 'bed'
+  | 'care_card'
+  | 'irrigation'
+  | 'bee'
+  | 'weed'
+  | 'playbook'
+  | 'season'
+  | 'replay'
+  | 'router'
+  | 'ambient';
 
 export interface Encoding<I> {
   id: string;
@@ -250,6 +262,143 @@ export const seasonRate: Encoding<{ success: { n: number } }> = {
   level: (s) => (s.success.n >= MIN_RUNS_FOR_BLOOM ? 0 : 1),
 };
 
+// ---- replay (time-lapse of one run, M5) -------------------------------------------------------
+
+/** Mark shape per step kind group; index = level of `replayMarkShape`. */
+export const REPLAY_SHAPE_KINDS: readonly (readonly StepKind[])[] = [
+  ['tool_call'],
+  ['tool_result'],
+  ['thinking'],
+  ['user_message', 'assistant_message'],
+  ['subagent_spawn', 'subagent_return'],
+  ['hook', 'error', 'compaction'],
+];
+
+export const replayMarkShape: Encoding<Pick<ReplayFrame, 'kind'>> = {
+  id: 'replay.mark_shape',
+  element: 'replay',
+  channel: 'Step mark shape (and its row in the lane)',
+  metric: 'Step kind',
+  howComputed:
+    'One mark per stored step, placed at the step’s timestamp. Calls sit above the lane line, results below it, thinking and messages on it.',
+  action:
+    'Long stretches of thinking or many results with no new calls: look at what the agent was stuck on.',
+  levels: [
+    'Filled dot: tool call',
+    'Ring: tool result',
+    'Diamond: thinking (length only, never text)',
+    'Square: prompt or reply',
+    'Triangle: subagent spawn / return',
+    'Tick: hook or other',
+  ],
+  level: (f) =>
+    Math.max(
+      0,
+      REPLAY_SHAPE_KINDS.findIndex((g) => g.includes(f.kind)),
+    ),
+};
+
+const REPLAY_CATEGORIES = ['builtin', 'mcp', 'skill', 'subagent'] as const;
+export const replayMarkColor: Encoding<Pick<ReplayFrame, 'tool'>> = {
+  id: 'replay.mark_color',
+  element: 'replay',
+  channel: 'Step mark color',
+  metric: 'Tool category',
+  howComputed:
+    'From the tool name at ingestion: mcp__<server>__<tool> → MCP, Skill → skill, Agent/Task → subagent, anything else → built-in. Steps without a tool are gray.',
+  action: 'See where a run spends its calls: built-in tools, MCP connectors, skills, or subagents.',
+  levels: ['Built-in tool', 'MCP tool', 'Skill', 'Subagent', 'No tool'],
+  level: (f) => (f.tool ? REPLAY_CATEGORIES.indexOf(f.tool.category) : 4),
+};
+
+export const replayError: Encoding<Pick<ReplayFrame, 'isError'>> = {
+  id: 'replay.error',
+  element: 'replay',
+  channel: 'Red cross mark',
+  metric: 'Error at this step',
+  howComputed:
+    'A tool_result flagged is_error, an error step (API error, interrupt), or a hook block.',
+  action:
+    'Scrub to the first red cross and read the step panel: what failed, and did the agent recover?',
+  levels: ['Red cross: tool or API error'],
+  level: () => 0,
+};
+
+export const replayCompaction: Encoding<Pick<ReplayFrame, 'compaction'>> = {
+  id: 'replay.compaction',
+  element: 'replay',
+  channel: 'Vertical cut through the lane and the context band',
+  metric: 'Context compaction',
+  howComputed:
+    'A compact_boundary record (auto or manual). The context area drops at the next API message, which reports the smaller prompt.',
+  action: 'Repeated cuts: the run outgrows its context. Split the task or trim the harness.',
+  levels: ['Cut: compaction (pre-compaction size labeled)'],
+  level: () => 0,
+};
+
+export const replayContext: Encoding<Pick<ReplayFrame, 'contextFill'>> = {
+  id: 'replay.context',
+  element: 'replay',
+  channel: 'Context band under the main lane, and the gauge',
+  metric: 'Prompt size ÷ the model’s context window',
+  howComputed:
+    'The latest prompt size (input + cache read + cache write) reported at or before the step, one value per API message (lines repeating a message are deduped), over the context window from the pricing table. The top line of the band is the window.',
+  action: 'Near the line: expect a compaction soon. Trim instructions, tools, or the task.',
+  levels: ['Under 50% of the window', '50–80%', '80% or more'],
+  level: (f) => binIndex(f.contextFill, [0.5, 0.8]),
+};
+
+export const replayLane: Encoding<{ depth: number }> = {
+  id: 'replay.lane',
+  element: 'replay',
+  channel: 'Lanes',
+  metric: 'Which run a step belongs to',
+  howComputed:
+    'The main run is the top lane. Each subagent run is a lane that branches off at its spawn step and merges back when the subagent run ends (followed 3 levels deep). Collapsed lanes show only their span and errors.',
+  action: 'Expand a lane to see what a subagent did, and whether its errors reached the parent.',
+  levels: ['Main run lane', 'Subagent lane (branch → merge)'],
+  level: (l) => (l.depth === 0 ? 0 : 1),
+};
+
+export const replayGap: Encoding<{ realMs: number }> = {
+  id: 'replay.gap',
+  element: 'replay',
+  channel: 'Zigzag break on the time axis',
+  metric: 'Idle gap',
+  howComputed:
+    'Time on x is real time, except gaps over 15 s between consecutive steps, which are drawn 4 s wide and labeled with their real length.',
+  action: 'Long idle gaps are waits: on a person, a permission prompt, or a slow tool.',
+  levels: ['Compressed idle gap (> 15 s)'],
+  level: () => 0,
+};
+
+export const replayProgress: Encoding<{ reached: boolean }> = {
+  id: 'replay.progress',
+  element: 'replay',
+  channel: 'Solid vs faded marks, and the playhead',
+  metric: 'Playback position',
+  howComputed: 'Steps at or before the playhead are solid; later steps are faded.',
+  action: 'Scrub or play to step through the run.',
+  levels: ['Reached', 'Not reached yet'],
+  level: (p) => (p.reached ? 0 : 1),
+};
+
+/** Only drawn while a "Which one do I call?" query is active (M6). */
+export const routerHighlight: Encoding<{ candidate: boolean }> = {
+  id: 'router.highlight',
+  element: 'router',
+  channel: 'Glow + confidence badge (everything else dims)',
+  metric: 'Router suggestion for the current “Which one do I call?” question',
+  howComputed:
+    'Glowing plants run a suggested agent or skill. Score = 0.45·BM25 (normalized) + 0.35·TF-IDF+LSA cosine + ' +
+    '0.20·Beta(2,2)-smoothed success on the k most similar past runs. The badge is the calibrated confidence: ' +
+    'a logistic fit of score and margin over #2 on the eval queries. Open “how computed” in the results list for the inputs and n.',
+  action:
+    'Call the glowing plant with the highest badge; check n before trusting a low-evidence suggestion.',
+  levels: ['Suggested: glow + confidence %', 'Not suggested: dimmed'],
+  level: (x) => (x.candidate ? 0 : 1),
+};
+
 export const ambientSway: Encoding<unknown> = {
   id: 'ambient.sway',
   element: 'ambient',
@@ -279,6 +428,15 @@ export const ENCODINGS = [
   playbookGate,
   seasonBand,
   seasonRate,
+  replayMarkShape,
+  replayMarkColor,
+  replayError,
+  replayCompaction,
+  replayContext,
+  replayLane,
+  replayGap,
+  replayProgress,
+  routerHighlight,
   ambientSway,
 ] as const satisfies readonly Encoding<never>[];
 

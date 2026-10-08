@@ -8,7 +8,7 @@ import { SessionContext, type SpawnRef } from './context';
 import { AgentMetaSchema, LineSchema, type AgentMeta, type Line } from './schema';
 import { ThreadParser } from './thread';
 
-const KNOWN_LINE_TYPES = new Set([
+export const KNOWN_LINE_TYPES = new Set([
   'user',
   'assistant',
   'attachment',
@@ -19,7 +19,7 @@ const KNOWN_LINE_TYPES = new Set([
 ]);
 
 /** Attachment types observed on real files (docs/sources.md). Others are reported as unknown. */
-const KNOWN_ATTACHMENT_TYPES = new Set([
+export const KNOWN_ATTACHMENT_TYPES = new Set([
   'environment',
   'model',
   'deferred_tools_delta',
@@ -41,7 +41,7 @@ const KNOWN_ATTACHMENT_TYPES = new Set([
   'edited_text_file',
 ]);
 
-const KNOWN_SYSTEM_SUBTYPES = new Set(['compact_boundary', 'stop_hook_summary']);
+export const KNOWN_SYSTEM_SUBTYPES = new Set(['compact_boundary', 'stop_hook_summary']);
 
 const MAX_MALFORMED_WARNINGS_PER_FILE = 20;
 

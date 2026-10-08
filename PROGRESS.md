@@ -9,9 +9,11 @@ Status log per milestone. A milestone is marked done only when its verification 
 | M2 Ingestion + demo data | ✅ done | 343 tests green; demo story gate + real-data ingest; see below |
 | M3 Server + Garden view | ✅ done | 382 tests + 6 e2e green; screenshots in docs/screenshots/m3-*; see below |
 | M4 Plant + Bed views | ✅ done | 407 tests + 10 e2e green; live label round trip; screenshots m4-*; see below |
-| M5 Time-lapse replay | ⬜ not started | |
-| M6 Router | ⬜ not started | |
-| M7 Seasons v1 | ⬜ not started | |
+| M5 Time-lapse replay | ✅ done | 426 tests + 13 e2e green; context fill = raw dedupe (fixture + real data); m5-replay-*; see below |
+| M6 Router | ✅ done | 441 tests + 13 e2e green; eval top-3 97% (holdout 100%); m6-router.png; see below |
+| L Live layer | ✅ server + client done; garden overlay in progress | 438 tests; line → event p50 20 ms on real data; see below |
+| K Knowledge map | 🔄 in progress | |
+| M7 Seasons v1 | ✅ done | 535 tests + e2e green; story 0.51 → 0.87 reproduced and SQL-checked; m7-seasons.png; see below |
 | M8 Deliverables & polish | ⬜ not started | |
 
 ## M0: Plan & conventions (2026-10-07)
@@ -293,5 +295,264 @@ Known gaps:
 - The plant, compare, and replant views need `garden serve`. The static export only contains the garden.
 - The Pixi garden keeps ticking (hidden) under pages: instant return, some idle CPU.
 - Signal names and tier descriptions are duplicated in the web app rather than served.
+- ~~`pnpm demo:data` run inside a git worktree collapsed projects into one bed.~~ Fixed 2026-10-08:
+  `canonicalProjectRoot` asks git first and folds by path shape only for deleted worktrees.
+
+## M5: Time-lapse replay (2026-10-08)
+
+Direction change during the build: the user asked for visuals more abstract than flowers and
+centered on time, so the replay stage is a **timeline**, not a growing plant (PLAN §10 M5's
+leaf/pruning/runner wording is superseded for this view).
+
+Done:
+- `packages/server/src/replay.ts`: `loadReplayInput` (SQL: run, steps, skill names, subagent runs
+  via `subagent_spawn → childRunId`, depth ≤ 3, cycle-safe) and a pure `buildReplay`. Context =
+  latest prompt size per API message, deduped by `apiMessageId`, carried forward; zero-size reports
+  (synthetic API errors) don't move it. `tokensCum` deduped per message; `costUsdCum` priced at query
+  time. Context window from `resolveModelPrice(model).contextWindow`, with a source sentence
+  (pricing-table version, garden.yaml override, unknown-model fallback 200K, "exceeds the window").
+  Labels come only from redacted previews; thinking shows only its length (`Thinking (1.2k chars)` /
+  `no text recorded`). Results are named by their call (`Edit …/src/app.ts → ok`).
+  `buildReplayView(store, runId, pricing)` composes both. `GET /api/replay/:runId` (404 unknown).
+- Contract: one optional field, `ReplayFrame.costUsdCum` (the step panel needs cumulative cost and
+  the frame only had tokens; estimating cost from a token share would be dishonest).
+- Web `#/replay/:runId` and `#/replay?plant=<id>` (latest run). Reached from a "▶ Replay" button on
+  every plant-view run row and "Replay its latest run →" in the garden's plant panel.
+  - Stage (`ReplayStage`, props: the ReplayView + current index): one lane per run, subagent lanes
+    branch at the spawn and merge back at the child's end; x = time with gaps > 15 s drawn 4 s wide
+    and labeled; mark shape = step kind (row above/below the lane line for calls/results), color =
+    tool category, red cross = error, dashed cut = compaction; context band under the main lane
+    against the dashed window line (50%/80% guides); faded marks = not yet reached; playhead.
+    Lanes collapse to span + errors (auto-expanded when ≤ 4 children). Click a mark to seek.
+  - Scrubber over compressed time, play/pause, 1×/4×/16×, ←/→/Home/End/Space, real UTC timestamps.
+  - Step panel (label, kind, tool + category/server/skill, tier, error, tokens and cost so far with
+    how-computed tips) and context gauge (fill vs window, 50/80% ticks, peak, compactions, source).
+  - Playback order walks every step of every lane in time order, so subagent steps play too.
+  - 8 registry entries (`replay.*`) with swatches drawn by `garden/replay-draw.ts`.
+- Fixture `apps/web/src/fixtures/replay.demo.json` (2 runs) exported by
+  `packages/server/src/replay-fixture.ts` from demo data generated **outside the git worktree**
+  (worktree generation collapses beds); run ids match the M4 fixtures.
+
+Verification:
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm test`: 426 tests (27 files).
+- [x] Builder tests: byte-identical output on rebuild; fixture context values equal an independent
+  first-usage-per-`message.id` walk of the raw JSONL (compaction fixture, repeated-usage lines,
+  subagent file); final `tokensCum` = run total; final `costUsdCum` = run cost; pure-builder tests
+  for duplicate message ids, window overflow, unknown models, dangling forks, labels.
+- [x] Real data (this container, skipped when `~/.claude/projects` is absent): a snapshot copy is
+  ingested and every run's per-step context and final tokens equal the independent raw dedupe.
+- [x] `pnpm e2e` incl. `m5.spec.ts`: garden panel → replay; plant runs table → replay; start/mid/end
+  screenshots, playback at 16×, lane collapse, legend lists replay channels, unknown-run state.
+  Screenshots: `docs/screenshots/m5-replay-{start,mid,end}.png` (demo, legacy-monolith main run with
+  two test-writer subagents, 6 red crosses, one compaction) and `m5-replay-real.png` (this
+  container's orchestrating session, 7 subagent lanes; served through a mocked API from a JSON
+  built locally). The real-session screenshot is gitignored (`*-real.png`): it shows redacted but
+  real prompt text, so it stays local per the never-commit-real-data rule.
+
+Known gaps:
+- The context band is linear against a 1M window, so typical runs fill only a thin strip (honest,
+  but low-contrast). The gauge gives the number.
+- Merge-back is drawn at the child's end time, not at the parent's matching tool_result.
+- Real-session screenshot needs `GARDEN_REAL_REPLAY=<json>`; otherwise that e2e test is skipped.
+- Error labels quote the redacted error text, which can include absolute paths from the data.
+
+## Live layer: transcript tailer, live state machine, SSE API, demo live source
+
+Status: built (backend only; the pixel-art renderer consumes `/api/live/stream`). No view changed, so
+no screenshot.
+
+- [x] `packages/ingest/src/live/`: `LiveTailer` (fs.watch recursive + 250 ms poll, per-file offsets,
+  partial-line buffer, truncation/rotation, 30-min start window seeded from 256 KB tails, subagent
+  files linked by `.meta.json` `toolUseId` with retry, optional session registry), pure
+  `reduceLive` / `tickLive` (tested with an injected clock), `LiveHub`, `DemoLiveSource`.
+- [x] Server: `GET /api/live`, `GET /api/live/stream` (snapshot, then event/agent/gone, 15 s heartbeat,
+  unsubscribe on disconnect). `garden serve` live on by default, `--no-live`, `--live-demo`;
+  `pnpm demo` uses `--live-demo`. `garden live:probe` for verification.
+- [x] Privacy: planted secrets written into a tailed transcript are absent from every emitted message,
+  the snapshot, and the SSE bytes; thinking text never emitted; previews ≤ 120 chars; nothing written.
+- [x] Real data (this container): events within p50 20 ms / max 92 ms of the line timestamp with
+  fs.watch, p50 190 ms / max 279 ms polling only. One unknown shape (`attachment.type=instructions`).
+  Live `bedId` / `plantId` join the stored history (checked against the store).
+- [x] Demo replay over a 6-bed demo store: first minute showed all six beds, subagent forks, an error,
+  a compaction, and a waiting_permission moment.
+
+Known gaps:
+- Permission waits are inferred (timer, registry `waiting`); no real permission prompt could be
+  produced here (auto-approve), so the registry `waitingFor` path is untested on real data.
+- `loop` on LiveAgent is never set; `LiveAgent.plantId` only for plantings already in the store.
+- Inline sidechain lines (older CC format) become child agents but are not linked to a spawn call.
+- Demo: one stalled call per cycle; `turn_end` is synthesized at the end of each replayed run.
 - `pnpm demo:data` run *inside a git worktree* collapses projects into one bed (paths resolve to the
   worktree root). From the main checkout it's correct.
+
+## M6: Router, "Which one do I call?" (2026-10-08)
+
+Built in a worktree against the M5–M7 contracts (`RouterCandidate`, `RouterResult`; `views.ts` unchanged).
+
+Done:
+- **`packages/router`** (`@garden/router`, depends only on `@garden/core`): pure and offline.
+  - Corpus per candidate (every agent and skill): name, description, and the redacted task previews
+    of its past runs. Previews with fewer than 3 content tokens ("thanks, commit it") are follow-ups
+    and are skipped. A run counts for its agent and for every skill it invoked. Per-run weight:
+    success 1, partial 0.7, unknown 0.6, failure 0.35. Repeated tasks are damped by 1 + ln(count).
+  - **Lexical**: BM25 (k1 1.2, b 0.75, Lucene idf) over one weighted document per candidate,
+    divided by the best score for the query.
+  - **Embedding**: an `Embedder` interface. The default is TF-IDF (sublinear tf, smoothed idf, l2)
+    plus LSA: a rank-64 truncated SVD in TypeScript (seeded block subspace iteration, then
+    Rayleigh–Ritz with a Jacobi eigensolver). Deterministic, with no network and no model download.
+    The component is the mean of two cosines: query vs name + description, and query vs the
+    candidate's 3 most similar past tasks. `createMiniLmEmbedder()` is an opt-in stub that throws
+    `EmbedderUnavailableError` ("not available offline").
+  - **Outcome kNN**: Beta(2,2)-smoothed success over the candidate's k = 10 most similar past runs
+    with cosine ≥ 0.3. Unknown labels are excluded. With no similar runs it is the prior, 0.5.
+  - **Score** = 0.45·lexical + 0.35·embedding + 0.20·outcome. A candidate with no lexical or
+    embedding signal is never suggested, so gibberish gets an empty list.
+  - **Confidence** = σ(a + b·score + c·margin), where margin = score − the best *other* candidate's
+    score (positive only for #1). Fitted by Platt/logistic regression (L2 0.1, Newton) on the
+    calibration split, top-5 candidates per query (n = 105). Recorded in `calibration.ts`:
+    a −2.9807, b 4.2622, c 7.6643. The text goes into `method.calibration`.
+  - **Reasons**: the matched name/description words, the 1–3 most similar past tasks with their
+    outcome counts and similarity, and the outcome history (kNN counts → smoothed %, n, plus the
+    all-runs rate with n).
+- **Eval**: 31 hand-written queries (`eval-queries.ts`) covering every agent and skill that has a
+  description or past runs, the main thread, and the loop tasks. A test checks that no query equals
+  or contains a demo task preview. Every third query is held out of calibration. One query
+  accepts two answers: the changelog-writer / release-notes duplicate skills.
+  `pnpm router:eval [--db <garden.db>] [--verbose] [--fit] [--export <file>]` prints the table.
+  The gate test is `packages/server/src/route.eval.test.ts`. It generates the demo in a tmpdir
+  outside any worktree.
+- **Server**: `GET /api/route?q=&days=&limit=`. zod validates it: q is trimmed, 1..500 chars,
+  limit 1..20. The window's index is cached per `days|asOf` (LRU of 4, about 0.35 s to build on
+  the demo, about 1–6 ms per query) and cleared when a manual label is written.
+- **Web**: a "Which one do I call?" box in the header above the window controls. `/` focuses it
+  and `Esc` clears it. Results show rank, kind, a confidence badge and meter, the beds the
+  candidate is planted in, "open plant", the reasons, and a "How computed" breakdown (each
+  component × weight = what it adds, the score, the confidence formula and calibration text, n and
+  corpus size). In the garden, the candidates' plants glow with a confidence badge and everything
+  else dims, through `GardenRenderer.highlight(plantIds, badges)` plus `garden/highlight.ts`.
+  This is a new registry channel, `router.highlight` (element `router`, 2 levels), with a legend
+  swatch drawn by the same pen code. Fixture mode bundles 5 real RouterResults exported from the
+  demo store (`apps/web/src/fixtures/router.demo.json`, plant ids match `garden.demo.json`). Any
+  other question shows those 5 as clickable examples.
+
+Eval (demo seed 42, 90-day window ending 2026-10-01T12:00Z; 19 candidates, 1,639 runs, 623 unique tasks):
+
+| Router | top-1 (all) | top-3 (all) | top-1 (calib.) | top-3 (calib.) | top-1 (holdout) | top-3 (holdout) |
+|---|---|---|---|---|---|---|
+| lexical (BM25) only | 97% | 97% | 95% | 95% | 100% | 100% |
+| + embedding (TF-IDF+LSA) | 90% | 97% | 95% | 95% | 80% | 100% |
+| + outcome kNN (full) | 90% | 97% | 90% | 95% | 90% | 100% |
+
+n = 31 (21 calibration, 10 holdout). Calibration: Brier 0.041 on the calibration split, **0.043 on
+the holdout** (always predicting the base rate scores 0.16). Holdout top-1 mean confidence is 74%
+against 90% observed accuracy (n = 10), so it is slightly under-confident at this n.
+
+Reading the ablation honestly: on this query set, **BM25 alone is best at top-1**. Embedding and
+outcomes leave top-3 unchanged and cost two top-1 hits: "locate the session handling…" goes to
+main over Explore, and "backstory behind the scheduler…" goes to main over legacy-archaeologist.
+The main thread has hundreds of similar-sounding past tasks. The demo's descriptions and task
+templates share vocabulary with natural queries, so lexical matching is strong. The 0.45/0.35/0.20
+weights are the plan's and were not tuned on the eval, to avoid overfitting 31 queries. The one top-3 miss,
+"document how the date range picker behaves", ranks docs-writer 4th behind main.
+
+Verification:
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm build`. `pnpm test`: 441 tests (34 new). `pnpm e2e`: 13 (3 new).
+- [x] Eval gate: top-3 ≥ 80% overall (97%) and on the holdout (100%). The recorded calibration
+  coefficients must match a refit (2 decimals), and the recorded holdout Brier must match.
+- [x] `/api/route`: plant ids are plants in the garden view; 400 on missing/blank/501-char q,
+  bad limit or days; a cached second query under 150 ms; gibberish gives no candidates.
+- [x] Screenshot `docs/screenshots/m6-router.png`, reviewed. For "write unit tests for the invoice
+  totals": test-writer 61% (glowing in shop-api and legacy-monolith), main 28% (six plants), all
+  other plants and beds dimmed. The reasons surface the demo story: on similar invoice-totals
+  tasks test-writer went 1 success / 9 failure → 21% outcome (n = 10).
+
+Known gaps:
+- **Not bed-aware.** The router ranks agents and skills, not plantings. test-writer gets one
+  confidence even though it thrives in shop-api and wilts in legacy-monolith. The outcome reason
+  shows this, but the badge doesn't. A `bed` parameter (outcome kNN per planting) is the natural next step.
+- The eval is small (31 queries, 10 held out) and written by the person who built the router.
+  Treat the confidence as indicative.
+- Built-in agents (Explore, Plan, general-purpose) have no description in the data, so they are
+  found only through their past tasks.
+- MiniLM is an interface only: no weights ship, and nothing downloads.
+- Fixture mode answers only the 5 bundled questions. Static exports have no router.
+- The router box adds about 18 px to the header, so earlier m3/m4 screenshots (not regenerated in
+  this commit) are slightly out of date.
+
+## M7: Seasons v1 (2026-10-08)
+
+Done:
+- **Segmentation** (`packages/server/src/seasons.ts`, pure): one chain per (bed, primary agent),
+  the same chains the derive pass builds. Versions are ordered by first use. A version with no
+  meaningful difference from the season before it merges into that season, so every boundary is
+  a real change. "Meaningful" is the `summarizeDiff` lines plus two things the stored diff misses:
+  instruction files edited without a size change, and subagent definitions added or removed. An
+  entrypoint-only change merges. Titles come from the commit subject when the commit is new.
+  Otherwise they are generated from the diff, e.g. "Model: opus 5.5 → sonnet 5.5" for the
+  web-dashboard switch that was observed a day after its settings commit.
+- **Attribution**: a run belongs to the season of the harness version it ran under, never to the
+  season its timestamp falls in. A run that started on the old harness after the new one first
+  appeared still counts for the old season (tested).
+- **Per-season metrics**: the garden's `rateOf` (partial = 0.5, unknown excluded, manual counted,
+  Wilson 95%), median cost per run with `costEstimated`, runs, and `vsPrevious` with bed compare's
+  separated / within-noise rule (`rateDeltaOf`, now shared with `plant.ts`).
+- **Loop rows** (an optional field added to `SeasonsView.series`: `loop?: {id, name}`). Runs
+  triggered by a loop repeat one task, so they get their own row. Otherwise a change in loop
+  volume would move the agent's rate. This is also how the M2 story query was defined
+  (`loop_id IS NULL`).
+- `GET /api/seasons/:bedId?days=&asOf=` (404 for an unknown bed), documented in docs/api.md.
+- **Seasons page** (`#/seasons/:bedId`). Reached from the bed-label picker ("Seasons of <bed> →"),
+  both bed columns on the compare page, and the plant view's harness card. It shows:
+  - The caveat at the top.
+  - A season band (the `season.band` row of §8; alternating tints, numbered, titled).
+  - A boundary card per change: the soil diff plus the main row's before → after with its badge.
+  - One small multiple per agent (and per loop). Each season gets a level line at its success
+    rate, the Wilson band shaded behind it, and a hollow marker under n=5 (new registry entry
+    `season.rate`, with a legend swatch). Each boundary is labelled with its Δ and badge, and
+    hover tooltips give n, unknown, manual, runs, and cost.
+  - A numbers table (`T`) and a "How these numbers are computed" section.
+- **Scrub-to-date**: a date scrubber on the band's time axis, with a dashed cursor across every
+  row and a readout of which season the date falls in. "View garden as of <date>" goes to
+  `#/?asOf=<end of that UTC day>`. The garden reloads from `/api/garden?asOf=` under a "Garden as
+  of <date> · built only from runs up to that date" banner with **Back to now**. The window in
+  the header follows the date. Fixtures and static exports refuse an as-of date with a reason
+  instead of showing today's garden under a past date.
+- Fixtures: `seasons.demo.json` (all 6 demo beds) and `garden-asof-2026-08-10.demo.json`,
+  exported from the API over a copy of the main checkout's `.garden-demo` store. Its exported
+  garden is byte-identical to `garden.demo.json`, so the ids match the M3/M4 fixtures. A demo
+  generated in a fresh temp dir gets different path-derived ids.
+
+Verification:
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm test`: 535 tests (after merging M5/M6/live).
+  M7 adds 8 segmentation/attribution unit tests, 6 demo-store tests, and 8 web tests.
+- [x] **Cross-check against direct SQL** (`seasons.demo.test.ts`). The demo is generated by the
+  real CLI into a temp dir outside any worktree, then ingested and derived. For every bed, series,
+  and season, runs, labeled n, unknown, manual, the rate (to 1e-12), and the Wilson interval equal
+  a direct SQL aggregate over `runs ⋈ outcomes ⟕ manual_labels`. Median cost equals tokens ×
+  pricing over the same rows. Every in-window run is attributed exactly once.
+- [x] **Story gate reproduced**: shop-api main is **0.509 (n=226, CI 44–57%) → 0.865 (n=204, CI
+  81–91%)**, +36 points, **separated**, across "Tighten CLAUDE.md and add test hook"
+  (instructions −10,581 bytes, hooks, settings, permissions → acceptEdits). The M2 story query
+  (time split at the commit, `loop_id IS NULL`) gives the same values. The nightly-flaky-triage
+  loop row went 0.89 → 0.84, within noise. Including loop runs, main would read 0.57 → 0.86.
+  web-dashboard has 4 main seasons: Initial commit → Add api-docs skill → Switch default model to
+  sonnet → Model: opus 5.5 → sonnet 5.5.
+- [x] `pnpm e2e`: `m7.spec.ts` covers:
+  - Navigation from the bed label, the compare page, and the plant view.
+  - The as-of action disabled in fixture mode, with its reason.
+  - Against a mocked local API serving the exported responses: before/after numbers, tooltip,
+    scrub to 2026-08-10, the as-of garden with banner and window 2026-05-12 → 2026-08-10
+    (web-dashboard still on opus), and Back to now.
+- [x] Screenshots reviewed: `docs/screenshots/m7-seasons.png` (shop-api main steps from 51% to
+  87% with the 81–91% band clear of the 44–57% one; test-writer, code-reviewer, and Explore flat;
+  the loop row slightly down, within noise) and `m7-garden-asof.png`.
+
+Known gaps:
+- Pages opened from an as-of garden (plant, compare, seasons) still show the current window. Only
+  the garden itself is time-travelled.
+- An agent whose runs span two chains (e.g. Explore running under docs-writer's harness in
+  web-dashboard) shows both chains' seasons in one row, each clipped at the next one's start.
+- A version id that recurs (config reverted to an earlier state) is one version in the chain, so
+  "A → B → A" shows as two seasons.
+- Static exports carry no seasons. The as-of garden needs the local server.
+- Fixture mode can't time-travel. The e2e covers the as-of flow with a mocked API.

@@ -427,11 +427,14 @@ export class ClaudeCodeAdapter implements Adapter {
  * which may already be deleted) fold into their main repository so they share one bed.
  */
 export function canonicalProjectRoot(cwd: string): string {
-  const wt = /^(.*?)\/\.claude\/worktrees\/[^/]+(?:\/.*)?$/.exec(cwd);
-  if (wt?.[1]) return canonicalProjectRoot(wt[1]);
-  if (!existsSync(cwd)) return cwd;
-  const top = gitRoot(cwd);
-  if (!top) return cwd;
+  // Ask git first: a repository nested under a worktree path (e.g. a demo project generated inside
+  // `.claude/worktrees/<name>/`) is its own project, not part of the outer repo.
+  const top = existsSync(cwd) ? gitRoot(cwd) : undefined;
+  if (!top) {
+    // Deleted (or non-git) worktree: fold by path shape.
+    const wt = /^(.*?)\/\.claude\/worktrees\/[^/]+(?:\/.*)?$/.exec(cwd);
+    return wt?.[1] ? canonicalProjectRoot(wt[1]) : cwd;
+  }
   try {
     const common = execFileSync(
       'git',

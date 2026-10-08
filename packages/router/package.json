@@ -1,0 +1,13 @@
+{
+  "name": "@garden/router",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "\"Which one do I call?\": BM25 + TF-IDF/LSA embeddings + outcome kNN over past runs. Pure, offline.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@garden/core": "workspace:*"
+  }
+}

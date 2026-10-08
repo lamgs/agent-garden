@@ -42,7 +42,7 @@ import {
 
 const SUBAGENT_TOOLS: readonly string[] = SUBAGENT_TOOL_NAMES;
 const SYNTHETIC_MODEL = '<synthetic>';
-const KNOWN_BLOCK_TYPES = new Set([
+export const KNOWN_BLOCK_TYPES = new Set([
   'thinking',
   'redacted_thinking',
   'text',

@@ -4,6 +4,8 @@ import { BedPicker } from './components/BedPicker';
 import { GardenStage, type GardenStageHandle } from './components/GardenStage';
 import { Legend } from './components/Legend';
 import { PlantPanel } from './components/PlantPanel';
+import { RouterBox, type RouterBoxHandle } from './components/RouterBox';
+import { highlightFor } from './data/router';
 import { TableView } from './components/TableView';
 import { HoverTipLayer } from './components/ui';
 import { loadGarden, SOURCE_LABEL, type Loaded } from './data/load';
@@ -15,6 +17,7 @@ import { PageShell } from './views/PageShell';
 import { PlantPage } from './views/PlantPage';
 import { ReplantPage } from './views/ReplantPage';
 import { SeasonsPage } from './views/SeasonsPage';
+import { ReplayRoute } from './replay/ReplayPage';
 import { useView } from './views/useView';
 import { ViewMessage } from './components/ui';
 
@@ -46,6 +49,8 @@ export function App() {
   /** null = closed; '' = open with no preselected bed. */
   const [picker, setPicker] = useState<ID | '' | null>(null);
   const stage = useRef<GardenStageHandle>(null);
+  const routerBox = useRef<RouterBoxHandle>(null);
+  const [routed, setRouted] = useState<ReturnType<typeof highlightFor> | null>(null);
   const selRef = useRef<ID | null>(null);
   selRef.current = selected;
   const stateRef = useRef({ route, legendOpen, picker });
@@ -106,7 +111,10 @@ export function App() {
       }
       return;
     }
-    if (e.key === 'l' || e.key === 'L') setLegendOpen((o) => !o);
+    if (e.key === '/') {
+      e.preventDefault();
+      routerBox.current?.focus();
+    } else if (e.key === 'l' || e.key === 'L') setLegendOpen((o) => !o);
     else if (e.key === 't' || e.key === 'T') setTableOpen((o) => !o);
     else if (e.key === 'Escape') {
       if (selRef.current) setSelected(null);
@@ -134,35 +142,48 @@ export function App() {
           <h1>Agent Garden</h1>
           <p className="tagline">{TAGLINE}</p>
         </div>
-        <div className="header-controls">
-          <label className="window-select">
-            <span>Window</span>
-            <select
-              value={days}
-              onChange={(e) => setDays(Number(e.target.value))}
-              disabled={fixed}
-              title={fixed ? 'This data source has a fixed window' : 'Days of history to show'}
-            >
-              {WINDOWS.map((d) => (
-                <option key={d} value={d}>
-                  {d} days
-                </option>
-              ))}
-            </select>
-          </label>
-          <span className={`source source-${data?.source ?? 'none'}`} title={data?.detail}>
-            <span className="source-dot" aria-hidden="true" />
-            {data
-              ? `${SOURCE_LABEL[data.source]} · ${data.detail}`
-              : error
-                ? 'no data'
-                : 'loading…'}
-          </span>
+        <div className="header-right">
           {data ? (
-            <span className="window-dates">
-              {data.view.window.from.slice(0, 10)} → {data.view.window.to.slice(0, 10)}
-            </span>
+            <div className="router-slot" hidden={onPage}>
+              <RouterBox
+                ref={routerBox}
+                days={days}
+                view={data.view}
+                onResult={(r) => setRouted(r ? highlightFor(r) : null)}
+                onSelect={setSelected}
+              />
+            </div>
           ) : null}
+          <div className="header-controls">
+            <label className="window-select">
+              <span>Window</span>
+              <select
+                value={days}
+                onChange={(e) => setDays(Number(e.target.value))}
+                disabled={fixed}
+                title={fixed ? 'This data source has a fixed window' : 'Days of history to show'}
+              >
+                {WINDOWS.map((d) => (
+                  <option key={d} value={d}>
+                    {d} days
+                  </option>
+                ))}
+              </select>
+            </label>
+            <span className={`source source-${data?.source ?? 'none'}`} title={data?.detail}>
+              <span className="source-dot" aria-hidden="true" />
+              {data
+                ? `${SOURCE_LABEL[data.source]} · ${data.detail}`
+                : error
+                  ? 'no data'
+                  : 'loading…'}
+            </span>
+            {data ? (
+              <span className="window-dates">
+                {data.view.window.from.slice(0, 10)} → {data.view.window.to.slice(0, 10)}
+              </span>
+            ) : null}
+          </div>
         </div>
       </header>
 
@@ -193,10 +214,10 @@ export function App() {
               onSelect={setSelected}
               onZoomLevel={setZoom}
               onBedLabel={(id) => setPicker(id)}
+              highlight={routed}
             />
           </div>
         ) : null}
-
         <div className="toolbar" role="toolbar" aria-label="Garden controls" inert={onPage}>
           <button
             type="button"
@@ -283,6 +304,8 @@ function RoutedPage({
   garden: Loaded['view'] | null;
 }) {
   if (route.view === 'garden') return null;
+  if (route.view === 'replay')
+    return <ReplayRoute runId={route.runId} plantId={route.plantId} days={days} />;
   if (route.view === 'unknown') {
     return (
       <PageShell crumb="Not found">
@@ -290,7 +313,7 @@ function RoutedPage({
           <p>
             <code>#{route.hash}</code> is not a garden route. Pages are <code>#/plant/:id</code>,{' '}
             <code>#/compare?left=&amp;right=</code>, <code>#/replant?agent=&amp;from=&amp;to=</code>
-            , and <code>#/seasons/:bedId</code>.
+            , <code>#/seasons/:bedId</code>, and <code>#/replay/:runId</code>.
           </p>
         </ViewMessage>
       </PageShell>

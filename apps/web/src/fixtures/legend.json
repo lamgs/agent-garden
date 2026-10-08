@@ -1,232 +1,357 @@
 [
- {
-  "id": "plant.height",
-  "element": "plant",
-  "channel": "Height",
-  "metric": "Runs in the selected window",
-  "howComputed": "Count of runs for this agent in this bed (log-scaled bins).",
-  "action": "Tall plants are load-bearing; short ones are rarely called.",
-  "levels": [
-   "0 runs",
-   "1–3",
-   "4–15",
-   "16–63",
-   "64+"
-  ]
- },
- {
-  "id": "plant.bloom",
-  "element": "plant",
-  "channel": "Bloom (flowers and openness)",
-  "metric": "Success rate",
-  "howComputed": "success = 1, partial = 0.5, failure = 0, over runs with a known label; unknown excluded. Hollow bud when fewer than 5 labeled runs.",
-  "action": "Full bloom: trust it. Sparse bloom: open the plant and read its failing runs.",
-  "levels": [
-   "Too few labeled runs",
-   "0–20%",
-   "20–40%",
-   "40–60%",
-   "60–80%",
-   "80–100%"
-  ]
- },
- {
-  "id": "plant.droop",
-  "element": "plant",
-  "channel": "Droop (stem angle)",
-  "metric": "Failure share, last 14 days",
-  "howComputed": "Failures ÷ known-label runs in the last 14 days of the window.",
-  "action": "Drooping: something recently broke. Check the harness or the prompt.",
-  "levels": [
-   "Upright (<30%)",
-   "Leaning (30–50%)",
-   "Drooping (≥50%)"
-  ]
- },
- {
-  "id": "plant.fade",
-  "element": "plant",
-  "channel": "Fade (desaturation, dry tips)",
-  "metric": "Days since last run",
-  "howComputed": "Window end minus the last run start, in days.",
-  "action": "Faded plants are unused. Retire them or find out why nobody calls them.",
-  "levels": [
-   "Fresh (<14 d)",
-   "Fading (14–45 d)",
-   "Dormant (>45 d or never)"
-  ]
- },
- {
-  "id": "plant.hue",
-  "element": "plant",
-  "channel": "Foliage color",
-  "metric": "Median cost per run (USD)",
-  "howComputed": "Median of per-run cost; tokens deduped per API message × pricing table. Marked “estimated” when some runs only had stream-start usage.",
-  "action": "Darker foliage costs more per run. Consider a cheaper model or a tighter prompt.",
-  "levels": [
-   "Unknown price",
-   "< $0.05",
-   "$0.05–0.25",
-   "$0.25–1",
-   "$1–5",
-   "≥ $5"
-  ]
- },
- {
-  "id": "bed.tone",
-  "element": "bed",
-  "channel": "Bed edging color + label",
-  "metric": "Model family of the current harness",
-  "howComputed": "Most-used model in the current harness version.",
-  "action": "Compare harnesses at a glance.",
-  "levels": [
-   "Fable",
-   "Opus",
-   "Sonnet",
-   "Haiku",
-   "Other / unknown"
-  ]
- },
- {
-  "id": "bed.texture",
-  "element": "bed",
-  "channel": "Soil texture density",
-  "metric": "Tools + MCP servers available",
-  "howComputed": "Tool names from the harness listing plus configured MCP servers.",
-  "action": "Very dense soil: the agent may have more tools than it needs.",
-  "levels": [
-   "< 15",
-   "15–39",
-   "40–79",
-   "80+"
-  ]
- },
- {
-  "id": "bed.strata",
-  "element": "bed",
-  "channel": "Soil strata lines",
-  "metric": "CLAUDE.md chain size",
-  "howComputed": "Total bytes of instruction files in the current harness version.",
-  "action": "Many strata: instructions may be bloated.",
-  "levels": [
-   "None",
-   "< 4 KB",
-   "4–16 KB",
-   "≥ 16 KB"
-  ]
- },
- {
-  "id": "care_card.size",
-  "element": "care_card",
-  "channel": "Seed-packet size",
-  "metric": "Skill invocations by this plant",
-  "howComputed": "Count of Skill tool calls naming this skill in this plant’s runs.",
-  "action": "Big packets are the skills that matter here.",
-  "levels": [
-   "1–3",
-   "4–15",
-   "16–63",
-   "64+"
-  ]
- },
- {
-  "id": "irrigation.flow",
-  "element": "irrigation",
-  "channel": "Flow speed and channel width",
-  "metric": "Loop runs per day",
-  "howComputed": "Runs attributed to the loop ÷ days in the window.",
-  "action": "Wide, fast channels are where loops spend.",
-  "levels": [
-   "< 0.2/day",
-   "0.2–1/day",
-   "1–5/day",
-   "≥ 5/day"
-  ]
- },
- {
-  "id": "irrigation.state",
-  "element": "irrigation",
-  "channel": "Water state",
-  "metric": "Loop health",
-  "howComputed": "Flooding: rate > 3× its baseline, or consecutive runs with no progress. Dry: 3× the expected interval with no run.",
-  "action": "Flooding: stop a runaway loop. Dry: a dead loop.",
-  "levels": [
-   "Flowing",
-   "Flooding (runaway)",
-   "Dry (dead)"
-  ]
- },
- {
-  "id": "irrigation.observed",
-  "element": "irrigation",
-  "channel": "Solid vs dotted channel",
-  "metric": "Whether loop executions are recorded",
-  "howComputed": "Dotted: the loop is configured (e.g. a settings.json hook) but its executions are not recorded in transcripts, so no flow rate is claimed.",
-  "action": "Dotted channels are wired but unmeasured. Check the hook itself if you rely on it.",
-  "levels": [
-   "Solid: executions recorded",
-   "Dotted: configured, not recorded"
-  ]
- },
- {
-  "id": "bee.count",
-  "element": "bee",
-  "channel": "Bees on a path",
-  "metric": "Subagent calls, parent → child",
-  "howComputed": "Count of Agent/Task tool calls from the parent plant spawning the child agent.",
-  "action": "See which agents hand work to which.",
-  "levels": [
-   "1 bee: 1–3 calls",
-   "2 bees: 4–15",
-   "3 bees: 16+"
-  ]
- },
- {
-  "id": "weed.kind",
-  "element": "weed",
-  "channel": "Weed",
-  "metric": "Hygiene issue",
-  "howComputed": "Orphan: defined but not run in 30 days. Duplicate: near-identical description or name shadowing. Unowned: missing description or broken reference.",
-  "action": "Pull it: delete, merge, or document.",
-  "levels": [
-   "Orphan",
-   "Duplicate",
-   "Unowned"
-  ]
- },
- {
-  "id": "playbook.gate",
-  "element": "playbook",
-  "channel": "Gate on a stepping-stone path",
-  "metric": "Playbook step gate",
-  "howComputed": "Open when the most recent run of the step satisfied its gate spec.",
-  "action": "A closed gate shows where the playbook breaks.",
-  "levels": [
-   "Open",
-   "Closed",
-   "Unknown (no runs)"
-  ]
- },
- {
-  "id": "season.band",
-  "element": "season",
-  "channel": "Background tint band",
-  "metric": "Harness version",
-  "howComputed": "One band per harness version; boundaries from git commits or observed fingerprint changes.",
-  "action": "Line up a harness change with what happened to outcomes.",
-  "levels": [
-   "Alternating tints, one per season"
-  ]
- },
- {
-  "id": "ambient.sway",
-  "element": "ambient",
-  "channel": "Gentle sway",
-  "metric": "None (ambient, no meaning)",
-  "howComputed": "Decorative motion. Disabled with prefers-reduced-motion.",
-  "action": "None.",
-  "levels": [
-   "Ambient"
-  ]
- }
+  {
+    "id": "plant.height",
+    "element": "plant",
+    "channel": "Height",
+    "metric": "Runs in the selected window",
+    "howComputed": "Count of runs for this agent in this bed (log-scaled bins).",
+    "action": "Tall plants are load-bearing; short ones are rarely called.",
+    "levels": [
+      "0 runs",
+      "1–3",
+      "4–15",
+      "16–63",
+      "64+"
+    ]
+  },
+  {
+    "id": "plant.bloom",
+    "element": "plant",
+    "channel": "Bloom (flowers and openness)",
+    "metric": "Success rate",
+    "howComputed": "success = 1, partial = 0.5, failure = 0, over runs with a known label; unknown excluded. Hollow bud when fewer than 5 labeled runs.",
+    "action": "Full bloom: trust it. Sparse bloom: open the plant and read its failing runs.",
+    "levels": [
+      "Too few labeled runs",
+      "0–20%",
+      "20–40%",
+      "40–60%",
+      "60–80%",
+      "80–100%"
+    ]
+  },
+  {
+    "id": "plant.droop",
+    "element": "plant",
+    "channel": "Droop (stem angle)",
+    "metric": "Failure share, last 14 days",
+    "howComputed": "Failures ÷ known-label runs in the last 14 days of the window.",
+    "action": "Drooping: something recently broke. Check the harness or the prompt.",
+    "levels": [
+      "Upright (<30%)",
+      "Leaning (30–50%)",
+      "Drooping (≥50%)"
+    ]
+  },
+  {
+    "id": "plant.fade",
+    "element": "plant",
+    "channel": "Fade (desaturation, dry tips)",
+    "metric": "Days since last run",
+    "howComputed": "Window end minus the last run start, in days.",
+    "action": "Faded plants are unused. Retire them or find out why nobody calls them.",
+    "levels": [
+      "Fresh (<14 d)",
+      "Fading (14–45 d)",
+      "Dormant (>45 d or never)"
+    ]
+  },
+  {
+    "id": "plant.hue",
+    "element": "plant",
+    "channel": "Foliage color",
+    "metric": "Median cost per run (USD)",
+    "howComputed": "Median of per-run cost; tokens deduped per API message × pricing table. Marked “estimated” when some runs only had stream-start usage.",
+    "action": "Darker foliage costs more per run. Consider a cheaper model or a tighter prompt.",
+    "levels": [
+      "Unknown price",
+      "< $0.05",
+      "$0.05–0.25",
+      "$0.25–1",
+      "$1–5",
+      "≥ $5"
+    ]
+  },
+  {
+    "id": "bed.tone",
+    "element": "bed",
+    "channel": "Bed edging color + label",
+    "metric": "Model family of the current harness",
+    "howComputed": "Most-used model in the current harness version.",
+    "action": "Compare harnesses at a glance.",
+    "levels": [
+      "Fable",
+      "Opus",
+      "Sonnet",
+      "Haiku",
+      "Other / unknown"
+    ]
+  },
+  {
+    "id": "bed.texture",
+    "element": "bed",
+    "channel": "Soil texture density",
+    "metric": "Tools + MCP servers available",
+    "howComputed": "Tool names from the harness listing plus configured MCP servers.",
+    "action": "Very dense soil: the agent may have more tools than it needs.",
+    "levels": [
+      "< 15",
+      "15–39",
+      "40–79",
+      "80+"
+    ]
+  },
+  {
+    "id": "bed.strata",
+    "element": "bed",
+    "channel": "Soil strata lines",
+    "metric": "CLAUDE.md chain size",
+    "howComputed": "Total bytes of instruction files in the current harness version.",
+    "action": "Many strata: instructions may be bloated.",
+    "levels": [
+      "None",
+      "< 4 KB",
+      "4–16 KB",
+      "≥ 16 KB"
+    ]
+  },
+  {
+    "id": "care_card.size",
+    "element": "care_card",
+    "channel": "Seed-packet size",
+    "metric": "Skill invocations by this plant",
+    "howComputed": "Count of Skill tool calls naming this skill in this plant’s runs.",
+    "action": "Big packets are the skills that matter here.",
+    "levels": [
+      "1–3",
+      "4–15",
+      "16–63",
+      "64+"
+    ]
+  },
+  {
+    "id": "irrigation.flow",
+    "element": "irrigation",
+    "channel": "Flow speed and channel width",
+    "metric": "Loop runs per day",
+    "howComputed": "Runs attributed to the loop ÷ days in the window.",
+    "action": "Wide, fast channels are where loops spend.",
+    "levels": [
+      "< 0.2/day",
+      "0.2–1/day",
+      "1–5/day",
+      "≥ 5/day"
+    ]
+  },
+  {
+    "id": "irrigation.state",
+    "element": "irrigation",
+    "channel": "Water state",
+    "metric": "Loop health",
+    "howComputed": "Flooding: rate > 3× its baseline, or consecutive runs with no progress. Dry: 3× the expected interval with no run.",
+    "action": "Flooding: stop a runaway loop. Dry: a dead loop.",
+    "levels": [
+      "Flowing",
+      "Flooding (runaway)",
+      "Dry (dead)"
+    ]
+  },
+  {
+    "id": "irrigation.observed",
+    "element": "irrigation",
+    "channel": "Solid vs dotted channel",
+    "metric": "Whether loop executions are recorded",
+    "howComputed": "Dotted: the loop is configured (e.g. a settings.json hook) but its executions are not recorded in transcripts, so no flow rate is claimed.",
+    "action": "Dotted channels are wired but unmeasured. Check the hook itself if you rely on it.",
+    "levels": [
+      "Solid: executions recorded",
+      "Dotted: configured, not recorded"
+    ]
+  },
+  {
+    "id": "bee.count",
+    "element": "bee",
+    "channel": "Bees on a path",
+    "metric": "Subagent calls, parent → child",
+    "howComputed": "Count of Agent/Task tool calls from the parent plant spawning the child agent.",
+    "action": "See which agents hand work to which.",
+    "levels": [
+      "1 bee: 1–3 calls",
+      "2 bees: 4–15",
+      "3 bees: 16+"
+    ]
+  },
+  {
+    "id": "weed.kind",
+    "element": "weed",
+    "channel": "Weed",
+    "metric": "Hygiene issue",
+    "howComputed": "Orphan: defined but not run in 30 days. Duplicate: near-identical description or name shadowing. Unowned: missing description or broken reference.",
+    "action": "Pull it: delete, merge, or document.",
+    "levels": [
+      "Orphan",
+      "Duplicate",
+      "Unowned"
+    ]
+  },
+  {
+    "id": "playbook.gate",
+    "element": "playbook",
+    "channel": "Gate on a stepping-stone path",
+    "metric": "Playbook step gate",
+    "howComputed": "Open when the most recent run of the step satisfied its gate spec.",
+    "action": "A closed gate shows where the playbook breaks.",
+    "levels": [
+      "Open",
+      "Closed",
+      "Unknown (no runs)"
+    ]
+  },
+  {
+    "id": "season.band",
+    "element": "season",
+    "channel": "Background tint band",
+    "metric": "Harness version",
+    "howComputed": "One band per season of a (bed, agent) harness chain; boundaries from git commits or observed fingerprint changes. Versions with no meaningful difference (e.g. only the entrypoint changed) merge into one season. Runs belong to the season of the harness version they ran under.",
+    "action": "Line up a harness change with what happened to outcomes.",
+    "levels": [
+      "Alternating tints, one per season"
+    ]
+  },
+  {
+    "id": "season.rate",
+    "element": "season",
+    "channel": "Level line, shaded band, and marker in a season (Seasons view)",
+    "metric": "Success rate in that season, with its 95% Wilson interval",
+    "howComputed": "Height of the line = success rate (success 1, partial 0.5, failure 0; unknown excluded; manual labels win) over the season’s runs; shaded band = 95% Wilson interval. Hollow marker when fewer than 5 labeled runs.",
+    "action": "A step that clears the previous band is a change unlikely to be noise; then read the runs on both sides.",
+    "levels": [
+      "Filled: 5+ labeled runs",
+      "Hollow: fewer than 5"
+    ]
+  },
+  {
+    "id": "replay.mark_shape",
+    "element": "replay",
+    "channel": "Step mark shape (and its row in the lane)",
+    "metric": "Step kind",
+    "howComputed": "One mark per stored step, placed at the step’s timestamp. Calls sit above the lane line, results below it, thinking and messages on it.",
+    "action": "Long stretches of thinking or many results with no new calls: look at what the agent was stuck on.",
+    "levels": [
+      "Filled dot: tool call",
+      "Ring: tool result",
+      "Diamond: thinking (length only, never text)",
+      "Square: prompt or reply",
+      "Triangle: subagent spawn / return",
+      "Tick: hook or other"
+    ]
+  },
+  {
+    "id": "replay.mark_color",
+    "element": "replay",
+    "channel": "Step mark color",
+    "metric": "Tool category",
+    "howComputed": "From the tool name at ingestion: mcp__<server>__<tool> → MCP, Skill → skill, Agent/Task → subagent, anything else → built-in. Steps without a tool are gray.",
+    "action": "See where a run spends its calls: built-in tools, MCP connectors, skills, or subagents.",
+    "levels": [
+      "Built-in tool",
+      "MCP tool",
+      "Skill",
+      "Subagent",
+      "No tool"
+    ]
+  },
+  {
+    "id": "replay.error",
+    "element": "replay",
+    "channel": "Red cross mark",
+    "metric": "Error at this step",
+    "howComputed": "A tool_result flagged is_error, an error step (API error, interrupt), or a hook block.",
+    "action": "Scrub to the first red cross and read the step panel: what failed, and did the agent recover?",
+    "levels": [
+      "Red cross: tool or API error"
+    ]
+  },
+  {
+    "id": "replay.compaction",
+    "element": "replay",
+    "channel": "Vertical cut through the lane and the context band",
+    "metric": "Context compaction",
+    "howComputed": "A compact_boundary record (auto or manual). The context area drops at the next API message, which reports the smaller prompt.",
+    "action": "Repeated cuts: the run outgrows its context. Split the task or trim the harness.",
+    "levels": [
+      "Cut: compaction (pre-compaction size labeled)"
+    ]
+  },
+  {
+    "id": "replay.context",
+    "element": "replay",
+    "channel": "Context band under the main lane, and the gauge",
+    "metric": "Prompt size ÷ the model’s context window",
+    "howComputed": "The latest prompt size (input + cache read + cache write) reported at or before the step, one value per API message (lines repeating a message are deduped), over the context window from the pricing table. The top line of the band is the window.",
+    "action": "Near the line: expect a compaction soon. Trim instructions, tools, or the task.",
+    "levels": [
+      "Under 50% of the window",
+      "50–80%",
+      "80% or more"
+    ]
+  },
+  {
+    "id": "replay.lane",
+    "element": "replay",
+    "channel": "Lanes",
+    "metric": "Which run a step belongs to",
+    "howComputed": "The main run is the top lane. Each subagent run is a lane that branches off at its spawn step and merges back when the subagent run ends (followed 3 levels deep). Collapsed lanes show only their span and errors.",
+    "action": "Expand a lane to see what a subagent did, and whether its errors reached the parent.",
+    "levels": [
+      "Main run lane",
+      "Subagent lane (branch → merge)"
+    ]
+  },
+  {
+    "id": "replay.gap",
+    "element": "replay",
+    "channel": "Zigzag break on the time axis",
+    "metric": "Idle gap",
+    "howComputed": "Time on x is real time, except gaps over 15 s between consecutive steps, which are drawn 4 s wide and labeled with their real length.",
+    "action": "Long idle gaps are waits: on a person, a permission prompt, or a slow tool.",
+    "levels": [
+      "Compressed idle gap (> 15 s)"
+    ]
+  },
+  {
+    "id": "replay.progress",
+    "element": "replay",
+    "channel": "Solid vs faded marks, and the playhead",
+    "metric": "Playback position",
+    "howComputed": "Steps at or before the playhead are solid; later steps are faded.",
+    "action": "Scrub or play to step through the run.",
+    "levels": [
+      "Reached",
+      "Not reached yet"
+    ]
+  },
+  {
+    "id": "router.highlight",
+    "element": "router",
+    "channel": "Glow + confidence badge (everything else dims)",
+    "metric": "Router suggestion for the current “Which one do I call?” question",
+    "howComputed": "Glowing plants run a suggested agent or skill. Score = 0.45·BM25 (normalized) + 0.35·TF-IDF+LSA cosine + 0.20·Beta(2,2)-smoothed success on the k most similar past runs. The badge is the calibrated confidence: a logistic fit of score and margin over #2 on the eval queries. Open “how computed” in the results list for the inputs and n.",
+    "action": "Call the glowing plant with the highest badge; check n before trusting a low-evidence suggestion.",
+    "levels": [
+      "Suggested: glow + confidence %",
+      "Not suggested: dimmed"
+    ]
+  },
+  {
+    "id": "ambient.sway",
+    "element": "ambient",
+    "channel": "Gentle sway",
+    "metric": "None (ambient, no meaning)",
+    "howComputed": "Decorative motion. Disabled with prefers-reduced-motion.",
+    "action": "None.",
+    "levels": [
+      "Ambient"
+    ]
+  }
 ]

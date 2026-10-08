@@ -11,3 +11,5 @@ test-results/
 playwright-report/
 .claude/worktrees/
 .garden-demo/
+# Screenshots of real (non-demo) sessions stay local: CLAUDE.md "never commit real user data".
+docs/screenshots/*-real.png
