@@ -7,6 +7,8 @@ import type { Redactor, Store } from '@garden/ingest';
 import { loadGardenData, type GardenData } from './data';
 import { buildGardenView } from './garden';
 import { buildCompareView, buildPlantView, buildReplantView, loadStepAggregates } from './plant';
+import { route as routeQuery } from '@garden/router';
+import { buildWindowIndex, RouterCache } from './route';
 
 export interface AppOptions {
   store: Store;
@@ -32,6 +34,13 @@ export function hostnameOf(hostHeader: string | undefined): string | undefined {
 const LabelBody = z.object({
   label: z.enum([...OUTCOME_LABELS, 'clear']),
   note: z.string().max(2000).optional(),
+});
+
+/** GET /api/route query: the task text is capped so a request can't make the router do unbounded work. */
+export const ROUTE_QUERY_MAX = 500;
+const RouteQuery = z.object({
+  q: z.string().trim().min(1).max(ROUTE_QUERY_MAX),
+  limit: z.coerce.number().int().min(1).max(20).optional(),
 });
 
 const DAY = 86_400_000;
@@ -70,6 +79,7 @@ export function gardenView(
 
 export function createApp(opts: AppOptions): Hono {
   const app = new Hono();
+  const routers = new RouterCache();
   app.use('*', async (c, next) => {
     await next();
     c.header('Content-Security-Policy', CSP);
@@ -164,9 +174,21 @@ export function createApp(opts: AppOptions): Hono {
       const note = body.note && opts.redactor ? opts.redactor.text(body.note, 2000) : undefined;
       opts.store.putManualLabel(runId, body.label, note, new Date().toISOString());
     }
+    routers.clear(); // outcomes changed: the router's outcome kNN must see the new label
     return c.json({ runId, outcome: opts.store.getOutcome(runId) ?? null });
   });
-
+  app.get('/api/route', (c) => {
+    const p = params(c);
+    if ('error' in p) return c.json({ error: p.error }, 400);
+    const parsed = RouteQuery.safeParse({ q: c.req.query('q'), limit: c.req.query('limit') });
+    if (!parsed.success)
+      return c.json({ error: `q must be 1..${ROUTE_QUERY_MAX} characters; limit 1..20` }, 400);
+    const index = routers.get(`${p.days}|${p.asOf ?? ''}`, () => {
+      const { data, garden } = windowData(opts, p.days, p.asOf);
+      return buildWindowIndex(data, garden);
+    });
+    return c.json(routeQuery(index, parsed.data.q, { limit: parsed.data.limit ?? 5 }));
+  });
   app.get('/api/health', (c) =>
     c.json({
       ok: true,

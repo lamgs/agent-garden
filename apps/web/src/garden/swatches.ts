@@ -18,6 +18,7 @@ import {
   drawWeed,
 } from './draw';
 import type { Genotype } from './genotype';
+import { drawBadge, drawGlow, drawVeil } from './highlight';
 import type { Pen } from './pen';
 
 export interface Swatch {
@@ -138,6 +139,16 @@ export const SWATCHES: Record<string, Swatch> = {
       pen.fill({ color: PAPER });
       pen.rect(40, 0, 20, 24);
       pen.fill({ color: INK.hairline, alpha: 0.5 });
+    },
+  },
+  'router.highlight': {
+    frame: { x: -40, y: -112, w: 80, h: 124 },
+    height: 64,
+    draw: (pen, l) => {
+      if (l === 0) drawGlow(pen, 0, 0, 80);
+      drawPlant(pen, BASE);
+      if (l === 0) drawBadge(pen, 0, -100, 30);
+      else drawVeil(pen, -40, -112, 80, 124);
     },
   },
   'ambient.sway': {

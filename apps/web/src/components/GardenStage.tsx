@@ -27,6 +27,8 @@ export interface GardenTestApi {
   ): { x: number; y: number } | null;
   /** Client point of a bed's label plaque (by bed name), or null when hidden. */
   bedLabelPoint(bedName: string): { x: number; y: number } | null;
+  /** Plant ids currently glowing for a router query (M6). */
+  highlighted?: () => string[];
 }
 
 declare global {
@@ -47,10 +49,12 @@ interface Props {
   onSelect: (id: ID) => void;
   onZoomLevel: (z: ZoomLevel) => void;
   onBedLabel: (bedId: ID) => void;
+  /** Router suggestions: these plants glow with a badge; everything else dims. */
+  highlight?: { plantIds: ID[]; badges: Record<ID, string> } | null;
 }
 
 export const GardenStage = forwardRef<GardenStageHandle, Props>(function GardenStage(
-  { view, selectedId, onSelect, onZoomLevel, onBedLabel },
+  { view, selectedId, onSelect, onZoomLevel, onBedLabel, highlight },
   ref,
 ) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -175,6 +179,13 @@ export const GardenStage = forwardRef<GardenStageHandle, Props>(function GardenS
   useEffect(() => {
     rendererRef.current?.setSelected(selectedId);
   }, [selectedId, ready, view]);
+
+  useEffect(() => {
+    const r = rendererRef.current;
+    if (!ready || !r) return;
+    r.highlight(highlight?.plantIds ?? [], highlight?.badges ?? {});
+    if (window.__garden) window.__garden.highlighted = () => [...r.highlighted];
+  }, [highlight, ready, view]);
 
   useImperativeHandle(ref, () => ({
     zoomBy: (f) => rendererRef.current?.zoomBy(f),

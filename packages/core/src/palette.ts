@@ -52,3 +52,6 @@ export const STATUS = {
 } as const;
 
 export const WEED = { leaf: '#6f7a3a', mark: '#4f5629' } as const;
+
+/** Router highlight: a warm sunlight halo (not a data hue; the confidence badge carries the number). */
+export const HIGHLIGHT = { glow: '#f3c64f', veilAlpha: 0.62 } as const;

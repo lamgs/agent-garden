@@ -13,6 +13,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "garden": "tsx --disable-warning=ExperimentalWarning packages/server/src/cli.ts",
+    "router:eval": "tsx --disable-warning=ExperimentalWarning packages/server/src/route-eval-cli.ts",
     "demo:data": "tsx scripts/demo/src/cli.ts --out .garden-demo && pnpm -s garden ingest --data .garden-demo/data --claude-home .garden-demo/home/.claude --claude-json .garden-demo/home/.claude.json --garden-yaml .garden-demo/garden.yaml",
     "demo": "pnpm -s build && pnpm -s demo:data && pnpm -s garden serve --data .garden-demo/data --garden-yaml .garden-demo/garden.yaml --as-of 2026-10-01T12:00:00Z",
     "build": "pnpm -s --filter @garden/web build",

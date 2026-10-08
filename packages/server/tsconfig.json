@@ -6,5 +6,18 @@
     "tsBuildInfoFile": "../../.tsbuild/server.tsbuildinfo"
   },
   "include": ["src"],
-  "references": [{ "path": "../core" }, { "path": "../ingest" }]
+  "references": [
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../ingest"
+    },
+    {
+      "path": "../router"
+    },
+    {
+      "path": "../../scripts/demo"
+    }
+  ]
 }

@@ -10,7 +10,7 @@ Status log per milestone. A milestone is marked done only when its verification 
 | M3 Server + Garden view | ✅ done | 382 tests + 6 e2e green; screenshots in docs/screenshots/m3-*; see below |
 | M4 Plant + Bed views | ✅ done | 407 tests + 10 e2e green; live label round trip; screenshots m4-*; see below |
 | M5 Time-lapse replay | ⬜ not started | |
-| M6 Router | ⬜ not started | |
+| M6 Router | ✅ done | 441 tests + 13 e2e green; eval top-3 97% (holdout 100%); m6-router.png; see below |
 | M7 Seasons v1 | ⬜ not started | |
 | M8 Deliverables & polish | ⬜ not started | |
 
@@ -295,3 +295,97 @@ Known gaps:
 - Signal names and tier descriptions are duplicated in the web app rather than served.
 - `pnpm demo:data` run *inside a git worktree* collapses projects into one bed (paths resolve to the
   worktree root). From the main checkout it's correct.
+
+## M6: Router, "Which one do I call?" (2026-10-08)
+
+Built in a worktree against the M5–M7 contracts (`RouterCandidate`, `RouterResult`; `views.ts` unchanged).
+
+Done:
+- **`packages/router`** (`@garden/router`, depends only on `@garden/core`): pure and offline.
+  - Corpus per candidate (every agent and skill): name, description, and the redacted task previews
+    of its past runs. Previews with fewer than 3 content tokens ("thanks, commit it") are follow-ups
+    and are skipped. A run counts for its agent and for every skill it invoked. Per-run weight:
+    success 1, partial 0.7, unknown 0.6, failure 0.35. Repeated tasks are damped by 1 + ln(count).
+  - **Lexical**: BM25 (k1 1.2, b 0.75, Lucene idf) over one weighted document per candidate,
+    divided by the best score for the query.
+  - **Embedding**: an `Embedder` interface. The default is TF-IDF (sublinear tf, smoothed idf, l2)
+    plus LSA: a rank-64 truncated SVD in TypeScript (seeded block subspace iteration, then
+    Rayleigh–Ritz with a Jacobi eigensolver). Deterministic, with no network and no model download.
+    The component is the mean of two cosines: query vs name + description, and query vs the
+    candidate's 3 most similar past tasks. `createMiniLmEmbedder()` is an opt-in stub that throws
+    `EmbedderUnavailableError` ("not available offline").
+  - **Outcome kNN**: Beta(2,2)-smoothed success over the candidate's k = 10 most similar past runs
+    with cosine ≥ 0.3. Unknown labels are excluded. With no similar runs it is the prior, 0.5.
+  - **Score** = 0.45·lexical + 0.35·embedding + 0.20·outcome. A candidate with no lexical or
+    embedding signal is never suggested, so gibberish gets an empty list.
+  - **Confidence** = σ(a + b·score + c·margin), where margin = score − the best *other* candidate's
+    score (positive only for #1). Fitted by Platt/logistic regression (L2 0.1, Newton) on the
+    calibration split, top-5 candidates per query (n = 105). Recorded in `calibration.ts`:
+    a −2.9807, b 4.2622, c 7.6643. The text goes into `method.calibration`.
+  - **Reasons**: the matched name/description words, the 1–3 most similar past tasks with their
+    outcome counts and similarity, and the outcome history (kNN counts → smoothed %, n, plus the
+    all-runs rate with n).
+- **Eval**: 31 hand-written queries (`eval-queries.ts`) covering every agent and skill that has a
+  description or past runs, the main thread, and the loop tasks. A test checks that no query equals
+  or contains a demo task preview. Every third query is held out of calibration. One query
+  accepts two answers: the changelog-writer / release-notes duplicate skills.
+  `pnpm router:eval [--db <garden.db>] [--verbose] [--fit] [--export <file>]` prints the table.
+  The gate test is `packages/server/src/route.eval.test.ts`. It generates the demo in a tmpdir
+  outside any worktree.
+- **Server**: `GET /api/route?q=&days=&limit=`. zod validates it: q is trimmed, 1..500 chars,
+  limit 1..20. The window's index is cached per `days|asOf` (LRU of 4, about 0.35 s to build on
+  the demo, about 1–6 ms per query) and cleared when a manual label is written.
+- **Web**: a "Which one do I call?" box in the header above the window controls. `/` focuses it
+  and `Esc` clears it. Results show rank, kind, a confidence badge and meter, the beds the
+  candidate is planted in, "open plant", the reasons, and a "How computed" breakdown (each
+  component × weight = what it adds, the score, the confidence formula and calibration text, n and
+  corpus size). In the garden, the candidates' plants glow with a confidence badge and everything
+  else dims, through `GardenRenderer.highlight(plantIds, badges)` plus `garden/highlight.ts`.
+  This is a new registry channel, `router.highlight` (element `router`, 2 levels), with a legend
+  swatch drawn by the same pen code. Fixture mode bundles 5 real RouterResults exported from the
+  demo store (`apps/web/src/fixtures/router.demo.json`, plant ids match `garden.demo.json`). Any
+  other question shows those 5 as clickable examples.
+
+Eval (demo seed 42, 90-day window ending 2026-10-01T12:00Z; 19 candidates, 1,639 runs, 623 unique tasks):
+
+| Router | top-1 (all) | top-3 (all) | top-1 (calib.) | top-3 (calib.) | top-1 (holdout) | top-3 (holdout) |
+|---|---|---|---|---|---|---|
+| lexical (BM25) only | 97% | 97% | 95% | 95% | 100% | 100% |
+| + embedding (TF-IDF+LSA) | 90% | 97% | 95% | 95% | 80% | 100% |
+| + outcome kNN (full) | 90% | 97% | 90% | 95% | 90% | 100% |
+
+n = 31 (21 calibration, 10 holdout). Calibration: Brier 0.041 on the calibration split, **0.043 on
+the holdout** (always predicting the base rate scores 0.16). Holdout top-1 mean confidence is 74%
+against 90% observed accuracy (n = 10), so it is slightly under-confident at this n.
+
+Reading the ablation honestly: on this query set, **BM25 alone is best at top-1**. Embedding and
+outcomes leave top-3 unchanged and cost two top-1 hits: "locate the session handling…" goes to
+main over Explore, and "backstory behind the scheduler…" goes to main over legacy-archaeologist.
+The main thread has hundreds of similar-sounding past tasks. The demo's descriptions and task
+templates share vocabulary with natural queries, so lexical matching is strong. The 0.45/0.35/0.20
+weights are the plan's and were not tuned on the eval, to avoid overfitting 31 queries. The one top-3 miss,
+"document how the date range picker behaves", ranks docs-writer 4th behind main.
+
+Verification:
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm build`. `pnpm test`: 441 tests (34 new). `pnpm e2e`: 13 (3 new).
+- [x] Eval gate: top-3 ≥ 80% overall (97%) and on the holdout (100%). The recorded calibration
+  coefficients must match a refit (2 decimals), and the recorded holdout Brier must match.
+- [x] `/api/route`: plant ids are plants in the garden view; 400 on missing/blank/501-char q,
+  bad limit or days; a cached second query under 150 ms; gibberish gives no candidates.
+- [x] Screenshot `docs/screenshots/m6-router.png`, reviewed. For "write unit tests for the invoice
+  totals": test-writer 61% (glowing in shop-api and legacy-monolith), main 28% (six plants), all
+  other plants and beds dimmed. The reasons surface the demo story: on similar invoice-totals
+  tasks test-writer went 1 success / 9 failure → 21% outcome (n = 10).
+
+Known gaps:
+- **Not bed-aware.** The router ranks agents and skills, not plantings. test-writer gets one
+  confidence even though it thrives in shop-api and wilts in legacy-monolith. The outcome reason
+  shows this, but the badge doesn't. A `bed` parameter (outcome kNN per planting) is the natural next step.
+- The eval is small (31 queries, 10 held out) and written by the person who built the router.
+  Treat the confidence as indicative.
+- Built-in agents (Explore, Plan, general-purpose) have no description in the data, so they are
+  found only through their past tasks.
+- MiniLM is an interface only: no weights ship, and nothing downloads.
+- Fixture mode answers only the 5 bundled questions. Static exports have no router.
+- The router box adds about 18 px to the header, so earlier m3/m4 screenshots (not regenerated in
+  this commit) are slightly out of date.

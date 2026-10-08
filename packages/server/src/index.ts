@@ -4,3 +4,4 @@ export * from './garden';
 export * from './serve';
 export * from './export';
 export * from './plant';
+export * from './route';
