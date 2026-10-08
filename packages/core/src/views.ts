@@ -447,6 +447,12 @@ export interface SeasonsView {
     agentId: ID;
     agentName: string;
     plantId: ID | null;
+    /**
+     * Set when this row holds only the runs one loop triggered for this agent. Loop runs repeat one
+     * task, so they get their own row instead of moving the agent's rate with loop volume.
+     * The row without `loop` holds the agent's other runs.
+     */
+    loop?: { id: ID; name: string };
     perSeason: SeasonStat[];
   }[];
   caveat: string;

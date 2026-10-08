@@ -152,6 +152,24 @@ export const SWATCHES: Record<string, Swatch> = {
       pen.fill({ color: INK.hairline, alpha: 0.5 });
     },
   },
+  // Mirrors the Seasons view's SVG: CI band, level line, marker (filled / hollow for small n).
+  'season.rate': {
+    frame: { x: 0, y: 0, w: 60, h: 24 },
+    draw: (pen, level) => {
+      pen.rect(2, 7, 56, 10);
+      pen.fill({ color: INK.primary, alpha: 0.18 });
+      pen.moveTo(2, 12);
+      pen.lineTo(58, 12);
+      pen.stroke({ color: INK.primary, width: 2 });
+      pen.circle(30, 12, 4);
+      if (level === 0) pen.fill({ color: INK.primary });
+      else {
+        pen.fill({ color: PAPER });
+        pen.circle(30, 12, 4);
+        pen.stroke({ color: INK.primary, width: 1.6 });
+      }
+    },
+  },
   'replay.mark_shape': {
     frame: { x: -10, y: -10, w: 20, h: 20 },
     height: 24,

@@ -237,10 +237,29 @@ export const seasonBand: Encoding<{ index: number }> = {
   channel: 'Background tint band',
   metric: 'Harness version',
   howComputed:
-    'One band per harness version; boundaries from git commits or observed fingerprint changes.',
+    'One band per season of a (bed, agent) harness chain; boundaries from git commits or observed fingerprint changes. ' +
+    'Versions with no meaningful difference (e.g. only the entrypoint changed) merge into one season. ' +
+    'Runs belong to the season of the harness version they ran under.',
   action: 'Line up a harness change with what happened to outcomes.',
   levels: ['Alternating tints, one per season'],
   level: () => 0,
+};
+
+export const seasonRate: Encoding<{ success: { n: number } }> = {
+  id: 'season.rate',
+  element: 'season',
+  channel: 'Level line, shaded band, and marker in a season (Seasons view)',
+  metric: 'Success rate in that season, with its 95% Wilson interval',
+  howComputed:
+    'Height of the line = success rate (success 1, partial 0.5, failure 0; unknown excluded; manual labels win) over the season’s runs; ' +
+    `shaded band = 95% Wilson interval. Hollow marker when fewer than ${MIN_RUNS_FOR_BLOOM} labeled runs.`,
+  action:
+    'A step that clears the previous band is a change unlikely to be noise; then read the runs on both sides.',
+  levels: [
+    `Filled: ${MIN_RUNS_FOR_BLOOM}+ labeled runs`,
+    `Hollow: fewer than ${MIN_RUNS_FOR_BLOOM}`,
+  ],
+  level: (s) => (s.success.n >= MIN_RUNS_FOR_BLOOM ? 0 : 1),
 };
 
 // ---- replay (time-lapse of one run, M5) -------------------------------------------------------
@@ -408,6 +427,7 @@ export const ENCODINGS = [
   weedKind,
   playbookGate,
   seasonBand,
+  seasonRate,
   replayMarkShape,
   replayMarkColor,
   replayError,

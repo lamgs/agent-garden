@@ -8,6 +8,7 @@ import { loadGardenData, type GardenData } from './data';
 import { buildGardenView } from './garden';
 import { registerLiveRoutes } from './live';
 import { buildCompareView, buildPlantView, buildReplantView, loadStepAggregates } from './plant';
+import { buildSeasonsView } from './seasons';
 import { buildReplayView } from './replay';
 import { route as routeQuery } from '@garden/router';
 import { buildWindowIndex, RouterCache } from './route';
@@ -160,6 +161,16 @@ export function createApp(opts: AppOptions): Hono {
       opts.pricing,
     );
     return v ? c.json(v) : c.json({ error: 'unknown agent or bed' }, 404);
+  });
+  app.get('/api/seasons/:familyId', (c) => {
+    const p = params(c);
+    if ('error' in p) return c.json({ error: p.error }, 400);
+    const { data, garden } = windowData(opts, p.days, p.asOf);
+    const v = buildSeasonsView(data, garden, c.req.param('familyId'), {
+      window: garden.window,
+      ...(opts.pricing ? { pricing: opts.pricing } : {}),
+    });
+    return v ? c.json(v) : c.json({ error: 'unknown bed (or no runs in this window)' }, 404);
   });
   app.get('/api/replay/:runId', (c) => {
     const v = buildReplayView(opts.store, c.req.param('runId'), opts.pricing);

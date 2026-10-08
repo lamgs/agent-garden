@@ -6,13 +6,16 @@
  *   #/plant/:plantId                    plant view
  *   #/compare?left=<bedId>&right=<bedId> bed compare
  *   #/replant?agent=&from=&to=          replant
+ *   #/seasons/:bedId                    seasons of a bed
+ *   #/?asOf=<ISO>                       the garden as of a past date (scrub-to-date)
  *   #/replay/:runId                     time-lapse replay of one run
  *   #/replay?plant=<plantId>            replay of a plant's latest run
  */
-import type { ID } from '@garden/core';
+import type { ID, ISO } from '@garden/core';
 
 export type Route =
-  | { view: 'garden' }
+  | { view: 'garden'; asOf?: ISO }
+  | { view: 'seasons'; bedId: ID }
   | { view: 'plant'; plantId: ID }
   | { view: 'compare'; left: ID; right: ID }
   | { view: 'replant'; agent: ID; from: ID; to: ID }
@@ -25,6 +28,14 @@ export function parseRoute(hash: string): Route {
   const [path = '', query = ''] = raw.split('?', 2);
   const q = new URLSearchParams(query);
   const parts = path.split('/').filter(Boolean);
+  if (parts.length === 0) {
+    const asOf = q.get('asOf');
+    if (asOf === null) return { view: 'garden' };
+    if (!Number.isNaN(Date.parse(asOf))) return { view: 'garden', asOf };
+  }
+  if (parts[0] === 'seasons' && parts.length === 2 && parts[1]) {
+    return { view: 'seasons', bedId: decodeURIComponent(parts[1]) };
+  }
   if (parts[0] === 'plant' && parts.length === 2 && parts[1]) {
     return { view: 'plant', plantId: decodeURIComponent(parts[1]) };
   }
@@ -51,7 +62,9 @@ export function parseRoute(hash: string): Route {
 export function formatRoute(r: Route): string {
   switch (r.view) {
     case 'garden':
-      return '#/';
+      return r.asOf ? `#/?${new URLSearchParams({ asOf: r.asOf }).toString()}` : '#/';
+    case 'seasons':
+      return `#/seasons/${encodeURIComponent(r.bedId)}`;
     case 'plant':
       return `#/plant/${encodeURIComponent(r.plantId)}`;
     case 'compare':
@@ -71,6 +84,8 @@ export const plantHref = (plantId: ID) => formatRoute({ view: 'plant', plantId }
 export const compareHref = (left: ID, right: ID) => formatRoute({ view: 'compare', left, right });
 export const replantHref = (agent: ID, from: ID, to: ID) =>
   formatRoute({ view: 'replant', agent, from, to });
+export const seasonsHref = (bedId: ID) => formatRoute({ view: 'seasons', bedId });
+export const gardenAsOfHref = (asOf: ISO) => formatRoute({ view: 'garden', asOf });
 export const replayHref = (runId: ID) => formatRoute({ view: 'replay', runId, plantId: null });
 export const latestReplayHref = (plantId: ID) =>
   formatRoute({ view: 'replay', runId: null, plantId });

@@ -22,6 +22,7 @@ import type { Store } from '@garden/ingest';
 import { diffBundles } from '@garden/ingest/harness';
 import type { GardenData, RunRow } from './data';
 import { plantId, runCost } from './garden';
+import { rateDeltaOf } from './seasons';
 
 export const RUNS_CAP = 200;
 export const CORRELATION_CAVEAT =
@@ -111,11 +112,7 @@ export function signalStats(runs: readonly RunRow[]): SignalStat[] {
 }
 
 export function rateDelta(a: PlantSummary | null, b: PlantSummary | null): RateDelta {
-  const ra = a?.success;
-  const rb = b?.success;
-  if (ra?.value == null || rb?.value == null) return { delta: null, separated: false };
-  const separated = !!ra.ci95 && !!rb.ci95 && (ra.ci95[1] < rb.ci95[0] || rb.ci95[1] < ra.ci95[0]);
-  return { delta: rb.value - ra.value, separated };
+  return rateDeltaOf(a?.success, b?.success);
 }
 
 const costRatio = (a: PlantSummary | null, b: PlantSummary | null): number | null =>

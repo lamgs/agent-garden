@@ -12,6 +12,7 @@ contracts in `packages/core/src/views.ts`. Every response carries a strict Conte
 | GET | `/api/plant/:plantId?days=` | `PlantView` (404 if the planting has no runs in the window) |
 | GET | `/api/compare?left=<bedId>&right=<bedId>&days=` | `BedCompareView` |
 | GET | `/api/replant?agent=<agentId>&from=<bedId>&to=<bedId>&days=` | `ReplantView` |
+| GET | `/api/seasons/:bedId?days=&asOf=` | `SeasonsView` (404 for an unknown bed or one with no runs in the window) |
 | GET | `/api/replay/:runId` | `ReplayView`: frames with deduped context fill and cumulative tokens/cost, child runs to depth 3 (404 for an unknown run; no window filter) |
 | POST | `/api/runs/:runId/label` | `{ runId, outcome }`, body `{ label: success\|partial\|failure\|unknown\|clear, note? }` |
 | GET | `/api/route?q=<task>&days=&limit=` | `RouterResult` ("Which one do I call?"). `q` 1..500 chars (trimmed), `limit` 1..20 (default 5) |

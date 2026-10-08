@@ -54,6 +54,8 @@ export interface GardenData {
     primaryAgentId: string | null;
     provenance: 'git' | 'observed' | 'snapshot';
     commitMessage: string | null;
+    /** Commit the version was read from (git provenance). Optional for hand-built test data. */
+    commitSha?: string | null;
     diff: HarnessDiff | null;
   }[];
   agents: {
@@ -192,7 +194,7 @@ export function loadGardenData(store: Store, from: string, to: string): GardenDa
     ),
     versions: all<Record<string, unknown>>(
       `SELECT hv.*, (SELECT r.agent_id FROM runs r WHERE r.harness_version_id = hv.id
-                      GROUP BY r.agent_id ORDER BY COUNT(*) DESC LIMIT 1) AS primary_agent
+                      GROUP BY r.agent_id ORDER BY COUNT(*) DESC, MIN(r.started_at) LIMIT 1) AS primary_agent
          FROM harness_versions hv ORDER BY hv.valid_from`,
     ).map((v) => ({
       id: String(v.id),
@@ -203,6 +205,7 @@ export function loadGardenData(store: Store, from: string, to: string): GardenDa
       primaryAgentId: v.primary_agent === null ? null : String(v.primary_agent),
       provenance: v.provenance as 'git' | 'observed' | 'snapshot',
       commitMessage: json<{ message?: string } | null>(v.commit_json, null)?.message ?? null,
+      commitSha: json<{ sha?: string } | null>(v.commit_json, null)?.sha ?? null,
       diff: json<HarnessDiff | null>(v.diff_json, null),
     })),
     agents: all<Record<string, unknown>>(

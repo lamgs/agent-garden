@@ -43,8 +43,27 @@ export function fixtureParam(search: string): string | null {
   return new URLSearchParams(search).get('fixture');
 }
 
-export async function loadGarden(days: number, search = window.location.search): Promise<Loaded> {
+/** Why a garden "as of" a past date can't be shown from fixtures or a static export. */
+export const AS_OF_UNAVAILABLE =
+  'A garden as of a past date is computed by the local server from the stored runs. Fixtures and static exports only hold the current window. Run `pnpm demo` or `garden serve`.';
+
+export async function loadGarden(
+  days: number,
+  search = window.location.search,
+  asOf?: string,
+): Promise<Loaded> {
   const fixture = fixtureParam(search);
+  if (asOf !== undefined) {
+    const isStaticExport =
+      document.querySelector('meta[name="agent-garden-source"][content="static"]') !== null;
+    if (fixture || isStaticExport) throw new Error(AS_OF_UNAVAILABLE);
+    // No fallback to "now" data: showing the current garden under an "as of" banner would lie.
+    const v = await attempt(
+      `/api/garden?${new URLSearchParams({ days: String(days), asOf }).toString()}`,
+    );
+    if (v instanceof Error) throw new Error(`Garden as of ${asOf.slice(0, 10)}: ${v.message}`);
+    return { view: v, source: 'api', detail: `${days} days as of ${asOf.slice(0, 10)}` };
+  }
   if (fixture === 'demo') {
     const mod = await import('../fixtures/garden.demo.json');
     return { view: mod.default as GardenView, source: 'fixture', detail: 'demo fixture' };

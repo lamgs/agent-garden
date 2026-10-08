@@ -1,0 +1,1158 @@
+{
+ "generatedAt": "2026-08-10T23:59:59.999Z",
+ "window": {
+  "from": "2026-05-12T23:59:59.999Z",
+  "to": "2026-08-10T23:59:59.999Z"
+ },
+ "beds": [
+  {
+   "id": "fam_4a4d4950f87bb9ad",
+   "name": "data-pipeline",
+   "soil": {
+    "model": "claude-sonnet-5-5",
+    "effort": "high",
+    "toolCount": 12,
+    "mcpCount": 2,
+    "hookCount": 1,
+    "instructionBytes": 974
+   },
+   "currentHarnessVersionId": "hv_dd04a057b7c4d059",
+   "seasonCount": 1,
+   "plantIds": [
+    "plt_32694e53104271b2",
+    "plt_d49177c6346d3b64",
+    "plt_a26457a692e09521"
+   ]
+  },
+  {
+   "id": "fam_2a132f4212348a00",
+   "name": "docs-site",
+   "soil": {
+    "model": "claude-haiku-5-5",
+    "effort": "medium",
+    "toolCount": 12,
+    "mcpCount": 1,
+    "hookCount": 1,
+    "instructionBytes": 721
+   },
+   "currentHarnessVersionId": "hv_67fd3e79b3e90eb0",
+   "seasonCount": 1,
+   "plantIds": [
+    "plt_f0f59a6a0dc03097",
+    "plt_f877277e110077ef",
+    "plt_ca33ce3116070630"
+   ]
+  },
+  {
+   "id": "fam_c3c543c89ad03831",
+   "name": "infra",
+   "soil": {
+    "model": "claude-sonnet-5-5",
+    "effort": "high",
+    "toolCount": 12,
+    "mcpCount": 1,
+    "hookCount": 1,
+    "instructionBytes": 763
+   },
+   "currentHarnessVersionId": "hv_6720d453793faf35",
+   "seasonCount": 1,
+   "plantIds": [
+    "plt_7f307d08a4720190",
+    "plt_d42d9115bb38528a",
+    "plt_cef5c7f6dd6766cd",
+    "plt_3a3d0cfac546763d"
+   ]
+  },
+  {
+   "id": "fam_e4f77dae0177d5e5",
+   "name": "legacy-monolith",
+   "soil": {
+    "model": "claude-opus-5-5",
+    "effort": "xhigh",
+    "toolCount": 12,
+    "mcpCount": 8,
+    "hookCount": 1,
+    "instructionBytes": 31948
+   },
+   "currentHarnessVersionId": "hv_ef9c336bb430210c",
+   "seasonCount": 1,
+   "plantIds": [
+    "plt_74f6b9c8234e6f8e",
+    "plt_9bf3ced2ad883242",
+    "plt_8143e4aa8474a2c2",
+    "plt_88d143cd7476c408",
+    "plt_0afdf741a0daed53"
+   ]
+  },
+  {
+   "id": "fam_77320afbea5626a6",
+   "name": "shop-api",
+   "soil": {
+    "model": "claude-sonnet-5-5",
+    "effort": "high",
+    "toolCount": 12,
+    "mcpCount": 1,
+    "hookCount": 1,
+    "instructionBytes": 12440
+   },
+   "currentHarnessVersionId": "hv_d6333a7f5b6fa2ee",
+   "seasonCount": 1,
+   "plantIds": [
+    "plt_ff3cf3eb8c753cda",
+    "plt_81ec76c7104d4e0b",
+    "plt_33d5665ce1f3aa59",
+    "plt_5f39547dea82bd11"
+   ]
+  },
+  {
+   "id": "fam_f9fcfe609d8ee649",
+   "name": "web-dashboard",
+   "soil": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "toolCount": 12,
+    "mcpCount": 1,
+    "hookCount": 1,
+    "instructionBytes": 839
+   },
+   "currentHarnessVersionId": "hv_d8dcc778f6d613d3",
+   "seasonCount": 2,
+   "plantIds": [
+    "plt_6598b12d6125172a",
+    "plt_e56611089dfa3c3d",
+    "plt_9621c2475b555fef",
+    "plt_d007bf482688f822",
+    "plt_6bcece3f7527e70c"
+   ]
+  }
+ ],
+ "plants": [
+  {
+   "id": "plt_32694e53104271b2",
+   "agentId": "agt_0d6e4079e36703eb",
+   "agentKind": "main",
+   "bedId": "fam_4a4d4950f87bb9ad",
+   "name": "main",
+   "runs": 99,
+   "success": {
+    "value": 0.6578947368421053,
+    "n": 95,
+    "nUnknown": 4,
+    "nManual": 0,
+    "ci95": [
+     0.5580282865828903,
+     0.7454876419330383
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0.0625,
+   "costPerRunUsd": 0.0447074,
+   "totalCostUsd": 4.9228266,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-10T23:36:55.315Z",
+   "staleDays": 0,
+   "skillIds": []
+  },
+  {
+   "id": "plt_f0f59a6a0dc03097",
+   "agentId": "agt_0d6e4079e36703eb",
+   "agentKind": "main",
+   "bedId": "fam_2a132f4212348a00",
+   "name": "main",
+   "runs": 33,
+   "success": {
+    "value": 0.765625,
+    "n": 32,
+    "nUnknown": 1,
+    "nManual": 0,
+    "ci95": [
+     0.595578496481741,
+     0.8787306861440347
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0,
+   "costPerRunUsd": 0.0026386400000000003,
+   "totalCostUsd": 0.08598789000000001,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-10T16:25:11.047Z",
+   "staleDays": 0,
+   "skillIds": []
+  },
+  {
+   "id": "plt_7f307d08a4720190",
+   "agentId": "agt_0d6e4079e36703eb",
+   "agentKind": "main",
+   "bedId": "fam_c3c543c89ad03831",
+   "name": "main",
+   "runs": 67,
+   "success": {
+    "value": 0.7727272727272727,
+    "n": 66,
+    "nUnknown": 1,
+    "nManual": 0,
+    "ci95": [
+     0.6583031596442961,
+     0.8571489491275532
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0.16666666666666666,
+   "costPerRunUsd": 0.056047400000000004,
+   "totalCostUsd": 3.6657684000000006,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-08T18:09:28.073Z",
+   "staleDays": 2,
+   "skillIds": []
+  },
+  {
+   "id": "plt_74f6b9c8234e6f8e",
+   "agentId": "agt_0d6e4079e36703eb",
+   "agentKind": "main",
+   "bedId": "fam_e4f77dae0177d5e5",
+   "name": "main",
+   "runs": 124,
+   "success": {
+    "value": 0.4449152542372881,
+    "n": 118,
+    "nUnknown": 6,
+    "nManual": 0,
+    "ci95": [
+     0.35839270723924443,
+     0.534911385944036
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0.46153846153846156,
+   "costPerRunUsd": 0.1418431,
+   "totalCostUsd": 17.405042600000005,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-10T19:17:33.102Z",
+   "staleDays": 0,
+   "skillIds": []
+  },
+  {
+   "id": "plt_ff3cf3eb8c753cda",
+   "agentId": "agt_0d6e4079e36703eb",
+   "agentKind": "main",
+   "bedId": "fam_77320afbea5626a6",
+   "name": "main",
+   "runs": 239,
+   "success": {
+    "value": 0.5804347826086956,
+    "n": 230,
+    "nUnknown": 9,
+    "nManual": 0,
+    "ci95": [
+     0.51584796366773,
+     0.6423788018008607
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0.4152542372881356,
+   "costPerRunUsd": 0.0710924,
+   "totalCostUsd": 16.3955924,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-10T19:40:49.043Z",
+   "staleDays": 0,
+   "skillIds": [
+    "skl_18d8be0c880ea784",
+    "skl_c2c4fb0252e0766a",
+    "skl_fe901e85872e182d"
+   ]
+  },
+  {
+   "id": "plt_6598b12d6125172a",
+   "agentId": "agt_0d6e4079e36703eb",
+   "agentKind": "main",
+   "bedId": "fam_f9fcfe609d8ee649",
+   "name": "main",
+   "runs": 50,
+   "success": {
+    "value": 0.6836734693877551,
+    "n": 49,
+    "nUnknown": 1,
+    "nManual": 0,
+    "ci95": [
+     0.5442221110446072,
+     0.7964185962768972
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0.11764705882352941,
+   "costPerRunUsd": 0.09486640000000002,
+   "totalCostUsd": 4.3357594,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-10T17:08:02.724Z",
+   "staleDays": 0,
+   "skillIds": []
+  },
+  {
+   "id": "plt_81ec76c7104d4e0b",
+   "agentId": "agt_e08ba693bb6ad36a",
+   "agentKind": "subagent",
+   "bedId": "fam_77320afbea5626a6",
+   "name": "code-reviewer",
+   "runs": 19,
+   "success": {
+    "value": 0.5,
+    "n": 19,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.2949485641549598,
+     0.7050514358450402
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0,
+   "costPerRunUsd": 0.028601599999999998,
+   "totalCostUsd": 0.5269391999999999,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-10T13:51:41.816Z",
+   "staleDays": 0,
+   "skillIds": []
+  },
+  {
+   "id": "plt_e56611089dfa3c3d",
+   "agentId": "agt_e08ba693bb6ad36a",
+   "agentKind": "subagent",
+   "bedId": "fam_f9fcfe609d8ee649",
+   "name": "code-reviewer",
+   "runs": 2,
+   "success": {
+    "value": 0.5,
+    "n": 2,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.09452865480086614,
+     0.9054713451991339
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": null,
+   "costPerRunUsd": 0.0214966,
+   "totalCostUsd": 0.0429932,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-07-07T16:10:04.846Z",
+   "staleDays": 34,
+   "skillIds": []
+  },
+  {
+   "id": "plt_f877277e110077ef",
+   "agentId": "agt_bfcbf1697ddbee1b",
+   "agentKind": "subagent",
+   "bedId": "fam_2a132f4212348a00",
+   "name": "docs-writer",
+   "runs": 4,
+   "success": {
+    "value": 0.5,
+    "n": 4,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.15003570882017148,
+     0.8499642911798285
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": null,
+   "costPerRunUsd": 0.00123083,
+   "totalCostUsd": 0.0049207850000000004,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-07-27T15:07:26.083Z",
+   "staleDays": 14,
+   "skillIds": []
+  },
+  {
+   "id": "plt_9621c2475b555fef",
+   "agentId": "agt_bfcbf1697ddbee1b",
+   "agentKind": "subagent",
+   "bedId": "fam_f9fcfe609d8ee649",
+   "name": "docs-writer",
+   "runs": 7,
+   "success": {
+    "value": 0.5,
+    "n": 7,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.2023681624157092,
+     0.7976318375842908
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0,
+   "costPerRunUsd": 0.00105973,
+   "totalCostUsd": 0.0078321,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-10T16:07:40.255Z",
+   "staleDays": 0,
+   "skillIds": [
+    "skl_340a332048f4011e"
+   ]
+  },
+  {
+   "id": "plt_d49177c6346d3b64",
+   "agentId": "agt_3b73900b8d29f963",
+   "agentKind": "subagent",
+   "bedId": "fam_4a4d4950f87bb9ad",
+   "name": "Explore",
+   "runs": 7,
+   "success": {
+    "value": 0.5,
+    "n": 7,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.2023681624157092,
+     0.7976318375842908
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0,
+   "costPerRunUsd": 0.00121006,
+   "totalCostUsd": 0.00847252,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-10T21:58:51.296Z",
+   "staleDays": 0,
+   "skillIds": []
+  },
+  {
+   "id": "plt_ca33ce3116070630",
+   "agentId": "agt_3b73900b8d29f963",
+   "agentKind": "subagent",
+   "bedId": "fam_2a132f4212348a00",
+   "name": "Explore",
+   "runs": 3,
+   "success": {
+    "value": 0.5,
+    "n": 3,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.12533145299844767,
+     0.8746685470015523
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0,
+   "costPerRunUsd": 0.000955075,
+   "totalCostUsd": 0.00294279,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-07-29T21:58:41.727Z",
+   "staleDays": 12,
+   "skillIds": []
+  },
+  {
+   "id": "plt_9bf3ced2ad883242",
+   "agentId": "agt_3b73900b8d29f963",
+   "agentKind": "subagent",
+   "bedId": "fam_e4f77dae0177d5e5",
+   "name": "Explore",
+   "runs": 16,
+   "success": {
+    "value": 0.5,
+    "n": 16,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.2799923761135083,
+     0.7200076238864916
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0,
+   "costPerRunUsd": 0.00196718,
+   "totalCostUsd": 0.03606108000000001,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-05T20:08:21.157Z",
+   "staleDays": 5,
+   "skillIds": []
+  },
+  {
+   "id": "plt_33d5665ce1f3aa59",
+   "agentId": "agt_3b73900b8d29f963",
+   "agentKind": "subagent",
+   "bedId": "fam_77320afbea5626a6",
+   "name": "Explore",
+   "runs": 13,
+   "success": {
+    "value": 0.5,
+    "n": 13,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.2611999565246629,
+     0.7388000434753371
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0,
+   "costPerRunUsd": 0.001443065,
+   "totalCostUsd": 0.018867795000000003,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-07T15:26:35.019Z",
+   "staleDays": 3,
+   "skillIds": []
+  },
+  {
+   "id": "plt_d007bf482688f822",
+   "agentId": "agt_3b73900b8d29f963",
+   "agentKind": "subagent",
+   "bedId": "fam_f9fcfe609d8ee649",
+   "name": "Explore",
+   "runs": 4,
+   "success": {
+    "value": 0.5,
+    "n": 4,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.15003570882017148,
+     0.8499642911798285
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0,
+   "costPerRunUsd": 0.001194915,
+   "totalCostUsd": 0.0046932499999999995,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-08T17:42:25.917Z",
+   "staleDays": 2,
+   "skillIds": []
+  },
+  {
+   "id": "plt_d42d9115bb38528a",
+   "agentId": "agt_db45ca5bb40691a7",
+   "agentKind": "subagent",
+   "bedId": "fam_c3c543c89ad03831",
+   "name": "general-purpose",
+   "runs": 4,
+   "success": {
+    "value": 0.5,
+    "n": 4,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.15003570882017148,
+     0.8499642911798285
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0,
+   "costPerRunUsd": 0.021290999999999997,
+   "totalCostUsd": 0.0863997,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-08T18:09:47.807Z",
+   "staleDays": 2,
+   "skillIds": []
+  },
+  {
+   "id": "plt_8143e4aa8474a2c2",
+   "agentId": "agt_ad89bb82d011832a",
+   "agentKind": "subagent",
+   "bedId": "fam_e4f77dae0177d5e5",
+   "name": "legacy-archaeologist",
+   "runs": 14,
+   "success": {
+    "value": 0.5,
+    "n": 14,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.2679886791947528,
+     0.7320113208052472
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0,
+   "costPerRunUsd": 0.069158,
+   "totalCostUsd": 1.0020008,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-06T15:48:51.971Z",
+   "staleDays": 4,
+   "skillIds": []
+  },
+  {
+   "id": "plt_a26457a692e09521",
+   "agentId": "agt_3b50cdea270e1512",
+   "agentKind": "subagent",
+   "bedId": "fam_4a4d4950f87bb9ad",
+   "name": "migration-helper",
+   "runs": 6,
+   "success": {
+    "value": 1,
+    "n": 6,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.6096569663469354,
+     0.9999999999999999
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0,
+   "costPerRunUsd": 0.02688535,
+   "totalCostUsd": 0.1622764,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-08T18:27:17.748Z",
+   "staleDays": 2,
+   "skillIds": [
+    "skl_d671bafe6f8bae54"
+   ]
+  },
+  {
+   "id": "plt_cef5c7f6dd6766cd",
+   "agentId": "agt_fa8ed0bdabdd6bcb",
+   "agentKind": "subagent",
+   "bedId": "fam_c3c543c89ad03831",
+   "name": "Plan",
+   "runs": 7,
+   "success": {
+    "value": 0.5,
+    "n": 7,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.2023681624157092,
+     0.7976318375842908
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0,
+   "costPerRunUsd": 0.023237400000000002,
+   "totalCostUsd": 0.1596355,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-07T16:33:54.891Z",
+   "staleDays": 3,
+   "skillIds": []
+  },
+  {
+   "id": "plt_88d143cd7476c408",
+   "agentId": "agt_fa8ed0bdabdd6bcb",
+   "agentKind": "subagent",
+   "bedId": "fam_e4f77dae0177d5e5",
+   "name": "Plan",
+   "runs": 6,
+   "success": {
+    "value": 0.5,
+    "n": 6,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.18761280689940868,
+     0.8123871931005913
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": null,
+   "costPerRunUsd": 0.0632247,
+   "totalCostUsd": 0.38793479999999997,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-07-26T17:08:23.822Z",
+   "staleDays": 15,
+   "skillIds": []
+  },
+  {
+   "id": "plt_6bcece3f7527e70c",
+   "agentId": "agt_0b38809e383acf0d",
+   "agentKind": "subagent",
+   "bedId": "fam_f9fcfe609d8ee649",
+   "name": "release-manager",
+   "runs": 1,
+   "success": {
+    "value": 1,
+    "n": 1,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.20654329147389294,
+     1
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": null,
+   "costPerRunUsd": 0.0195367,
+   "totalCostUsd": 0.0195367,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-07-21T20:56:41.642Z",
+   "staleDays": 20,
+   "skillIds": []
+  },
+  {
+   "id": "plt_3a3d0cfac546763d",
+   "agentId": "agt_4fa9cb0651f7ec56",
+   "agentKind": "subagent",
+   "bedId": "fam_c3c543c89ad03831",
+   "name": "terraform-planner",
+   "runs": 9,
+   "success": {
+    "value": 0.5,
+    "n": 9,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.22652570799481014,
+     0.7734742920051898
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0,
+   "costPerRunUsd": 0.0140686,
+   "totalCostUsd": 0.1268452,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-07T16:10:14.918Z",
+   "staleDays": 3,
+   "skillIds": []
+  },
+  {
+   "id": "plt_0afdf741a0daed53",
+   "agentId": "agt_c02389e440c4e177",
+   "agentKind": "subagent",
+   "bedId": "fam_e4f77dae0177d5e5",
+   "name": "test-writer",
+   "runs": 44,
+   "success": {
+    "value": 0.25,
+    "n": 44,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.14574066080685744,
+     0.39440849808414946
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0.8461538461538461,
+   "costPerRunUsd": 0.13386559999999997,
+   "totalCostUsd": 5.7879676,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-07T15:20:35.698Z",
+   "staleDays": 3,
+   "skillIds": []
+  },
+  {
+   "id": "plt_5f39547dea82bd11",
+   "agentId": "agt_c02389e440c4e177",
+   "agentKind": "subagent",
+   "bedId": "fam_77320afbea5626a6",
+   "name": "test-writer",
+   "runs": 51,
+   "success": {
+    "value": 0.9215686274509803,
+    "n": 51,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.8149980177513917,
+     0.9690783038730685
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0.1,
+   "costPerRunUsd": 0.0499503,
+   "totalCostUsd": 2.5843700999999997,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-08-10T18:35:30.400Z",
+   "staleDays": 0,
+   "skillIds": []
+  }
+ ],
+ "skills": [
+  {
+   "skillId": "skl_fe901e85872e182d",
+   "name": "changelog-writer",
+   "plantId": "plt_ff3cf3eb8c753cda",
+   "invocations": 2
+  },
+  {
+   "skillId": "skl_c2c4fb0252e0766a",
+   "name": "run-tests",
+   "plantId": "plt_ff3cf3eb8c753cda",
+   "invocations": 2
+  },
+  {
+   "skillId": "skl_18d8be0c880ea784",
+   "name": "tag-release",
+   "plantId": "plt_ff3cf3eb8c753cda",
+   "invocations": 2
+  },
+  {
+   "skillId": "skl_d671bafe6f8bae54",
+   "name": "db-migrate",
+   "plantId": "plt_a26457a692e09521",
+   "invocations": 6
+  },
+  {
+   "skillId": "skl_340a332048f4011e",
+   "name": "api-docs",
+   "plantId": "plt_9621c2475b555fef",
+   "invocations": 1
+  }
+ ],
+ "loops": [
+  {
+   "loopId": "loop_b865f12b92e54495",
+   "name": "Backfill yesterday's events partition and fix an…",
+   "tier": "application",
+   "targetPlantIds": [
+    "plt_32694e53104271b2"
+   ],
+   "runsPerDay": 0.4222222222222222,
+   "observed": true,
+   "state": "flowing",
+   "evidence": [
+    "38 runs in the window (0.42/day), inferred loop, trigger headless_repeat."
+   ]
+  },
+  {
+   "loopId": "loop_c2352359d8eac5b6",
+   "name": "PostToolUse hook (Edit|Write)",
+   "tier": "verification",
+   "targetPlantIds": [
+    "plt_32694e53104271b2",
+    "plt_32694e53104271b2",
+    "plt_32694e53104271b2",
+    "plt_32694e53104271b2",
+    "plt_32694e53104271b2",
+    "plt_32694e53104271b2",
+    "plt_f0f59a6a0dc03097",
+    "plt_f0f59a6a0dc03097",
+    "plt_f0f59a6a0dc03097",
+    "plt_f0f59a6a0dc03097",
+    "plt_f0f59a6a0dc03097",
+    "plt_f0f59a6a0dc03097",
+    "plt_7f307d08a4720190",
+    "plt_7f307d08a4720190",
+    "plt_7f307d08a4720190",
+    "plt_7f307d08a4720190",
+    "plt_7f307d08a4720190",
+    "plt_7f307d08a4720190",
+    "plt_74f6b9c8234e6f8e",
+    "plt_74f6b9c8234e6f8e",
+    "plt_74f6b9c8234e6f8e",
+    "plt_74f6b9c8234e6f8e",
+    "plt_74f6b9c8234e6f8e",
+    "plt_74f6b9c8234e6f8e",
+    "plt_ff3cf3eb8c753cda",
+    "plt_ff3cf3eb8c753cda",
+    "plt_ff3cf3eb8c753cda",
+    "plt_ff3cf3eb8c753cda",
+    "plt_ff3cf3eb8c753cda",
+    "plt_ff3cf3eb8c753cda",
+    "plt_6598b12d6125172a",
+    "plt_6598b12d6125172a",
+    "plt_6598b12d6125172a",
+    "plt_6598b12d6125172a",
+    "plt_6598b12d6125172a",
+    "plt_6598b12d6125172a"
+   ],
+   "runsPerDay": 0,
+   "observed": false,
+   "state": "flowing",
+   "evidence": [
+    "Configured hook (user PostToolUse matcher=Edit|Write (command)). Its executions are not recorded in transcripts, so no flow rate is claimed. Upper bound: at most 9.2 runs/day happen in the beds where it is active."
+   ]
+  },
+  {
+   "loopId": "loop_d8f9e80790f8e182",
+   "name": "PostToolUse hook (Edit|Write)",
+   "tier": "verification",
+   "targetPlantIds": [
+    "plt_ff3cf3eb8c753cda",
+    "plt_ff3cf3eb8c753cda",
+    "plt_ff3cf3eb8c753cda",
+    "plt_ff3cf3eb8c753cda",
+    "plt_ff3cf3eb8c753cda",
+    "plt_ff3cf3eb8c753cda"
+   ],
+   "runsPerDay": 0,
+   "observed": false,
+   "state": "flowing",
+   "evidence": [
+    "Configured hook (project PostToolUse matcher=Edit|Write (command)). Its executions are not recorded in transcripts, so no flow rate is claimed. Upper bound: at most 3.6 runs/day happen in the beds where it is active."
+   ]
+  },
+  {
+   "loopId": "loop_22aa974b10d78350",
+   "name": "dependency-update-sweep",
+   "tier": "application",
+   "targetPlantIds": [
+    "plt_7f307d08a4720190"
+   ],
+   "runsPerDay": 0.05555555555555555,
+   "observed": true,
+   "state": "flowing",
+   "evidence": [
+    "5 runs in the window (0.06/day), declared loop, trigger cron."
+   ]
+  },
+  {
+   "loopId": "loop_50471c905c57f8e5",
+   "name": "nightly-flaky-triage",
+   "tier": "application",
+   "targetPlantIds": [
+    "plt_ff3cf3eb8c753cda"
+   ],
+   "runsPerDay": 0.4222222222222222,
+   "observed": true,
+   "state": "flowing",
+   "evidence": [
+    "38 runs in the window (0.42/day), declared loop, trigger cron."
+   ]
+  }
+ ],
+ "bees": [
+  {
+   "fromPlantId": "plt_74f6b9c8234e6f8e",
+   "toPlantId": "plt_0afdf741a0daed53",
+   "calls": 44
+  },
+  {
+   "fromPlantId": "plt_ff3cf3eb8c753cda",
+   "toPlantId": "plt_5f39547dea82bd11",
+   "calls": 51
+  },
+  {
+   "fromPlantId": "plt_7f307d08a4720190",
+   "toPlantId": "plt_3a3d0cfac546763d",
+   "calls": 9
+  },
+  {
+   "fromPlantId": "plt_ff3cf3eb8c753cda",
+   "toPlantId": "plt_81ec76c7104d4e0b",
+   "calls": 19
+  },
+  {
+   "fromPlantId": "plt_6598b12d6125172a",
+   "toPlantId": "plt_e56611089dfa3c3d",
+   "calls": 2
+  },
+  {
+   "fromPlantId": "plt_32694e53104271b2",
+   "toPlantId": "plt_a26457a692e09521",
+   "calls": 6
+  },
+  {
+   "fromPlantId": "plt_74f6b9c8234e6f8e",
+   "toPlantId": "plt_9bf3ced2ad883242",
+   "calls": 16
+  },
+  {
+   "fromPlantId": "plt_74f6b9c8234e6f8e",
+   "toPlantId": "plt_8143e4aa8474a2c2",
+   "calls": 14
+  },
+  {
+   "fromPlantId": "plt_6598b12d6125172a",
+   "toPlantId": "plt_9621c2475b555fef",
+   "calls": 7
+  },
+  {
+   "fromPlantId": "plt_32694e53104271b2",
+   "toPlantId": "plt_d49177c6346d3b64",
+   "calls": 7
+  },
+  {
+   "fromPlantId": "plt_ff3cf3eb8c753cda",
+   "toPlantId": "plt_33d5665ce1f3aa59",
+   "calls": 13
+  },
+  {
+   "fromPlantId": "plt_f0f59a6a0dc03097",
+   "toPlantId": "plt_ca33ce3116070630",
+   "calls": 3
+  },
+  {
+   "fromPlantId": "plt_74f6b9c8234e6f8e",
+   "toPlantId": "plt_88d143cd7476c408",
+   "calls": 6
+  },
+  {
+   "fromPlantId": "plt_f0f59a6a0dc03097",
+   "toPlantId": "plt_f877277e110077ef",
+   "calls": 4
+  },
+  {
+   "fromPlantId": "plt_7f307d08a4720190",
+   "toPlantId": "plt_d42d9115bb38528a",
+   "calls": 4
+  },
+  {
+   "fromPlantId": "plt_7f307d08a4720190",
+   "toPlantId": "plt_cef5c7f6dd6766cd",
+   "calls": 7
+  },
+  {
+   "fromPlantId": "plt_6598b12d6125172a",
+   "toPlantId": "plt_d007bf482688f822",
+   "calls": 4
+  },
+  {
+   "fromPlantId": "plt_6598b12d6125172a",
+   "toPlantId": "plt_6bcece3f7527e70c",
+   "calls": 1
+  }
+ ],
+ "weeds": [
+  {
+   "id": "weed_29045075f6b46936",
+   "kind": "orphan",
+   "subject": {
+    "type": "agent",
+    "id": "agt_58c898a42061f25e"
+   },
+   "reason": "Agent “perf-profiler” is defined (user) but never ran in the window."
+  },
+  {
+   "id": "weed_83b8aa5e674ef4c1",
+   "kind": "orphan",
+   "subject": {
+    "type": "skill",
+    "id": "skl_31d8861378b8364a"
+   },
+   "reason": "Skill “misc-helpers” was never invoked in the window."
+  },
+  {
+   "id": "weed_2339bf67ab68a928",
+   "kind": "unowned",
+   "subject": {
+    "type": "skill",
+    "id": "skl_31d8861378b8364a"
+   },
+   "reason": "Skill “misc-helpers” has no description; the model cannot know when to load it."
+  },
+  {
+   "id": "weed_ea45defb381711c6",
+   "kind": "orphan",
+   "subject": {
+    "type": "skill",
+    "id": "skl_4ae1eb667fb53609"
+   },
+   "reason": "Skill “release-notes” was never invoked in the window."
+  },
+  {
+   "id": "weed_e4bcd4f2669d9d64",
+   "kind": "duplicate",
+   "subject": {
+    "type": "skill",
+    "id": "skl_4ae1eb667fb53609"
+   },
+   "reason": "Skill “release-notes” overlaps with “changelog-writer” (description similarity 0.83). Merge or differentiate them."
+  },
+  {
+   "id": "weed_96c9d76741ec8ecb",
+   "kind": "orphan",
+   "subject": {
+    "type": "mcp_server",
+    "id": "browser"
+   },
+   "bedId": "fam_e4f77dae0177d5e5",
+   "reason": "MCP server “browser” is connected in legacy-monolith but was never called in the window. Its tool descriptions still cost context."
+  },
+  {
+   "id": "weed_158d0a356c5a1d6d",
+   "kind": "orphan",
+   "subject": {
+    "type": "mcp_server",
+    "id": "datadog"
+   },
+   "bedId": "fam_e4f77dae0177d5e5",
+   "reason": "MCP server “datadog” is connected in legacy-monolith but was never called in the window. Its tool descriptions still cost context."
+  },
+  {
+   "id": "weed_4ac77a8a05558388",
+   "kind": "orphan",
+   "subject": {
+    "type": "mcp_server",
+    "id": "github"
+   },
+   "reason": "MCP server “github” is connected in 6 beds (data-pipeline, docs-site, infra, legacy-monolith, shop-api, web-dashboard) but was never called in the window. Its tool descriptions still cost context."
+  },
+  {
+   "id": "weed_c0f6fdad28607a43",
+   "kind": "orphan",
+   "subject": {
+    "type": "mcp_server",
+    "id": "mysql-legacy"
+   },
+   "bedId": "fam_e4f77dae0177d5e5",
+   "reason": "MCP server “mysql-legacy” is connected in legacy-monolith but was never called in the window. Its tool descriptions still cost context."
+  },
+  {
+   "id": "weed_d08ff90e7d078e83",
+   "kind": "orphan",
+   "subject": {
+    "type": "mcp_server",
+    "id": "sentry"
+   },
+   "bedId": "fam_e4f77dae0177d5e5",
+   "reason": "MCP server “sentry” is connected in legacy-monolith but was never called in the window. Its tool descriptions still cost context."
+  },
+  {
+   "id": "weed_66cf049bd20489e4",
+   "kind": "orphan",
+   "subject": {
+    "type": "mcp_server",
+    "id": "slack"
+   },
+   "bedId": "fam_e4f77dae0177d5e5",
+   "reason": "MCP server “slack” is connected in legacy-monolith but was never called in the window. Its tool descriptions still cost context."
+  }
+ ],
+ "playbooks": [
+  {
+   "id": "pb_a4d451ec23463726",
+   "name": "release",
+   "steps": [
+    {
+     "stepId": "changelog",
+     "bedId": "fam_77320afbea5626a6",
+     "plantId": "plt_ff3cf3eb8c753cda",
+     "gate": "open",
+     "evidence": "Step finished without errors. (latest attempt 2026-08-05)"
+    },
+    {
+     "stepId": "tests",
+     "bedId": "fam_77320afbea5626a6",
+     "plantId": "plt_ff3cf3eb8c753cda",
+     "gate": "open",
+     "evidence": "`pnpm test --` passed. (latest attempt 2026-08-05)"
+    },
+    {
+     "stepId": "tag",
+     "bedId": "fam_77320afbea5626a6",
+     "plantId": "plt_ff3cf3eb8c753cda",
+     "gate": "open",
+     "evidence": "“git tag” succeeded. (latest attempt 2026-08-05)"
+    }
+   ]
+  }
+ ]
+}
