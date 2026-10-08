@@ -478,3 +478,64 @@ Known gaps:
 - Fixture mode answers only the 5 bundled questions. Static exports have no router.
 - The router box adds about 18 px to the header, so earlier m3/m4 screenshots (not regenerated in
   this commit) are slightly out of date.
+
+## Live UI: garden overlay, Needs-you strip, event ticker (2026-10-08)
+
+Status: built. Verified in fixture mode (`?fixture=demo`) and against a served demo store
+(`garden serve --live-demo`, dataset generated outside the worktree).
+
+Mapping. Every channel is registered in `encodings.ts` (`element: 'live'`), with swatches drawn by
+`garden/live-draw.ts`:
+
+| Element | Channel | Metric |
+|---|---|---|
+| Ring on the soil around the plant (`live.ring`) | Arc length and context-bin color (replay bins); faint when idle or done | A live run; prompt size ÷ context window |
+| Ink mark in a tag right of the plant top (`live.activity`) | 11 marks: thinking, reading, searching, editing, running, web, MCP, skill, delegating, compacting, done | Current activity (the panel shows the rule that decided it) |
+| Amber `!` / `?` tag (`live.attention`) | Solid = recorded (hooks, session registry, AskUserQuestion); dashed = inferred | Waiting for permission / input |
+| Red ticks on the ring (`live.error`) | 1–3 ticks, bold while the newest event is the error | Errors this turn |
+| Cut across the ring (`live.compaction`) | Shown for 3 s; the ring restarts | A compaction just happened |
+| Live bee (`live.bee`) | Flies parent → child, hovers while the child is live, flies back | A subagent handoff happening now (same meaning as bee paths) |
+| Channel pulse (`live.loop_pulse`) | One bright pulse (a static 2 s glow with reduced motion) | A loop just started a run |
+| Seedling with a "new" flag (`live.seedling`) | Sits in a free slot of its bed | A live agent with no planting yet |
+| Pips beside the tag (`live.count`) | 0–3 pips | Live runs sharing one plant (the ring and tag show the most urgent) |
+
+- [x] Overlay: `garden/live-overlay.ts`, its own Pixi layer attached with `GardenRenderer.addOverlay`
+  (scene, camera, and ticker hooks; the router highlight does not dim it). The pure model lives in
+  `live/overlay-model.ts`: join by plantId, then bed + agent name, then seedling, then off-stage;
+  urgency grouping; bees; loop pulses; compaction cuts. Seedling slots come from
+  `garden/live-layout.ts`. The store (`live/live-store.ts`) feeds the overlay directly; React only
+  renders the chrome.
+- [x] Chrome:
+  - Live pill. States: live / fixture / connecting / reconnecting / off. Shows the source and how many
+    agents are active and waiting. Click toggles the layer; `?live=off` starts with it off.
+  - Needs-you strip. Permission waits first, then the longest wait. Each row has an inferred label and
+    its evidence on hover; click opens the plant. Top 5 rows, then "+N more".
+  - Event ticker, collapsible.
+  - Plant panel "Now" section: activity and how it was decided, tool, context fill, tool calls and
+    errors this turn, loop, model, and a link to the latest stored replay.
+- [x] The live stream opens only on the garden view, and only where it can exist. `/api/health` now
+  reports `live`. Static exports and non-demo fixtures request nothing. When the stream is
+  unavailable the layer is off: the client's demo fallback is never mixed into a real garden.
+- [x] Fixture stream: the shop-api publish waits 26 s (was 16 s). infra now also delegates to a new
+  `cost-estimator` agent, which has no planting and so shows the seedling.
+- [x] Tests:
+  - `overlay-model.test.ts`: join, glyph mapping, urgency, the inferred rule, bees, pulses, seedling slots.
+  - The legend test covers the 9 new channels.
+  - `e2e/live.spec.ts`: overlay; the inferred permission wait in Needs you, with evidence; the ticker
+    advances; panel "Now"; legend; pill toggle; no console errors or external requests; with reduced
+    motion, bees are placed and never fly; `?live=off`.
+- Screenshots: `docs/screenshots/live-garden.png`, `live-needs-you.png`, `live-panel.png`, and
+  `live-served.png` (served demo store). The reduced-motion garden test now runs with `live=off`:
+  live state changes are not motion, but they change pixels. Older milestone screenshots were not
+  regenerated in this commit.
+
+Known gaps:
+- Served mode never sets `LiveAgent.loop`, so the loop pulse only appears in fixture mode so far.
+- The served demo keeps ended main sessions as `waiting_input` for the whole active window, so Needs
+  you fills with inferred input waits (capped at 5 rows). The research suggests treating text-only
+  turn ends as idle.
+- Seedlings and off-stage agents are not clickable: there is no planting to open. Off-stage agents
+  (bed not in the window) appear only in the strip and the ticker. The far zoom hides the overlay.
+- `LiveAgent` has no run id, so "Now" links to the latest stored replay, not to the run in progress.
+- Server previews for some tools are raw JSON input (e.g. `{"command":"pnpm test…`). They are
+  redacted, but not pretty.

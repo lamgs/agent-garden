@@ -3,6 +3,7 @@ import type { GardenView, ID } from '@garden/core';
 import { describePlant, plantLabel } from '../describe';
 import { formatRate } from '../format';
 import { latestReplayHref, plantHref } from '../route';
+import { LiveNow } from './Live';
 import { DescriptionBody } from './Tooltip';
 
 /** Side panel for a selected plant. M4 grows this into the full Plant view. */
@@ -41,6 +42,7 @@ export function PlantPanel({
         ×
       </button>
       <DescriptionBody d={d} />
+      <LiveNow view={view} plantId={p.id} />
       <p className="panel-open">
         <a className="open-plant" href={plantHref(p.id)}>
           Open plant view →

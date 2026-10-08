@@ -3,6 +3,8 @@ import type { GardenView, ID } from '@garden/core';
 import { describe, targetKey, type HoverTarget } from '../describe';
 import { formatRate } from '../format';
 import { GardenRenderer, type ZoomLevel } from '../garden/renderer';
+import { LiveOverlay, type LiveOverlayStats } from '../garden/live-overlay';
+import { liveStore } from '../live/live-store';
 import { DescriptionBody } from './Tooltip';
 
 export interface GardenTestApi {
@@ -34,6 +36,8 @@ export interface GardenTestApi {
 declare global {
   interface Window {
     __garden?: GardenTestApi;
+    /** Live overlay state for e2e checks (counts and phases only, no content). */
+    __live?: { stats(): LiveOverlayStats };
   }
 }
 
@@ -115,6 +119,19 @@ export const GardenStage = forwardRef<GardenStageHandle, Props>(function GardenS
       onBedLabel: (id) => cbRef.current.onBedLabel(id),
     });
     rendererRef.current = r;
+    // Live overlay: its own Pixi layer, fed straight from the live store (never through React).
+    const overlay = new LiveOverlay();
+    const detach = r.addOverlay(overlay);
+    const store = liveStore();
+    let lastSnap = store.get().snapshot;
+    overlay.setSnapshot(lastSnap);
+    const unsubLive = store.subscribe(() => {
+      const snap = store.get().snapshot;
+      if (snap === lastSnap) return;
+      lastSnap = snap;
+      overlay.setSnapshot(snap);
+    });
+    window.__live = { stats: () => overlay.stats() };
     const fontsReady = document.fonts?.ready ?? Promise.resolve();
     void Promise.all([
       r.init(host),
@@ -133,6 +150,9 @@ export const GardenStage = forwardRef<GardenStageHandle, Props>(function GardenS
     return () => {
       cancelled = true;
       host.removeEventListener('pointermove', onMove);
+      unsubLive();
+      detach();
+      overlay.destroy();
       r.destroy();
       rendererRef.current = null;
       if (window.__garden) window.__garden.ready = false;

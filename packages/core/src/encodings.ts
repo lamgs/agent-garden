@@ -9,6 +9,8 @@ import type {
   BedSummary,
   BeeFlow,
   GateState,
+  LiveActivity,
+  LiveAgent,
   LoopChannel,
   PlantSummary,
   ReplayFrame,
@@ -27,6 +29,7 @@ export type GardenElement =
   | 'season'
   | 'replay'
   | 'router'
+  | 'live'
   | 'ambient';
 
 export interface Encoding<I> {
@@ -380,6 +383,168 @@ export const routerHighlight: Encoding<{ candidate: boolean }> = {
   level: (x) => (x.candidate ? 0 : 1),
 };
 
+// ---- live layer (what is happening now; drawn over the garden by the live overlay) ---------------
+
+/** Activities drawn as an ink mark above the plant, in legend order (`liveActivity` levels). */
+export const LIVE_GLYPH_ACTIVITIES = [
+  'thinking',
+  'reading',
+  'searching',
+  'editing',
+  'running',
+  'web',
+  'mcp',
+  'skill',
+  'delegating',
+  'compacting',
+  'done',
+] as const satisfies readonly LiveActivity[];
+
+/** Activities that count as working (the ring is drawn in full ink). */
+export function liveWorking(a: LiveActivity): boolean {
+  return a !== 'idle' && a !== 'done';
+}
+
+export const liveRing: Encoding<Pick<LiveAgent, 'activity' | 'contextTokens' | 'contextWindow'>> = {
+  id: 'live.ring',
+  element: 'live',
+  channel: 'Ring on the soil around the plant (arc length and color)',
+  metric: 'A live run of this planting, and its context fill (prompt size ÷ context window)',
+  howComputed:
+    'Drawn while the agent had a transcript event within the active window. The arc starts at the front and grows clockwise with the latest prompt size (input + cache read + cache write of the newest API message, once per message.id) over the model’s context window from the pricing table (200k when unknown). Same bins as the replay context band. Faint when the agent is idle or done.',
+  action: 'A nearly closed ring means a compaction is coming: split the task or trim the harness.',
+  levels: [
+    'Working, under 50% of the window',
+    'Working, 50–80%',
+    'Working, 80% or more',
+    'Idle or done (faint ring)',
+  ],
+  level: (a) =>
+    !liveWorking(a.activity)
+      ? 3
+      : binIndex(a.contextWindow > 0 ? a.contextTokens / a.contextWindow : 0, [0.5, 0.8]),
+};
+
+export const liveActivity: Encoding<Pick<LiveAgent, 'activity'>> = {
+  id: 'live.activity',
+  element: 'live',
+  channel: 'Ink mark in a tag above the plant',
+  metric: 'What the agent is doing right now',
+  howComputed:
+    'From the newest transcript line: an open tool_use decides the mark by tool (Read → reading; Grep/Glob → searching; Edit/Write → editing; Bash → running; WebFetch/WebSearch → web; mcp__* → MCP; Skill → skill; Agent/Task → delegating); thinking blocks and text → thinking; compact_boundary → compacting. The plant panel’s “Now” section shows the exact rule that fired. Level −1 (no mark): idle, waiting, or errored, which other live channels draw.',
+  action: 'See at a glance who is reading, who is changing files, and who is running commands.',
+  levels: [
+    'Thinking (spiral)',
+    'Reading (open page)',
+    'Searching (lens)',
+    'Editing (nib)',
+    'Running a command (prompt chevron)',
+    'Web (globe)',
+    'MCP connector (plug)',
+    'Skill (seed packet)',
+    'Delegating to a subagent (fork)',
+    'Compacting (two arrows closing)',
+    'Done (check)',
+  ],
+  level: (a) => (LIVE_GLYPH_ACTIVITIES as readonly LiveActivity[]).indexOf(a.activity),
+};
+
+export const liveAttention: Encoding<{
+  reason: 'waiting_permission' | 'waiting_input';
+  inferred: boolean;
+}> = {
+  id: 'live.attention',
+  element: 'live',
+  channel: 'Amber attention tag (! or ?), solid or dashed',
+  metric: 'The agent is waiting for you: a permission prompt or your input',
+  howComputed:
+    'Solid: recorded (hook events, the session registry’s “waiting” status, or an AskUserQuestion / ExitPlanMode call, which is the question itself). Dashed: inferred. Transcripts never record permission prompts, so a tool call with no result and no newer line for 6 s (30 s for Bash, web, MCP) is shown as a possible permission wait, and an end of turn as waiting for input. A slow tool looks the same. The “Needs you” list shows the evidence.',
+  action: 'Approve or answer it. Frequent dashed waits on a safe tool: add an allow rule.',
+  levels: [
+    'Permission, recorded (solid !)',
+    'Permission, inferred from silence (dashed !)',
+    'Input, recorded (solid ?)',
+    'Input, inferred from end of turn (dashed ?)',
+  ],
+  level: (x) => (x.reason === 'waiting_permission' ? 0 : 2) + (x.inferred ? 1 : 0),
+};
+
+export const liveError: Encoding<Pick<LiveAgent, 'errors'>> = {
+  id: 'live.error',
+  element: 'live',
+  channel: 'Red ticks on the ring',
+  metric: 'Errors in the current turn',
+  howComputed:
+    'One tick per tool_result with is_error or API error record since the turn started (up to 3). Bold while the newest event is the error.',
+  action: 'Open the plant and read the error preview; repeated ticks mean the agent is stuck.',
+  levels: ['1 error this turn', '2 errors', '3 or more'],
+  level: (a) => Math.max(0, Math.min(2, a.errors - 1)),
+};
+
+export const liveCompaction: Encoding<unknown> = {
+  id: 'live.compaction',
+  element: 'live',
+  channel: 'Cut across the ring (brief)',
+  metric: 'Context compaction just happened',
+  howComputed:
+    'A compact_boundary record (activity “compacting”) or a drop of the prompt size by more than a third. The cut marks where the ring stood; the ring restarts from the smaller prompt. Shown for a few seconds.',
+  action: 'Repeated cuts: the run outgrows its context. Split the task or trim the harness.',
+  levels: ['Cut: compaction, ring restarts'],
+  level: () => 0,
+};
+
+export const liveBee: Encoding<{ phase: 'out' | 'hover' | 'back' }> = {
+  id: 'live.bee',
+  element: 'live',
+  channel: 'Live bee between two plants',
+  metric: 'A subagent handoff happening now (same meaning as bee paths: parent → child)',
+  howComputed:
+    'When a subagent run starts, a bee flies from the parent’s plant to the child’s plant and hovers there while the child is live. When the child finishes (the parent’s tool_result or task notification), it flies back. Flight speed carries no meaning. With reduced motion the bee is placed directly.',
+  action: 'Follow the bee to see which subagent the work went to.',
+  levels: [
+    'Flying out: subagent started',
+    'Hovering at the child: subagent working',
+    'Flying back: subagent finished',
+  ],
+  level: (b) => ['out', 'hover', 'back'].indexOf(b.phase),
+};
+
+export const liveLoopPulse: Encoding<unknown> = {
+  id: 'live.loop_pulse',
+  element: 'live',
+  channel: 'Bright pulse along an irrigation channel (once)',
+  metric: 'The loop just started a run',
+  howComputed:
+    'A new live agent whose session matched a loop (headless/cron entrypoint or hook continuation). The channel of that loop pulses once toward its target plants. With reduced motion the channel is lit for 2 s instead.',
+  action: 'Watch how often loops fire; a pulse every few seconds is a runaway.',
+  levels: ['Pulse: a loop-triggered run started'],
+  level: () => 0,
+};
+
+export const liveSeedling: Encoding<unknown> = {
+  id: 'live.seedling',
+  element: 'live',
+  channel: 'Seedling marked “new”',
+  metric: 'A live agent with no planting in this window yet',
+  howComputed:
+    'The live agent’s bed exists, but no plant in the window has this agent name (no stored runs yet). It sits in a free slot of its bed until the next ingest plants it.',
+  action: 'A new agent is running here; check it after its first runs are ingested.',
+  levels: ['New agent, not yet planted'],
+  level: () => 0,
+};
+
+export const liveCount: Encoding<{ count: number }> = {
+  id: 'live.count',
+  element: 'live',
+  channel: 'Pips beside the activity tag',
+  metric: 'Live runs on the same plant',
+  howComputed:
+    'Live agents joined to this plant (several sessions, or parallel subagents of one type). The ring and tag show the most urgent one: waiting first, then errored, then the most recent event.',
+  action: 'Several pips: parallel sessions share this agent; open the plant to see each.',
+  levels: ['1 live run (no pips)', '2 (one pip)', '3 (two pips)', '4 or more (three pips)'],
+  level: (x) => Math.max(0, Math.min(3, x.count - 1)),
+};
+
 export const ambientSway: Encoding<unknown> = {
   id: 'ambient.sway',
   element: 'ambient',
@@ -417,6 +582,15 @@ export const ENCODINGS = [
   replayGap,
   replayProgress,
   routerHighlight,
+  liveRing,
+  liveActivity,
+  liveAttention,
+  liveError,
+  liveCompaction,
+  liveBee,
+  liveLoopPulse,
+  liveSeedling,
+  liveCount,
   ambientSway,
 ] as const satisfies readonly Encoding<never>[];
 
