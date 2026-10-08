@@ -295,3 +295,60 @@ Known gaps:
 - Signal names and tier descriptions are duplicated in the web app rather than served.
 - `pnpm demo:data` run *inside a git worktree* collapses projects into one bed (paths resolve to the
   worktree root). From the main checkout it's correct.
+
+## M5: Time-lapse replay (2026-10-08)
+
+Direction change during the build: the user asked for visuals more abstract than flowers and
+centered on time, so the replay stage is a **timeline**, not a growing plant (PLAN §10 M5's
+leaf/pruning/runner wording is superseded for this view).
+
+Done:
+- `packages/server/src/replay.ts`: `loadReplayInput` (SQL: run, steps, skill names, subagent runs
+  via `subagent_spawn → childRunId`, depth ≤ 3, cycle-safe) and a pure `buildReplay`. Context =
+  latest prompt size per API message, deduped by `apiMessageId`, carried forward; zero-size reports
+  (synthetic API errors) don't move it. `tokensCum` deduped per message; `costUsdCum` priced at query
+  time. Context window from `resolveModelPrice(model).contextWindow`, with a source sentence
+  (pricing-table version, garden.yaml override, unknown-model fallback 200K, "exceeds the window").
+  Labels come only from redacted previews; thinking shows only its length (`Thinking (1.2k chars)` /
+  `no text recorded`). Results are named by their call (`Edit …/src/app.ts → ok`).
+  `buildReplayView(store, runId, pricing)` composes both. `GET /api/replay/:runId` (404 unknown).
+- Contract: one optional field, `ReplayFrame.costUsdCum` (the step panel needs cumulative cost and
+  the frame only had tokens; estimating cost from a token share would be dishonest).
+- Web `#/replay/:runId` and `#/replay?plant=<id>` (latest run). Reached from a "▶ Replay" button on
+  every plant-view run row and "Replay its latest run →" in the garden's plant panel.
+  - Stage (`ReplayStage`, props: the ReplayView + current index): one lane per run, subagent lanes
+    branch at the spawn and merge back at the child's end; x = time with gaps > 15 s drawn 4 s wide
+    and labeled; mark shape = step kind (row above/below the lane line for calls/results), color =
+    tool category, red cross = error, dashed cut = compaction; context band under the main lane
+    against the dashed window line (50%/80% guides); faded marks = not yet reached; playhead.
+    Lanes collapse to span + errors (auto-expanded when ≤ 4 children). Click a mark to seek.
+  - Scrubber over compressed time, play/pause, 1×/4×/16×, ←/→/Home/End/Space, real UTC timestamps.
+  - Step panel (label, kind, tool + category/server/skill, tier, error, tokens and cost so far with
+    how-computed tips) and context gauge (fill vs window, 50/80% ticks, peak, compactions, source).
+  - Playback order walks every step of every lane in time order, so subagent steps play too.
+  - 8 registry entries (`replay.*`) with swatches drawn by `garden/replay-draw.ts`.
+- Fixture `apps/web/src/fixtures/replay.demo.json` (2 runs) exported by
+  `packages/server/src/replay-fixture.ts` from demo data generated **outside the git worktree**
+  (worktree generation collapses beds); run ids match the M4 fixtures.
+
+Verification:
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm test`: 426 tests (27 files).
+- [x] Builder tests: byte-identical output on rebuild; fixture context values equal an independent
+  first-usage-per-`message.id` walk of the raw JSONL (compaction fixture, repeated-usage lines,
+  subagent file); final `tokensCum` = run total; final `costUsdCum` = run cost; pure-builder tests
+  for duplicate message ids, window overflow, unknown models, dangling forks, labels.
+- [x] Real data (this container, skipped when `~/.claude/projects` is absent): a snapshot copy is
+  ingested and every run's per-step context and final tokens equal the independent raw dedupe.
+- [x] `pnpm e2e` incl. `m5.spec.ts`: garden panel → replay; plant runs table → replay; start/mid/end
+  screenshots, playback at 16×, lane collapse, legend lists replay channels, unknown-run state.
+  Screenshots: `docs/screenshots/m5-replay-{start,mid,end}.png` (demo, legacy-monolith main run with
+  two test-writer subagents, 6 red crosses, one compaction) and `m5-replay-real.png` (this
+  container's orchestrating session, 7 subagent lanes; served through a mocked API from a JSON
+  built locally and not committed; reviewed: only redacted prompts and command descriptions).
+
+Known gaps:
+- The context band is linear against a 1M window, so typical runs fill only a thin strip (honest,
+  but low-contrast). The gauge gives the number.
+- Merge-back is drawn at the child's end time, not at the parent's matching tool_result.
+- Real-session screenshot needs `GARDEN_REAL_REPLAY=<json>`; otherwise that e2e test is skipped.
+- Error labels quote the redacted error text, which can include absolute paths from the data.

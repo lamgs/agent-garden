@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { GardenView, ID } from '@garden/core';
 import { describePlant, plantLabel } from '../describe';
 import { formatRate } from '../format';
-import { plantHref } from '../route';
+import { latestReplayHref, plantHref } from '../route';
 import { DescriptionBody } from './Tooltip';
 
 /** Side panel for a selected plant. M4 grows this into the full Plant view. */
@@ -46,6 +46,14 @@ export function PlantPanel({
           Open plant view →
         </a>
         <span className="muted"> runs, evidence, labels</span>
+        {p.runs > 0 ? (
+          <>
+            <br />
+            <a className="open-replay" href={latestReplayHref(p.id)}>
+              Replay its latest run →
+            </a>
+          </>
+        ) : null}
       </p>
       {loops.length ? (
         <section>
