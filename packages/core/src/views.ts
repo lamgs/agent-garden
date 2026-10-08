@@ -287,6 +287,12 @@ export interface ReplayFrame {
   contextTokens: number;
   /** Cumulative deduped tokens (input + output + cache) up to and including this step. */
   tokensCum: number;
+  /**
+   * Cost of `tokensCum` at query time (pricing table × the run's model, cache rates applied);
+   * null when the model is unpriced. Optional: added in M5 so the step panel never estimates
+   * cost from a token share.
+   */
+  costUsdCum?: number | null;
   /** Short human label, e.g. "Edit src/app.ts" or "Thinking (1.2k chars)". Redacted preview text. */
   label: string;
   tool?: { name: string; category: ToolCategory; mcpServer?: string; skillName?: string };

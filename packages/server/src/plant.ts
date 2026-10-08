@@ -52,7 +52,7 @@ export function harnessSummary(v: Version | undefined): HarnessSummary | null {
 
 export function toRunRow(
   r: RunRow,
-  data: GardenData,
+  data: Pick<GardenData, 'runs'>,
   pricing?: Record<string, ModelPrice>,
 ): RunRowView {
   const t = r.tokens;

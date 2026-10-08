@@ -39,7 +39,7 @@ import {
   shortModel,
   truncate,
 } from '../format';
-import { plantHref, replantHref } from '../route';
+import { plantHref, replantHref, replayHref } from '../route';
 import { PlantSprite, SoilPlot } from '../components/Specimen';
 import {
   BedTag,
@@ -543,6 +543,9 @@ function RunsTable({
               <th scope="col" className="num">
                 Subagents
               </th>
+              <th scope="col">
+                <span className="sr-only">Replay</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -593,11 +596,20 @@ function RunsTable({
                     <td className="num nowrap">{formatDuration(r.durationMs)}</td>
                     <td className="num">{r.errorCount}</td>
                     <td className="num">{r.childCount}</td>
+                    <td>
+                      <a
+                        className="replay-btn"
+                        href={replayHref(r.runId)}
+                        aria-label={`Replay run ${formatDateTime(r.startedAt)}`}
+                      >
+                        ▶ Replay
+                      </a>
+                    </td>
                   </tr>
                   {isOpen ? (
                     <tr className="run-detail">
                       <td />
-                      <td colSpan={10}>
+                      <td colSpan={11}>
                         <RunDetail run={r} disabled={disabled} onSaved={onReload} />
                       </td>
                     </tr>

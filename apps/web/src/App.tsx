@@ -14,6 +14,7 @@ import { ComparePage } from './views/ComparePage';
 import { PageShell } from './views/PageShell';
 import { PlantPage } from './views/PlantPage';
 import { ReplantPage } from './views/ReplantPage';
+import { ReplayRoute } from './replay/ReplayPage';
 import { useView } from './views/useView';
 import { ViewMessage } from './components/ui';
 
@@ -258,14 +259,16 @@ function RoutedPage({
   garden: Loaded['view'] | null;
 }) {
   if (route.view === 'garden') return null;
+  if (route.view === 'replay')
+    return <ReplayRoute runId={route.runId} plantId={route.plantId} days={days} />;
   if (route.view === 'unknown') {
     return (
       <PageShell crumb="Not found">
         <ViewMessage title="No such page">
           <p>
             <code>#{route.hash}</code> is not a garden route. Pages are <code>#/plant/:id</code>,{' '}
-            <code>#/compare?left=&amp;right=</code>, and{' '}
-            <code>#/replant?agent=&amp;from=&amp;to=</code>.
+            <code>#/compare?left=&amp;right=</code>, <code>#/replant?agent=&amp;from=&amp;to=</code>
+            , and <code>#/replay/:runId</code>.
           </p>
         </ViewMessage>
       </PageShell>

@@ -8,6 +8,7 @@ import { loadGardenData, type GardenData } from './data';
 import { buildGardenView } from './garden';
 import { registerLiveRoutes } from './live';
 import { buildCompareView, buildPlantView, buildReplantView, loadStepAggregates } from './plant';
+import { buildReplayView } from './replay';
 
 export interface AppOptions {
   store: Store;
@@ -149,6 +150,10 @@ export function createApp(opts: AppOptions): Hono {
       opts.pricing,
     );
     return v ? c.json(v) : c.json({ error: 'unknown agent or bed' }, 404);
+  });
+  app.get('/api/replay/:runId', (c) => {
+    const v = buildReplayView(opts.store, c.req.param('runId'), opts.pricing);
+    return v ? c.json(v) : c.json({ error: 'no such run' }, 404);
   });
   app.post('/api/runs/:id/label', async (c) => {
     const runId = c.req.param('id');

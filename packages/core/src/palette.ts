@@ -52,3 +52,14 @@ export const STATUS = {
 } as const;
 
 export const WEED = { leaf: '#6f7a3a', mark: '#4f5629' } as const;
+
+/**
+ * Replay view (M5). Mark colors = tool category, reusing the all-pairs validated categorical set
+ * (a different view, so no clash with bed edging); errors use STATUS.critical with a cross shape.
+ * Context band: water at ease, warning and serious near the window.
+ */
+export const REPLAY = {
+  category: ['#2a78d6', '#1baf7a', '#8a3fa0', '#eb6834', '#9a978d'],
+  context: ['#5aa9c9', '#fab219', '#ec835a'],
+  window: '#2b2a26',
+} as const;

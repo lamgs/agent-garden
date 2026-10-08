@@ -18,6 +18,17 @@ import {
   drawWeed,
 } from './draw';
 import type { Genotype } from './genotype';
+import {
+  drawBranch,
+  drawContextBand,
+  drawCut,
+  drawErrorMark,
+  drawGapBreak,
+  drawLaneLine,
+  drawPlayhead,
+  drawStepMark,
+  SHAPE_ROW,
+} from './replay-draw';
 import type { Pen } from './pen';
 
 export interface Swatch {
@@ -138,6 +149,73 @@ export const SWATCHES: Record<string, Swatch> = {
       pen.fill({ color: PAPER });
       pen.rect(40, 0, 20, 24);
       pen.fill({ color: INK.hairline, alpha: 0.5 });
+    },
+  },
+  'replay.mark_shape': {
+    frame: { x: -10, y: -10, w: 20, h: 20 },
+    height: 24,
+    draw: (pen, l) => drawStepMark(pen, 0, SHAPE_ROW[l]! * 3, l, l === 2 ? 4 : 0, 5),
+  },
+  'replay.mark_color': {
+    frame: { x: -10, y: -10, w: 20, h: 20 },
+    height: 24,
+    draw: (pen, l) => drawStepMark(pen, 0, 0, 0, l, 5.5),
+  },
+  'replay.error': {
+    frame: { x: -10, y: -10, w: 20, h: 20 },
+    height: 24,
+    draw: (pen) => drawErrorMark(pen, 0, 0, 5),
+  },
+  'replay.compaction': {
+    frame: { x: 0, y: 0, w: 48, h: 40 },
+    draw: (pen) => {
+      drawLaneLine(pen, 2, 46, 10, 0);
+      drawContextBand(pen, 2, 46, 18, 20, [
+        { x: 2, fill: 0.85, level: 2 },
+        { x: 30, fill: 0.2, level: 0 },
+      ]);
+      drawCut(pen, 24, 10, 2, 38);
+    },
+  },
+  'replay.context': {
+    frame: { x: 0, y: 0, w: 48, h: 30 },
+    draw: (pen, l) => {
+      const fill = [0.3, 0.65, 0.9][l]!;
+      drawContextBand(pen, 2, 46, 4, 24, [{ x: 2, fill, level: l }]);
+    },
+  },
+  'replay.lane': {
+    frame: { x: 0, y: 0, w: 60, h: 36 },
+    draw: (pen, l) => {
+      drawLaneLine(pen, 2, 58, 8, 0);
+      if (l === 0) {
+        drawStepMark(pen, 18, 8, 0, 0, 3.5);
+        drawStepMark(pen, 40, 8, 0, 0, 3.5);
+        return;
+      }
+      drawBranch(pen, 12, 8, 20, 28);
+      drawLaneLine(pen, 20, 42, 28, 1);
+      drawBranch(pen, 42, 28, 50, 8);
+      drawStepMark(pen, 30, 28, 0, 0, 3);
+    },
+  },
+  'replay.gap': {
+    frame: { x: 0, y: 0, w: 48, h: 24 },
+    draw: (pen) => {
+      drawLaneLine(pen, 2, 46, 12, 0);
+      drawStepMark(pen, 12, 12, 0, 0, 3.5);
+      drawStepMark(pen, 36, 12, 0, 0, 3.5);
+      drawGapBreak(pen, 24, 3, 21);
+    },
+  },
+  'replay.progress': {
+    frame: { x: 0, y: 0, w: 48, h: 28 },
+    draw: (pen, l) => {
+      drawLaneLine(pen, 2, 46, 16, 0);
+      const a = l === 0 ? 1 : 0.28;
+      drawStepMark(pen, 12, 16, 0, 0, 3.5, a);
+      drawStepMark(pen, 26, 16, 1, 0, 3.5, a);
+      if (l === 0) drawPlayhead(pen, 38, 8, 26);
     },
   },
   'ambient.sway': {
