@@ -8,7 +8,7 @@ Status log per milestone. A milestone is marked done only when its verification 
 | M1 Contracts & foundations | ✅ done | 75 tests green, typecheck + lint clean; see below |
 | M2 Ingestion + demo data | ✅ done | 343 tests green; demo story gate + real-data ingest; see below |
 | M3 Server + Garden view | ✅ done | 382 tests + 6 e2e green; screenshots in docs/screenshots/m3-*; see below |
-| M4 Plant + Bed views | ⬜ not started | |
+| M4 Plant + Bed views | ✅ done | 407 tests + 10 e2e green; live label round trip; screenshots m4-*; see below |
 | M5 Time-lapse replay | ⬜ not started | |
 | M6 Router | ⬜ not started | |
 | M7 Seasons v1 | ⬜ not started | |
@@ -237,3 +237,61 @@ Known gaps:
   proxy) even with background networking disabled. Page-level requests are 0, which is what the
   app controls and what the e2e test asserts.
 - Real-GPU performance is unmeasured here.
+
+## M4: Plant + Bed views (2026-10-08)
+
+How it was built: I defined the contracts (`PlantView`, `HarnessSummary`, `SignalStat`, `RunRow`,
+`BedCompareView`, `RateDelta`, `ReplantView`, `LabelRequest`), wrote the server builders, routes,
+label write path and security guards, and exported real demo responses as fixtures. A UI subagent
+built the pages against them in a worktree. I merged it, ran a live label round trip myself, and
+reviewed the screenshots.
+
+Done:
+- **Plant view** (`#/plant/:id`), a "specimen page":
+  - The plant drawn large by the garden's own genotype code, with key numbers and their encoding levels.
+  - A capability card (definition, allowed tools) and the harness it runs under (model, effort,
+    permissions, instructions size, MCP/skills/hooks, provenance, changes).
+  - "Why this rate": Wilson interval, n, unknown and manual counts, method text, an outcome-mix bar,
+    and a table of how often each heuristic fired.
+  - Loop-tier breakdown, tools/skills/MCP actually used, and a runs table with expandable per-signal
+    evidence and labeling controls.
+- **Bed compare** (`#/compare`): two beds with their plants, "what differs in the soil" (harness
+  diff), and shared agents with success delta, a **separated / within noise** badge (Wilson
+  intervals overlap or not), cost ratio, and the correlation caveat.
+- **Replant** (`#/replant`), the demo moment: the same agent drawn in both soils, the delta, cost
+  ratio, soil changes, a per-signal comparison, recent tasks on each side, and the caveat. A bed
+  where the agent never ran is shown as empty soil with the harness difference and no prediction.
+- **Manual labels**: `POST /api/runs/:id/label` (zod-validated). Notes are redacted by the ingestion
+  `Redactor` before storage. Fixture and static modes show the controls disabled with the reason.
+- **Local-only guards** (docs/api.md): requests addressed to any non-loopback `Host` get a 403
+  (DNS-rebinding defence). Writes need a loopback `Origin` and `application/json` (CSRF defence).
+
+Verification:
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm test`: 407 tests. `pnpm e2e`: 10 Playwright tests.
+- [x] **Label round trip, API level** (server tests): a label flips the run in the plant view, `nManual`
+  increments in both the plant and garden views, the heuristic label stays visible, the note is stored,
+  and clearing restores the exact previous rate. A planted secret in a note is redacted. Bad
+  input → 400, unknown run → 404, a note without a redactor → 501.
+- [x] **Label round trip, live UI → API → DB** (Chromium against `garden serve`, copy of the demo store):
+  before 26% / 0 manual / 0 DB rows → click Success with a note → DB row `success` + note, view
+  27% / 1 manual (`docs/screenshots/m4-label-live.png`) → Clear → 26% / 0 / 0 rows. 0 console errors.
+- [x] **Guards**: foreign Host → 403; POST without Origin, with a foreign or `null` Origin → 403;
+  `text/plain` → 415; the run stays heuristic.
+- [x] **Demo moment** (`docs/screenshots/m4-replant.png`): test-writer upright and blooming in
+  shop-api (92%, CI 85–96%, n=108, $0.044/run) vs drooping with one flower in legacy-monolith (26%,
+  CI 19–36%, n=102, $0.135/run). **−65 points, separated, 3.1×**. Soil changes: sonnet → opus,
+  +29.4 KB instructions, +7 MCP servers, hooks changed, effort high → xhigh.
+- [x] Screenshots reviewed: `m4-plant.png`, `m4-plant-runs.png`, `m4-compare.png` (main −24
+  separated; Explore 0, within noise; test-writer −65 separated), `m4-replant.png`,
+  `m4-label-disabled.png`, `m4-label-live.png`.
+
+Found and fixed during M4:
+- Replanting into a bed where the agent never ran compared the subagent's observed harness with the
+  bed's main-thread harness ("tools +12"). Both sides now use the beds' current harnesses in that case.
+
+Known gaps:
+- The plant, compare, and replant views need `garden serve`. The static export only contains the garden.
+- The Pixi garden keeps ticking (hidden) under pages: instant return, some idle CPU.
+- Signal names and tier descriptions are duplicated in the web app rather than served.
+- `pnpm demo:data` run *inside a git worktree* collapses projects into one bed (paths resolve to the
+  worktree root). From the main checkout it's correct.
