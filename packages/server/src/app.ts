@@ -7,6 +7,7 @@ import type { Redactor, Store } from '@garden/ingest';
 import { loadGardenData, type GardenData } from './data';
 import { buildGardenView } from './garden';
 import { buildCompareView, buildPlantView, buildReplantView, loadStepAggregates } from './plant';
+import { buildSeasonsView } from './seasons';
 
 export interface AppOptions {
   store: Store;
@@ -144,6 +145,16 @@ export function createApp(opts: AppOptions): Hono {
       opts.pricing,
     );
     return v ? c.json(v) : c.json({ error: 'unknown agent or bed' }, 404);
+  });
+  app.get('/api/seasons/:familyId', (c) => {
+    const p = params(c);
+    if ('error' in p) return c.json({ error: p.error }, 400);
+    const { data, garden } = windowData(opts, p.days, p.asOf);
+    const v = buildSeasonsView(data, garden, c.req.param('familyId'), {
+      window: garden.window,
+      ...(opts.pricing ? { pricing: opts.pricing } : {}),
+    });
+    return v ? c.json(v) : c.json({ error: 'unknown bed (or no runs in this window)' }, 404);
   });
   app.post('/api/runs/:id/label', async (c) => {
     const runId = c.req.param('id');

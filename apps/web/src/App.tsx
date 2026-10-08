@@ -14,6 +14,7 @@ import { ComparePage } from './views/ComparePage';
 import { PageShell } from './views/PageShell';
 import { PlantPage } from './views/PlantPage';
 import { ReplantPage } from './views/ReplantPage';
+import { SeasonsPage } from './views/SeasonsPage';
 import { useView } from './views/useView';
 import { ViewMessage } from './components/ui';
 
@@ -36,6 +37,12 @@ export function App() {
   const [tableOpen, setTableOpen] = useState(false);
   const [zoom, setZoom] = useState<ZoomLevel>('mid');
   const [route, setRoute] = useState<Route>(() => parseRoute(window.location.hash));
+  /** The garden's "as of" date (scrub-to-date); kept while a page is open over the garden. */
+  const [asOf, setAsOf] = useState<string | undefined>(() => {
+    const r = parseRoute(window.location.hash);
+    return r.view === 'garden' ? r.asOf : undefined;
+  });
+  const asOfRef = useRef(asOf);
   /** null = closed; '' = open with no preselected bed. */
   const [picker, setPicker] = useState<ID | '' | null>(null);
   const stage = useRef<GardenStageHandle>(null);
@@ -46,7 +53,9 @@ export function App() {
 
   useEffect(() => {
     const onHash = () => {
-      setRoute(parseRoute(window.location.hash));
+      const r = parseRoute(window.location.hash);
+      setRoute(r);
+      if (r.view === 'garden') setAsOf(r.asOf);
       setPicker(null);
     };
     window.addEventListener('hashchange', onHash);
@@ -62,13 +71,18 @@ export function App() {
   useEffect(() => {
     let live = true;
     setError(null);
-    loadGarden(days)
+    if (asOfRef.current !== asOf) {
+      // Never show one date's garden under another date's banner.
+      asOfRef.current = asOf;
+      setData(null);
+    }
+    loadGarden(days, undefined, asOf)
       .then((d) => live && setData(d))
       .catch((e: unknown) => live && setError(e instanceof Error ? e.message : String(e)));
     return () => {
       live = false;
     };
-  }, [days]);
+  }, [days, asOf]);
 
   const onKey = useCallback((e: KeyboardEvent) => {
     const t = e.target as HTMLElement | null;
@@ -153,6 +167,17 @@ export function App() {
       </header>
 
       <main className={`stage${legendOpen ? ' legend-open' : ''}${onPage ? ' on-page' : ''}`}>
+        {asOf && !onPage ? (
+          <div className="asof-banner" role="status">
+            <span>
+              Garden as of <b>{asOf.slice(0, 10)}</b>
+              <span className="muted"> · built only from runs up to that date</span>
+            </span>
+            <button type="button" onClick={() => navigate('#/')}>
+              Back to now
+            </button>
+          </div>
+        ) : null}
         {error ? (
           <div className="empty">
             <h2>No garden yet</h2>
@@ -264,8 +289,8 @@ function RoutedPage({
         <ViewMessage title="No such page">
           <p>
             <code>#{route.hash}</code> is not a garden route. Pages are <code>#/plant/:id</code>,{' '}
-            <code>#/compare?left=&amp;right=</code>, and{' '}
-            <code>#/replant?agent=&amp;from=&amp;to=</code>.
+            <code>#/compare?left=&amp;right=</code>, <code>#/replant?agent=&amp;from=&amp;to=</code>
+            , and <code>#/seasons/:bedId</code>.
           </p>
         </ViewMessage>
       </PageShell>
@@ -297,6 +322,13 @@ function ViewPage({
       return (
         <ComparePage
           result={result as Parameters<typeof ComparePage>[0]['result']}
+          garden={garden}
+        />
+      );
+    case 'seasons':
+      return (
+        <SeasonsPage
+          result={result as Parameters<typeof SeasonsPage>[0]['result']}
           garden={garden}
         />
       );

@@ -11,16 +11,19 @@ import type {
   OutcomeLabel,
   PlantView,
   ReplantView,
+  SeasonsView,
 } from '@garden/core';
 import type { Route } from '../route';
 import { fixtureParam, type DataSource } from './load';
 
-export type ViewRoute = Extract<Route, { view: 'plant' | 'compare' | 'replant' }>;
+export type ViewRoute = Extract<Route, { view: 'plant' | 'compare' | 'replant' | 'seasons' }>;
 export type ViewData<R extends ViewRoute> = R extends { view: 'plant' }
   ? PlantView
   : R extends { view: 'compare' }
     ? BedCompareView
-    : ReplantView;
+    : R extends { view: 'seasons' }
+      ? SeasonsView
+      : ReplantView;
 
 export type ViewResult<T> =
   | { status: 'ok'; data: T; source: DataSource }
@@ -47,14 +50,18 @@ export interface DemoFixtures {
   plant: PlantView;
   compare: BedCompareView;
   replant: ReplantView;
+  /** Seasons for every demo bed, by bed id. */
+  seasons?: Record<string, SeasonsView>;
 }
 
 /** Which bundled demo fixture answers a route, or null when the ids are not the fixture's. */
 export function resolveFixture(
   route: ViewRoute,
   fx: DemoFixtures,
-): PlantView | BedCompareView | ReplantView | null {
+): PlantView | BedCompareView | ReplantView | SeasonsView | null {
   switch (route.view) {
+    case 'seasons':
+      return fx.seasons?.[route.bedId] ?? null;
     case 'plant':
       return fx.plant.plant.id === route.plantId ? fx.plant : null;
     case 'compare':
@@ -78,6 +85,8 @@ export function apiUrl(route: ViewRoute, days: number): string {
       return `/api/compare?${new URLSearchParams({ left: route.left, right: route.right, days: String(days) }).toString()}`;
     case 'replant':
       return `/api/replant?${new URLSearchParams({ agent: route.agent, from: route.from, to: route.to, days: String(days) }).toString()}`;
+    case 'seasons':
+      return `/api/seasons/${encodeURIComponent(route.bedId)}?days=${days}`;
   }
 }
 
@@ -85,18 +94,21 @@ const VIEW_NOUN: Record<ViewRoute['view'], string> = {
   plant: 'plant view',
   compare: 'bed comparison',
   replant: 'replant view',
+  seasons: 'seasons view',
 };
 
 async function loadDemoFixtures(): Promise<DemoFixtures> {
-  const [plant, compare, replant] = await Promise.all([
+  const [plant, compare, replant, seasons] = await Promise.all([
     import('../fixtures/plant.demo.json'),
     import('../fixtures/compare.demo.json'),
     import('../fixtures/replant.demo.json'),
+    import('../fixtures/seasons.demo.json'),
   ]);
   return {
     plant: plant.default as unknown as PlantView,
     compare: compare.default as unknown as BedCompareView,
     replant: replant.default as unknown as ReplantView,
+    seasons: seasons.default as unknown as Record<string, SeasonsView>,
   };
 }
 
@@ -127,7 +139,7 @@ export async function loadView<R extends ViewRoute>(
         title: `This ${VIEW_NOUN[route.view]} is not in the demo fixture`,
         message:
           which === 'demo'
-            ? 'The bundled demo fixture has one plant (test-writer in legacy-monolith), one bed pair (shop-api vs legacy-monolith), and one replant (test-writer, shop-api → legacy-monolith). Run `pnpm demo` to explore every plant against the local server.'
+            ? 'The bundled demo fixture has one plant (test-writer in legacy-monolith), one bed pair (shop-api vs legacy-monolith), one replant (test-writer, shop-api → legacy-monolith), and the seasons of every demo bed. Run `pnpm demo` to explore every plant against the local server.'
             : `The “${which ?? ''}” fixture only contains a garden. Run \`pnpm demo\` to open this view against the local server.`,
       };
     }
@@ -138,7 +150,7 @@ export async function loadView<R extends ViewRoute>(
       status: 'missing',
       title: `This static export has no ${VIEW_NOUN[route.view]}`,
       message:
-        'Static exports carry only the garden. Run `garden serve` (or `pnpm demo`) to open plant, compare, and replant views.',
+        'Static exports carry only the garden. Run `garden serve` (or `pnpm demo`) to open plant, compare, replant, and seasons views.',
     };
   }
   try {

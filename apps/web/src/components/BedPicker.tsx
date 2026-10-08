@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { GardenView, ID } from '@garden/core';
 import { bedLabel } from '../format';
-import { compareHref, navigate } from '../route';
+import { compareHref, navigate, seasonsHref } from '../route';
 import { bedToneOf } from './Specimen';
 
 /** "Compare beds" picker: the first bed is preselected (from a bed label click), choose the second. */
@@ -106,6 +106,15 @@ export function BedPicker({
             </select>
           </label>
           <div className="picker-actions">
+            {left ? (
+              <a
+                className="quiet-link picker-seasons"
+                href={seasonsHref(left)}
+                onClick={() => onClose()}
+              >
+                Seasons of {view.beds.find((b) => b.id === left)?.name ?? 'this bed'} →
+              </a>
+            ) : null}
             <button type="button" onClick={onClose}>
               Cancel
             </button>
