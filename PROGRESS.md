@@ -293,8 +293,8 @@ Known gaps:
 - The plant, compare, and replant views need `garden serve`. The static export only contains the garden.
 - The Pixi garden keeps ticking (hidden) under pages: instant return, some idle CPU.
 - Signal names and tier descriptions are duplicated in the web app rather than served.
-- `pnpm demo:data` run *inside a git worktree* collapses projects into one bed (paths resolve to the
-  worktree root). From the main checkout it's correct.
+- ~~`pnpm demo:data` run inside a git worktree collapsed projects into one bed.~~ Fixed 2026-10-08:
+  `canonicalProjectRoot` asks git first and folds by path shape only for deleted worktrees.
 
 ## M5: Time-lapse replay (2026-10-08)
 
