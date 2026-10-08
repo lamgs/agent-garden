@@ -80,6 +80,19 @@ export function zoomLevelFor(scale: number): ZoomLevel {
   return scale < FAR_BELOW ? 'far' : scale >= NEAR_FROM ? 'near' : 'mid';
 }
 
+/**
+ * A layer another module draws above the plants (e.g. the live overlay, garden/live-overlay.ts).
+ * The renderer owns the scene and the ticker; the overlay only gets the scene, the camera, and time.
+ * Overlays are not dimmed by the router highlight.
+ */
+export interface GardenOverlay {
+  readonly container: Container;
+  setScene(view: GardenView, layout: GardenLayout): void;
+  camera(scale: number, zoom: ZoomLevel): void;
+  tick(deltaMS: number, reducedMotion: boolean): void;
+  destroy?(): void;
+}
+
 export interface RendererCallbacks {
   onHover: (t: HoverTarget | null, clientX: number, clientY: number) => void;
   onSelect: (t: HoverTarget) => void;
@@ -149,6 +162,8 @@ export class GardenRenderer {
   private destroyed = false;
   private plaqueByBed = new Map<ID, Container>();
   private cleanup: (() => void)[] = [];
+  private overlays: GardenOverlay[] = [];
+  private overlayLayer = new Container();
   /** Router highlight (encoding router.highlight): glows under plants, badges on top. */
   private hl = {
     under: new Container(),
@@ -187,6 +202,7 @@ export class GardenRenderer {
       L.weeds,
       L.markers,
       L.bees,
+      this.overlayLayer,
       L.near,
       L.plaques,
       L.far,
@@ -286,6 +302,19 @@ export class GardenRenderer {
     this.buildFar(view, layout);
     this.fit();
     this.highlight(this.hl.ids, this.hl.badges);
+    for (const o of this.overlays) o.setScene(view, layout);
+  }
+
+  /** Attach an overlay layer; returns a detach function. */
+  addOverlay(o: GardenOverlay): () => void {
+    this.overlays.push(o);
+    this.overlayLayer.addChild(o.container);
+    if (this.view && this.layout) o.setScene(this.view, this.layout);
+    o.camera(this.scale, this.zoom);
+    return () => {
+      this.overlays = this.overlays.filter((x) => x !== o);
+      this.overlayLayer.removeChild(o.container);
+    };
   }
 
   private interactive(obj: Container, target: HoverTarget, hit?: Rectangle): void {
@@ -725,6 +754,7 @@ export class GardenRenderer {
     L.plaques.visible = !far;
     L.near.visible = z === 'near';
     L.far.visible = far;
+    for (const o of this.overlays) o.camera(s, z);
     this.cb.onCamera();
   }
 
@@ -971,6 +1001,7 @@ export class GardenRenderer {
 
   private tick(deltaMS: number): void {
     if (!this.view) return;
+    for (const o of this.overlays) o.tick(deltaMS, this.reducedMotion);
     if (this.reducedMotion) {
       if (this.time === 0) {
         this.drawFlowFrame(0);
@@ -990,6 +1021,7 @@ export class GardenRenderer {
   destroy(): void {
     this.destroyed = true;
     for (const f of this.cleanup) f();
+    for (const o of this.overlays) o.destroy?.();
     try {
       this.app.destroy({ removeView: true }, { children: true, texture: true });
     } catch {

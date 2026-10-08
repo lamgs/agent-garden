@@ -6,7 +6,7 @@ contracts in `packages/core/src/views.ts`. Every response carries a strict Conte
 
 | Method | Path | Returns |
 |---|---|---|
-| GET | `/api/health` | `{ ok, schemaVersion, runs, asOf }` |
+| GET | `/api/health` | `{ ok, schemaVersion, runs, asOf, live }` (`live`: whether the live layer runs, so the web app only opens the stream when it exists) |
 | GET | `/api/legend` | Legend entries generated from the encodings registry |
 | GET | `/api/garden?days=90&asOf=<ISO>` | `GardenView` |
 | GET | `/api/plant/:plantId?days=` | `PlantView` (404 if the planting has no runs in the window) |

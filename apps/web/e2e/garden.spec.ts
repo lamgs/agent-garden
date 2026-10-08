@@ -127,7 +127,8 @@ test('prefers-reduced-motion: no sway, bees, or water animation; state still dra
 }) => {
   const errors = collectErrors(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await openGarden(page, 'demo');
+  // Live state changes are not motion but would change pixels; live.spec.ts covers live + reduced motion.
+  await openGarden(page, 'demo&live=off');
   await page.mouse.move(700, 20);
   const canvas = page.locator('.canvas-host canvas');
   const a = await canvas.screenshot();

@@ -3,6 +3,8 @@ import type { ID } from '@garden/core';
 import { BedPicker } from './components/BedPicker';
 import { GardenStage, type GardenStageHandle } from './components/GardenStage';
 import { Legend } from './components/Legend';
+import { EventTicker, LivePill, NeedsYou } from './components/Live';
+import { liveStore } from './live/live-store';
 import { PlantPanel } from './components/PlantPanel';
 import { RouterBox, type RouterBoxHandle } from './components/RouterBox';
 import { highlightFor } from './data/router';
@@ -133,6 +135,13 @@ export function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [onKey]);
 
+  // The live layer belongs to the garden view: connect once the garden is shown.
+  useEffect(() => {
+    if (data && route.view === 'garden') liveStore().configure(data.source);
+  }, [data, route.view]);
+  // A garden scrubbed to a past date must not show today's live activity on top of it.
+  useEffect(() => liveStore().setHistorical(asOf), [asOf]);
+
   const fixed = data?.source !== 'api';
   const onPage = route.view !== 'garden';
 
@@ -156,6 +165,7 @@ export function App() {
             </div>
           ) : null}
           <div className="header-controls">
+            <LivePill />
             <label className="window-select">
               <span>Window</span>
               <select
@@ -188,7 +198,9 @@ export function App() {
         </div>
       </header>
 
-      <main className={`stage${legendOpen ? ' legend-open' : ''}${onPage ? ' on-page' : ''}`}>
+      <main
+        className={`stage${legendOpen ? ' legend-open' : ''}${onPage ? ' on-page' : ''}${selected ? ' panel-open' : ''}`}
+      >
         {asOf && !onPage ? (
           <div className="asof-banner" role="status">
             <span>
@@ -267,6 +279,8 @@ export function App() {
           label to compare beds
         </p>
 
+        {data && !onPage ? <NeedsYou view={data.view} onSelect={setSelected} /> : null}
+        {data && !onPage ? <EventTicker /> : null}
         {tableOpen && data ? (
           <div className="table-overlay">
             <TableView view={data.view} onSelect={setSelected} />

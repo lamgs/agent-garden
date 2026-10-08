@@ -9,7 +9,8 @@
  * Scripted moments in the first minute (then every agent keeps working on seeded random turns):
  *   - shop-api main: a Bash publish waits for permission (inferred after 7 s of silence).
  *   - legacy-monolith main: context near the window, then an auto compaction.
- *   - infra main: `terraform plan` fails (tool error → errored).
+ *   - infra main: `terraform plan` fails (tool error → errored), then delegates to terraform-planner
+ *     and to cost-estimator, a new agent with no planting yet (no plantId → a "new" seedling).
  *   - data-pipeline: a headless run triggered by the (flooding) backfill loop; main delegates to
  *     migration-helper, which runs the db-migrate skill.
  *   - web-dashboard main: delegates to code-reviewer and Explore at once; docs-writer uses a skill.
@@ -359,7 +360,7 @@ function scriptedTurn(bed: BedDef, r: Rng): Op[] {
         { op: 'hook', pass: true, ms: 400 },
         t(B('Bash'), 2600, 'Bash pnpm test'),
         { op: 'think', ms: 900 },
-        t(B('Bash'), 16000, 'Bash npm publish --tag next', { permission: true }),
+        t(B('Bash'), 26000, 'Bash npm publish --tag next', { permission: true }),
         t(mcpTool('github', 'create_pull_request'), 2200, 'github: open pull request'),
         {
           op: 'spawn',
@@ -426,8 +427,12 @@ function scriptedTurn(bed: BedDef, r: Rng): Op[] {
         { op: 'think', ms: 5000 },
         {
           op: 'spawn',
-          preview: 'Task → terraform-planner',
-          children: [{ name: 'terraform-planner', ops: childOps(r, bed, 3) }],
+          preview: 'Task → terraform-planner, cost-estimator',
+          children: [
+            { name: 'terraform-planner', ops: childOps(r, bed, 3) },
+            // A new agent type with no planting yet: the live overlay shows it as a seedling.
+            { name: 'cost-estimator', ops: childOps(r, bed, 4) },
+          ],
         },
         t(B('Bash'), 2600, 'Bash terraform plan'),
         { op: 'say', ms: 1200, preview: 'Plan is clean: 1 to change' },

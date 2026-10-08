@@ -93,6 +93,8 @@ test('shop-api seasons: before/after, separated delta, then the garden as of a s
         ? route.fulfill({ json: gardenAsOf })
         : route.fulfill({ status: 500, json: { error: `no mock for ${asOf}` } });
     }
+    // The live layer asks /api/health whether the server streams; this mock server doesn't.
+    if (url.pathname === '/api/health') return route.fulfill({ json: { ok: true, live: false } });
     const m = /^\/api\/seasons\/([^/]+)$/.exec(url.pathname);
     if (m && seasons[m[1]!]) return route.fulfill({ json: seasons[m[1]!] });
     return route.fulfill({ status: 404, json: { error: 'not found' } });

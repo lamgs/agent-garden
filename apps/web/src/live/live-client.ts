@@ -9,6 +9,7 @@
  */
 import type { ID, LiveAgent, LiveEvent, LiveMessage, LiveSnapshot } from '@garden/core';
 import type { LiveDemoOptions } from '../fixtures/live-demo';
+import { waitInferred } from './overlay-model';
 
 export const LIVE_STREAM_URL = '/api/live/stream';
 export const RECENT_CAP = 60;
@@ -148,13 +149,14 @@ export interface AttentionItem {
   agent: LiveAgent;
   reason: 'waiting_permission' | 'waiting_input';
   waitingMs: number;
-  /** Transcript mode never records these waits; they are guessed from silence. */
+  /** Guessed from silence or an end of turn (see `waitInferred`); hooks and the registry record it. */
   inferred: boolean;
 }
 
 /**
  * "Needs you now": agents waiting for permission or for input, permission first, then the longest
- * wait first. In transcript or demo mode the wait is inferred; only hook events record it.
+ * wait first. In transcript or demo mode most waits are inferred; hook events, the session
+ * registry, and AskUserQuestion / ExitPlanMode calls record them.
  */
 export function attentionQueue(
   s: LiveSnapshot,
@@ -168,7 +170,7 @@ export function attentionQueue(
       agent: a,
       reason: a.activity,
       waitingMs: Math.max(0, nowMs - Date.parse(a.activitySince)),
-      inferred: s.source !== 'hooks',
+      inferred: waitInferred(a, s.source),
     });
   }
   const rank = (r: AttentionItem['reason']) => (r === 'waiting_permission' ? 0 : 1);

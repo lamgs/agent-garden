@@ -2,7 +2,13 @@
  * Legend swatches: one per registry level, drawn by the SAME functions the garden uses.
  * Keyed by encoding id; `legend.test.ts` checks every registry entry has a swatch per level.
  */
-import { INK, MODEL_FAMILY_COLORS, PAPER, SOIL_FAMILIES } from '@garden/core';
+import {
+  INK,
+  LIVE_GLYPH_ACTIVITIES,
+  MODEL_FAMILY_COLORS,
+  PAPER,
+  SOIL_FAMILIES,
+} from '@garden/core';
 import {
   dashPolyline,
   drawBed,
@@ -31,6 +37,19 @@ import {
 } from './replay-draw';
 import { drawBadge, drawGlow, drawVeil } from './highlight';
 import { blockHeight, drawRoot, drawSourceBlock, drawSprout, rootCurve } from './knowledge-draw';
+import {
+  drawActivityGlyph,
+  drawAttentionTag,
+  drawChannelLit,
+  drawCompactionCut,
+  drawCountPips,
+  drawErrorTicks,
+  drawLiveBee,
+  drawLiveRing,
+  drawNewFlag,
+  drawPulseSegment,
+  drawSeedling,
+} from './live-draw';
 import type { Pen } from './pen';
 
 export interface Swatch {
@@ -290,6 +309,79 @@ export const SWATCHES: Record<string, Swatch> = {
   'knowledge.usage': {
     frame: { x: -12, y: -16, w: 24, h: 20 },
     draw: (pen, l) => drawSprout(pen, 0, 2, l),
+  },
+  'live.ring': {
+    frame: { x: -36, y: -14, w: 72, h: 26 },
+    height: 30,
+    draw: (pen, l) => drawLiveRing(pen, 0, 0, [0.3, 0.65, 0.9, 0.4][l]!, l),
+  },
+  'live.activity': {
+    frame: { x: -11, y: -11, w: 22, h: 22 },
+    height: 26,
+    draw: (pen, l) => drawActivityGlyph(pen, 0, 0, LIVE_GLYPH_ACTIVITIES[l]!, 1.15),
+  },
+  'live.attention': {
+    frame: { x: -13, y: -13, w: 26, h: 26 },
+    height: 28,
+    draw: (pen, l) =>
+      drawAttentionTag(pen, 0, 0, l < 2 ? 'waiting_permission' : 'waiting_input', l % 2 === 1),
+  },
+  'live.error': {
+    frame: { x: -36, y: -14, w: 72, h: 26 },
+    height: 30,
+    draw: (pen, l) => {
+      drawLiveRing(pen, 0, 0, 0.35, 0);
+      drawErrorTicks(pen, 0, 0, l + 1, false);
+    },
+  },
+  'live.compaction': {
+    frame: { x: -36, y: -14, w: 72, h: 26 },
+    height: 30,
+    draw: (pen) => {
+      drawLiveRing(pen, 0, 0, 0.18, 0);
+      drawCompactionCut(pen, 0, 0, 0.82);
+    },
+  },
+  'live.bee': {
+    frame: { x: -4, y: -30, w: 76, h: 40 },
+    draw: (pen, l) => {
+      const a = { x: 4, y: 4 };
+      const b = { x: 64, y: 4 };
+      pen.circle(a.x, a.y, 2);
+      pen.circle(b.x, b.y, 2);
+      pen.fill({ color: INK.muted, alpha: 0.8 });
+      if (l === 0) drawLiveBee(pen, a, b, 0.55, 'out');
+      else if (l === 1) drawLiveBee(pen, a, { x: b.x, y: b.y - 10 }, 1, 'hover');
+      else drawLiveBee(pen, a, b, 0.4, 'back');
+    },
+  },
+  'live.loop_pulse': {
+    frame: { x: 0, y: -10, w: 64, h: 20 },
+    draw: (pen) => {
+      const pts = [
+        { x: 4, y: 0 },
+        { x: 60, y: 0 },
+      ];
+      drawChannel(pen, pts, 1, 0);
+      drawChannelLit(pen, pts, 0.35);
+      drawPulseSegment(pen, pts, 46, 18);
+    },
+  },
+  'live.seedling': {
+    frame: { x: -14, y: -24, w: 46, h: 30 },
+    height: 36,
+    draw: (pen) => {
+      drawSeedling(pen, 0, 0);
+      drawNewFlag(pen, 8, -2, 22);
+    },
+  },
+  'live.count': {
+    frame: { x: -11, y: -11, w: 28, h: 22 },
+    height: 26,
+    draw: (pen, l) => {
+      drawActivityGlyph(pen, 0, 0, 'editing', 1.15);
+      drawCountPips(pen, 13.5, 0, l + 1);
+    },
   },
   'ambient.sway': {
     frame: { x: -44, y: -100, w: 88, h: 106 },

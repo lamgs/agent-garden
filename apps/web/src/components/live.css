@@ -1,0 +1,280 @@
+/* Live layer chrome: calm paper cards, ink hairlines, amber only for "needs you". */
+
+/* ---- status pill ------------------------------------------------------------------------ */
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 13px;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.live-pill:hover {
+  border-color: var(--ink-3);
+}
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  box-sizing: border-box;
+}
+.live-pill-live .live-dot {
+  background: var(--good);
+}
+.live-pill-fixture .live-dot {
+  background: var(--water);
+}
+.live-pill-reconnecting .live-dot,
+.live-pill-connecting .live-dot {
+  background: transparent;
+  border: 1.5px dashed var(--ink-2);
+}
+.live-pill-off {
+  color: var(--ink-3);
+}
+.live-pill-off .live-dot {
+  background: transparent;
+  border: 1.5px solid var(--ink-3);
+}
+
+/* ---- needs you -------------------------------------------------------------------------- */
+.needs-you {
+  position: absolute;
+  z-index: 6;
+  top: 14px;
+  left: 20px;
+  width: 340px;
+  max-height: 40%;
+  overflow: auto;
+  padding: 8px 10px 6px;
+  background: var(--paper);
+  background-image: var(--grain);
+  border: 1px solid rgb(43 42 38 / 0.28);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  transition: left 180ms ease;
+}
+.legend-open .needs-you {
+  left: 440px;
+}
+.needs-you h2 {
+  margin: 0 0 4px;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 15px;
+}
+.needs-n {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink-2);
+  font-weight: 600;
+  margin-left: 2px;
+}
+.needs-you ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.needs-item {
+  display: grid;
+  grid-template-columns: 22px 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 4px;
+  border: none;
+  border-top: 1px solid rgb(43 42 38 / 0.08);
+  background: transparent;
+  text-align: left;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.needs-you li:first-child .needs-item {
+  border-top: none;
+}
+.needs-item:hover:not(:disabled) {
+  background: rgb(43 42 38 / 0.04);
+}
+.needs-item:disabled {
+  cursor: default;
+}
+.needs-who {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.needs-bed {
+  color: var(--ink-2);
+}
+.needs-what {
+  color: var(--ink-2);
+}
+.needs-what em {
+  font-style: italic;
+  color: var(--ink-3);
+}
+.needs-wait {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  min-width: 52px;
+  text-align: right;
+}
+.att-tag {
+  display: inline-grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  border: 1.8px solid var(--att-ink);
+  background: var(--att-fill);
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--ink);
+}
+.att-inferred {
+  border-style: dashed;
+}
+
+/* ---- event ticker ----------------------------------------------------------------------- */
+.ticker {
+  position: absolute;
+  z-index: 5;
+  right: 20px;
+  bottom: 38px;
+  width: min(560px, calc(100% - 640px));
+  min-width: 340px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 8px;
+  padding: 5px 10px 5px 6px;
+  background: rgb(246 241 231 / 0.94);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  font-size: 12px;
+  transition: right 180ms ease;
+}
+.panel-open .ticker {
+  right: 428px;
+}
+.ticker-toggle {
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 5px;
+  padding: 1px 6px;
+  font-size: 12px;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.ticker-toggle:hover {
+  border-color: var(--hairline);
+}
+.ticker-list {
+  list-style: none;
+  margin: 0;
+  padding: 2px 0 0;
+  min-width: 0;
+}
+.ticker.open .ticker-list {
+  max-height: 260px;
+  overflow: auto;
+}
+.ticker-list li {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 150px) 72px minmax(0, 1fr);
+  gap: 8px;
+  white-space: nowrap;
+  line-height: 1.6;
+}
+.ticker-list li > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ticker-list time {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.tick-who {
+  color: var(--ink-2);
+}
+.tick-kind {
+  color: var(--ink-3);
+  font-style: italic;
+}
+.tick-error .tick-kind,
+.tick-error .tick-text {
+  color: var(--critical);
+}
+.ticker-note {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* ---- plant panel: Now ------------------------------------------------------------------- */
+.live-now {
+  margin: 12px 0 4px;
+  padding: 8px 10px;
+  border: 1px solid rgb(43 42 38 / 0.18);
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.25);
+}
+.live-now h4 {
+  margin-top: 0 !important;
+}
+.now-agent + .now-agent {
+  border-top: 1px solid rgb(43 42 38 / 0.1);
+  margin-top: 6px;
+  padding-top: 6px;
+}
+.now-activity {
+  margin: 0 0 2px;
+}
+.now-rows {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  gap: 1px 10px;
+  margin: 0;
+  font-size: 12.5px;
+}
+.now-rows dt {
+  color: var(--ink-2);
+}
+.now-rows dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.now-how summary {
+  font-size: 12px;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.now-how p {
+  margin: 2px 0;
+  font-size: 12px;
+}
+.now-replay {
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+
+/* With the plant panel open on a narrow screen the panel's "Now" section replaces the ticker. */
+@media (max-width: 1599px) {
+  .panel-open .ticker {
+    display: none;
+  }
+}
+.needs-more {
+  margin: 2px 0 2px 34px;
+  font-size: 12px;
+  color: var(--ink-2);
+}

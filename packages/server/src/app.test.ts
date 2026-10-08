@@ -27,7 +27,11 @@ describe('API', () => {
   const app = () => createApp({ store, asOf: '2026-12-31T00:00:00Z' });
   it('health reports schema and counts', async () => {
     const r = await app().request('/api/health');
-    expect(await r.json()).toMatchObject({ ok: true, schemaVersion: MIGRATIONS.length });
+    expect(await r.json()).toMatchObject({
+      ok: true,
+      schemaVersion: MIGRATIONS.length,
+      live: false,
+    });
   });
   it('garden returns a GardenView for the window', async () => {
     const r = await app().request('/api/garden?days=3650');

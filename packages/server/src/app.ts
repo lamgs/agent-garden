@@ -236,6 +236,7 @@ export function createApp(opts: AppOptions): Hono {
       schemaVersion: opts.store.schemaVersion(),
       runs: opts.store.count('runs'),
       asOf: opts.asOf ?? null,
+      live: opts.live !== undefined,
     }),
   );
   app.get('/api/legend', (c) => c.json(legend()));
