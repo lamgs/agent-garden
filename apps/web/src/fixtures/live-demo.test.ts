@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { GardenView, LiveMessage } from '@garden/core';
-import { reduceAll } from '../studio/live-client';
+import { reduceAll } from '../live/live-client';
 import garden from './garden.demo.json';
 import { activityForTool, createLiveDemo, DEMO_BEDS, DEMO_LOOPS } from './live-demo';
 

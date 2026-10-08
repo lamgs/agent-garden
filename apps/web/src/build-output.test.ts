@@ -23,12 +23,14 @@ function files(dir: string): string[] {
 }
 
 describe.skipIf(!existsSync(DIST))('build output (apps/web/dist)', () => {
-  const text = files(DIST)
-    .filter((f) => /\.(js|css|html|json)$/.test(f))
-    .map((f) => ({ f, s: readFileSync(f, 'utf8') }));
+  // Read lazily: a skipped describe still runs its body during collection.
+  const read = () =>
+    files(DIST)
+      .filter((f) => /\.(js|css|html|json)$/.test(f))
+      .map((f) => ({ f, s: readFileSync(f, 'utf8') }));
 
   it('contains no URL strings outside the inert allowlist', () => {
-    const bad = text.flatMap(({ f, s }) =>
+    const bad = read().flatMap(({ f, s }) =>
       [...s.matchAll(/https?:\/\/[A-Za-z0-9._~:/?#@!$&'*+,;=%-]+/g)]
         .map((m) => m[0].replace(/["'`)\\]+$/, ''))
         .filter((u) => !ALLOWED.some((re) => re.test(u)))
@@ -38,7 +40,7 @@ describe.skipIf(!existsSync(DIST))('build output (apps/web/dist)', () => {
   });
 
   it('loads nothing remote from HTML or CSS (src/href/url())', () => {
-    for (const { f, s } of text) {
+    for (const { f, s } of read()) {
       if (f.endsWith('.html')) expect(s).not.toMatch(/(src|href)\s*=\s*["']?(https?:)?\/\//);
       if (f.endsWith('.css')) expect(s).not.toMatch(/url\(\s*["']?(https?:)?\/\//);
     }
