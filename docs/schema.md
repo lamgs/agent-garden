@@ -1,4 +1,4 @@
-# Agent Garden trace schema (v1)
+# Agent Garden trace schema (store schema version 3)
 
 Source of truth: [`packages/core/src/schema.ts`](../packages/core/src/schema.ts) (types) and
 [`packages/ingest/src/store/migrations.ts`](../packages/ingest/src/store/migrations.ts) (SQLite).
@@ -225,6 +225,18 @@ committed; `current`: every layer now), `layers` (always-loaded bytes per Knowle
 boolean read from `~/.claude.json` for this), `warnings`.
 
 ## SQLite tables
+
+Migrations are append-only (`MIGRATIONS` in `migrations.ts`; `meta.schema_version` records how many
+have run, and `garden db:init` or any command that opens the store applies the rest):
+
+| Version | Milestone | Change |
+|---|---|---|
+| 1 | M1 | All core tables below, from `meta` to `ingest_files` |
+| 2 | M2 | `runs.token_quality` (`reported` \| `output_estimated`, default `reported`) |
+| 3 | K | The five `knowledge_*` tables |
+
+The trace store holds no dollar amounts, no file content, and no live-layer state (the live layer
+keeps everything in memory and writes nothing).
 
 | Table | Holds |
 |---|---|

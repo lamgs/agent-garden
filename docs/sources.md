@@ -5,6 +5,12 @@ parsers must treat it as one: tolerant parsing, plus a census in `garden inspect
 
 Legend: **[observed]** = seen on a real file in this repo's dev container. **[docs]** = stated in
 official docs (URL given). **[npm]** = `npm view` on the date shown. **[ran]** = executed locally.
+**[bin]** = read in the installed Claude Code binary. Secondary-source tags ([SDK], [CL], [COM], [ND],
+[web]) are defined in the sections that use them. The official docs sites were blocked by this
+container's network policy for the whole build, so no entry carries a plain **[docs]** tag.
+
+Status at M8 (2026-10-08): entries marked *superseded* below were early hypotheses that later
+observation replaced; they are kept so the history of each claim stays readable.
 
 ## Environment (2026-10-07, cloud dev container)
 
@@ -25,7 +31,7 @@ official docs (URL given). **[npm]** = `npm view` on the date shown. **[ran]** =
 | react | 19.3.0 |
 | vite | 8.3.3 |
 | vitest | 5.0.3 |
-| typescript | 7.0.2 (native port; typescript-eslint support to be checked at M1) |
+| typescript | 7.0.2 (native port). *Resolved at M1:* typescript-eslint 8.71 supports `<6.1`, so the repo pins `~6.0.3` |
 | zod | 4.6.5 |
 | hono / @hono/node-server | 4.13.13 / 2.1.3 |
 | yaml | 2.9.1 |
@@ -74,7 +80,11 @@ Common fields on `user` / `assistant` / `attachment` lines: `uuid`, `parentUuid`
 these attachments.
 
 Not observed yet (no instance in available files): compaction records, hook-execution records, API
-error records, user interrupts.
+error records, user interrupts. *Partly superseded (M2):* hook executions were then observed as
+`system` lines with `subtype: "stop_hook_summary"` (next section), and `attachment.type =
+"instructions"` was observed in K. Compaction, API error, and interrupt records are still not
+observed on real data as of M8; the parser and live layer handle them from the hypothesized shapes
+below and from synthetic fixtures.
 
 ## Subagent transcripts [observed, CC v2.1.293]
 
@@ -124,7 +134,8 @@ error records, user interrupts.
   p90 70 ms, max 92 ms (includes CC's own 30–70 ms write lag). Polling only (`--no-watch`, 250 ms):
   8 events, p50 190 ms, p90/max 279 ms. Both are within the 1 s target.
 - [observed] Whole-history census through the live parser (3,273 lines, 23 MB, 9 files): 0 malformed
-  lines; one unknown shape, `attachment.type=instructions` (9 lines, counted and skipped). Seeding from
+  lines; one unknown shape, `attachment.type=instructions` (9 lines, counted and skipped). *Superseded (K):*
+  `instructions` is now a known attachment (load evidence, paths only). Seeding from
   a 256 KB tail produces one `tool_result without tool_use in the tailed range` (the call was before the
   seed window), counted, not thrown.
 - [observed] `stop_reason` is repeated on every line of a main-thread message (also on its `thinking`
@@ -196,12 +207,14 @@ agree with **[observed]** facts above, the observation wins.
   mapping is lossy, so always read `cwd` from the records [COM, consistent with observed].
 - Retention: `cleanupPeriodDays` (default 30) deletes inactive sessions at startup. Since v2.1.89, `0` is
   a validation error [CL]. → Ingestion keeps history in `garden.db`, and the README should advise
-  raising retention.
+  raising retention (it does, under "Your own data").
 - Subagent transcripts: separate `subagents/agent-<agentId>.jsonl` + `.meta.json` [COM; matches observed].
   The `SubagentStop` hook input has `agent_id`, `agent_transcript_path`, `agent_type` [SDK].
 - Compaction: a `system` record with `subtype: "compact_boundary"` [COM, cited in a v2.1.237 bug
   report]. `isCompactSummary` / `compactMetadata` [COM only]. Official format [ND]. → Parser must
-  treat these as hypotheses until a real fixture exists.
+  treat these as hypotheses until a real fixture exists. *Still a hypothesis at M8:* no real
+  compaction was observed; the transcript parser, replay, and live layer all use this shape, and
+  the demo generator writes it.
 - Subagent definitions: `.claude/agents/*.md` (project), `~/.claude/agents/*.md` (user), plugin
   `agents/*.md`. YAML frontmatter: `name`, `description` (required), `tools`, `disallowedTools`,
   `model` (`sonnet|opus|haiku|<id>|inherit`), `permissionMode`, `maxTurns`, `skills`, `mcpServers`,
@@ -281,6 +294,10 @@ On demand [bin, high]:
 - Imports outside the working directory from project/local files load only when
   `hasClaudeMdExternalIncludesApproved` (per project in `~/.claude.json`) is true; user-file imports
   outside are allowed in the CLI [bin, high]. Imported files load with their importer.
+- Agent Garden: the demo ingest passes `--knowledge-boundary .garden-demo` (and an empty
+  `--managed-dir`) so the ancestor walk stops at the demo folder. Without it, the repository's own
+  CLAUDE.md (an ancestor of `.garden-demo/projects/*`) was counted as an always-loaded source of
+  every demo bed (found at M8). Real ingests walk to the filesystem root, as Claude Code does (ours).
 - Agent Garden: targets that do not look like files (no `./ ~/ /` prefix and no extension, e.g.
   `@anthropic-ai/sdk`) are not reported as dangling (ours).
 

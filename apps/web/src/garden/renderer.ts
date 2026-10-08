@@ -164,6 +164,10 @@ export class GardenRenderer {
   private cleanup: (() => void)[] = [];
   private overlays: GardenOverlay[] = [];
   private overlayLayer = new Container();
+  /** Screen area in the top-left corner covered by DOM chrome (the Needs-you strip); fit avoids it. */
+  private obstacle = { w: 0, h: 0 };
+  /** True while the camera is where `fit()` put it (no pan/zoom since), so it may refit. */
+  private atFit = false;
   /** Router highlight (encoding router.highlight): glows under plants, badges on top. */
   private hl = {
     under: new Container(),
@@ -769,6 +773,7 @@ export class GardenRenderer {
     const wy = (sy - this.world.y) / s0;
     this.world.scale.set(s1);
     this.world.position.set(sx - wx * s1, sy - wy * s1);
+    this.atFit = false;
     this.applyCamera();
   }
 
@@ -800,19 +805,56 @@ export class GardenRenderer {
   fit(): void {
     if (!this.layout) return;
     const { w, h } = this.viewSize();
-    const s = Math.min(w / this.layout.width, h / this.layout.height) * 0.98;
+    const { width: lw, height: lh } = this.layout;
+    const scaleIn = (aw: number, ah: number) => Math.min(aw / lw, ah / lh) * 0.98;
+    const free = scaleIn(w, h);
+    // Keep plants out from under the top-left chrome (the Needs-you strip): give up either its
+    // height (fit below it) or its width (fit beside it), whichever keeps the garden larger. Never
+    // shrink into the far zoom for it, though: far hides the plants and the live overlay, so then
+    // the garden takes what room it needs and the strip covers less of it.
+    const o = this.obstacle;
+    let s = free;
+    let top = 0;
+    let left = 0;
+    if (o.w > 0 && o.h > 0) {
+      const below = scaleIn(w, h - o.h);
+      const beside = scaleIn(w - o.w, h);
+      s = Math.max(below, beside, Math.min(free, FAR_BELOW + 0.01));
+      if (beside >= below) left = o.w;
+      else top = o.h;
+    }
+    // Center in the free area; if the garden does not fit there, center it in the whole view
+    // (the strip then overlaps the margin a little rather than the bottom row going off-screen).
+    const centerIn = (start: number, size: number, need: number) =>
+      need <= size - start ? start + (size - start - need) / 2 : Math.max(0, (size - need) / 2);
+    const x = centerIn(left, w, lw * s);
+    const y = centerIn(top, h, lh * s);
     this.world.scale.set(s);
-    this.world.position.set(
-      (w - this.layout.width * s) / 2,
-      Math.max(0, (h - this.layout.height * s) / 2),
-    );
+    this.world.position.set(x, y);
     this.applyCamera();
+    this.atFit = true;
+  }
+
+  /**
+   * Reserve a top-left screen area (CSS px from the canvas corner) that fit() keeps plants out
+   * of. It only grows, so the camera does not jump as rows come and go, and it refits only while
+   * the camera is still at the fitted position (the user has not panned or zoomed).
+   */
+  reserveTopLeft(w: number, h: number): void {
+    const next = {
+      w: Math.max(this.obstacle.w, Math.ceil(w)),
+      h: Math.max(this.obstacle.h, Math.ceil(h)),
+    };
+    if (next.w === this.obstacle.w && next.h === this.obstacle.h) return;
+    this.obstacle = next;
+    if (this.atFit) this.fit();
   }
 
   centerOn(x: number, y: number, scale = this.scale): void {
     const { w, h } = this.viewSize();
     this.world.scale.set(scale);
     this.world.position.set(w / 2 - x * scale, h / 2 - y * scale);
+    this.atFit = false;
     this.applyCamera();
   }
 
@@ -938,6 +980,7 @@ export class GardenRenderer {
       }
       if (this.dragMoved) {
         this.world.position.set(this.world.x + p.x - last.x, this.world.y + p.y - last.y);
+        this.atFit = false;
         this.applyCamera();
       }
       last = p;

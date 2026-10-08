@@ -102,6 +102,12 @@ export interface KnowledgeScanOptions {
   /** Home directory for `~/` (default: the parent of claudeHome). */
   homeDir?: string;
   managedDir?: string;
+  /**
+   * Stop the ancestor walk at this directory (it is scanned; its parents are not). Claude Code
+   * walks to the filesystem root; the demo sets this so files above the demo folder (such as the
+   * repo's own CLAUDE.md) do not leak into a synthetic dataset.
+   */
+  ancestorBoundary?: string;
   /** Override for the auto-memory folder (default: autoMemoryDirectory setting, else projects/<slug>/memory). */
   memoryDir?: string;
   claudeJsonPath?: string;
@@ -410,9 +416,12 @@ export function scanKnowledge(o: KnowledgeScanOptions): RawKnowledge {
 
   // ---- 2. project: ancestors down to the root --------------------------------------------------------
   const dirs: string[] = [];
+  const boundary = o.ancestorBoundary ? resolve(o.ancestorBoundary) : undefined;
+  const insideBoundary =
+    boundary !== undefined && (root === boundary || root.startsWith(boundary + sep));
   for (let d = root; ; d = dirname(d)) {
     dirs.unshift(d);
-    if (dirname(d) === d) break;
+    if (dirname(d) === d || (insideBoundary && d === boundary)) break;
   }
   let hasProjectClaudeMd = false;
   for (const d of dirs) {

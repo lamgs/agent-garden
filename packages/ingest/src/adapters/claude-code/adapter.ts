@@ -63,6 +63,8 @@ export interface ClaudeCodeOptions {
   managedDir?: string;
   /** Home directory for `~/` in @imports (default: the parent of claudeHome). */
   homeDir?: string;
+  /** Knowledge scan: do not walk above this directory for ancestor CLAUDE.md files (the demo sets it). */
+  ancestorBoundary?: string;
 }
 
 interface Family {
@@ -320,6 +322,7 @@ export class ClaudeCodeAdapter implements Adapter {
       now: new Date().toISOString(),
       ...(this.opts.managedDir ? { managedDir: this.opts.managedDir } : {}),
       ...(this.opts.homeDir ? { homeDir: this.opts.homeDir } : {}),
+      ...(this.opts.ancestorBoundary ? { ancestorBoundary: this.opts.ancestorBoundary } : {}),
     });
     return k;
   }

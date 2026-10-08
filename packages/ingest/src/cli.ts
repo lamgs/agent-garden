@@ -38,9 +38,13 @@ export const dbPath = (o: Opts) =>
 function adapter(o: Opts): ClaudeCodeAdapter {
   const claudeHome = str(o, 'claude-home');
   const claudeJsonPath = str(o, 'claude-json');
+  const managedDir = str(o, 'managed-dir');
+  const ancestorBoundary = str(o, 'knowledge-boundary');
   return new ClaudeCodeAdapter({
     ...(claudeHome ? { claudeHome } : {}),
     ...(claudeJsonPath ? { claudeJsonPath } : {}),
+    ...(managedDir ? { managedDir } : {}),
+    ...(ancestorBoundary ? { ancestorBoundary } : {}),
     gardenYamlPath: str(o, 'garden-yaml') ?? join(dataDir(o), 'garden.yaml'),
     full: o.flags.full === true,
   });
@@ -184,6 +188,8 @@ Options:
   --claude-home <dir>    Claude Code data dir (default ~/.claude)
   --claude-json <file>   ~/.claude.json (only MCP server names are read)
   --garden-yaml <file>   playbooks / declared loops (default <data>/garden.yaml)
+  --managed-dir <dir>    managed-policy dir for CLAUDE.md (default /etc/claude-code on Linux)
+  --knowledge-boundary <dir>  do not read ancestor CLAUDE.md files above <dir> (the demo uses it)
   --data <dir>           Agent Garden data dir (default ~/.agent-garden, or $GARDEN_HOME)
   --db <file>            store path (default <data>/garden.db)`);
 }

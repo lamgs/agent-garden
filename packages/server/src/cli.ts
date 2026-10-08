@@ -1,5 +1,6 @@
 #!/usr/bin/env -S npx tsx
 /** `garden` CLI: ingest commands plus `serve` and `export`. */
+import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { main, dataDir, dbPath, str, type Command } from '@garden/ingest/cli';
@@ -119,6 +120,10 @@ const extra: Record<string, Command> = {
       const { url } = await startServer({ ...c, port, ...(live ? { live: live.hub } : {}) });
       console.log(`Agent Garden: ${url}  (bound to 127.0.0.1 only; Ctrl+C to stop)`);
       console.log(`Live layer: ${live ? live.label : 'off'}`);
+      if (!existsSync(c.webDist))
+        console.warn(
+          `Web app not built (${c.webDist} is missing): run \`pnpm build\`. The API works without it.`,
+        );
       await new Promise(() => {}); // keep running
     },
   },

@@ -3,7 +3,7 @@
 > "See every AI agent you run as a living garden: what's thriving, what's wilting, and which one to call."
 > Prompts are seeds. Harnesses are soil. Loops are seasons.
 
-Status: approved 2026-10-07; M0–M4 done. Direction changes from 2026-10-08 are in §10a.
+Status: approved 2026-10-07; v1 complete (M0–M8, L, K) as of 2026-10-08. Direction changes from 2026-10-08 are in §10a.
 Verified external facts are in [`docs/sources.md`](docs/sources.md). Conventions are in [`CLAUDE.md`](CLAUDE.md).
 
 ---

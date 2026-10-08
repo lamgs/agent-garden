@@ -14,7 +14,7 @@ Status log per milestone. A milestone is marked done only when its verification 
 | L Live layer | ✅ done (server, client, garden overlay) | 529 tests + 18 e2e; overlay screenshots live-*; line → event p50 20 ms on real data; see below |
 | K Knowledge map | ✅ done | 547 tests + 17 e2e green; formats verified in the CC 2.1.293 binary; k-knowledge.png; see below |
 | M7 Seasons v1 | ✅ done | 535 tests + e2e green; story 0.51 → 0.87 reproduced and SQL-checked; m7-seasons.png; see below |
-| M8 Deliverables & polish | ⬜ not started | |
+| M8 Deliverables & polish | ✅ done | README, PRD, demo script, `pnpm check:fresh` PASS; 588 tests + 22 e2e green (1 skipped); see below |
 
 ## M0: Plan & conventions (2026-10-07)
 
@@ -358,8 +358,8 @@ Known gaps:
 
 ## Live layer: transcript tailer, live state machine, SSE API, demo live source
 
-Status: built (backend only; the pixel-art renderer consumes `/api/live/stream`). No view changed, so
-no screenshot.
+Status: built. This entry covers the backend; the garden overlay that consumes `/api/live/stream` is
+the "Live UI" section below (the pixel-office renderer once planned for it was dropped, PLAN §10a).
 
 - [x] `packages/ingest/src/live/`: `LiveTailer` (fs.watch recursive + 250 ms poll, per-file offsets,
   partial-line buffer, truncation/rotation, 30-min start window seeded from 256 KB tails, subagent
@@ -382,8 +382,8 @@ Known gaps:
 - `loop` on LiveAgent is never set; `LiveAgent.plantId` only for plantings already in the store.
 - Inline sidechain lines (older CC format) become child agents but are not linked to a spawn call.
 - Demo: one stalled call per cycle; `turn_end` is synthesized at the end of each replayed run.
-- `pnpm demo:data` run *inside a git worktree* collapses projects into one bed (paths resolve to the
-  worktree root). From the main checkout it's correct.
+- ~~`pnpm demo:data` run *inside a git worktree* collapses projects into one bed.~~ Fixed 2026-10-08
+  (see M4).
 
 ## M6: Router, "Which one do I call?" (2026-10-08)
 
@@ -481,8 +481,8 @@ Known gaps:
   found only through their past tasks.
 - MiniLM is an interface only: no weights ship, and nothing downloads.
 - Fixture mode answers only the 5 bundled questions. Static exports have no router.
-- The router box adds about 18 px to the header, so earlier m3/m4 screenshots (not regenerated in
-  this commit) are slightly out of date.
+- ~~The router box adds about 18 px to the header, so earlier m3/m4 screenshots are slightly out of
+  date.~~ All e2e screenshots were regenerated at M8.
 
 ## M7: Seasons v1 (2026-10-08)
 
@@ -617,7 +617,7 @@ Known gaps:
 - `nested_memory` / `relevant_memories` shapes come from the binary; no real instance seen yet.
 - Bare-name mentions are flagged as dangling only when they look like memory files (heuristic).
 - Rules are not part of the harness bundle, so adding a rule does not start a new season.
-- m3/m4 screenshots predate the new strata bands (not regenerated, to avoid binary churn).
+- ~~m3/m4 screenshots predate the new strata bands.~~ Regenerated at M8.
 
 ## Live UI: garden overlay, Needs-you strip, event ticker (2026-10-08)
 
@@ -666,16 +666,91 @@ Mapping. Every channel is registered in `encodings.ts` (`element: 'live'`), with
     motion, bees are placed and never fly; `?live=off`.
 - Screenshots: `docs/screenshots/live-garden.png`, `live-needs-you.png`, `live-panel.png`, and
   `live-served.png` (served demo store). The reduced-motion garden test now runs with `live=off`:
-  live state changes are not motion, but they change pixels. Older milestone screenshots were not
-  regenerated in this commit.
+  live state changes are not motion, but they change pixels. (All screenshots were regenerated at M8.)
 
 Known gaps:
 - Served mode never sets `LiveAgent.loop`, so the loop pulse only appears in fixture mode so far.
 - The served demo keeps ended main sessions as `waiting_input` for the whole active window, so Needs
-  you fills with inferred input waits (capped at 5 rows). The research suggests treating text-only
+  you fills with inferred input waits (capped at 3 rows since M8, then "+N more"). The research suggests treating text-only
   turn ends as idle.
 - Seedlings and off-stage agents are not clickable: there is no planting to open. Off-stage agents
   (bed not in the window) appear only in the strip and the ticker. The far zoom hides the overlay.
 - `LiveAgent` has no run id, so "Now" links to the latest stored replay, not to the run in progress.
 - Server previews for some tools are raw JSON input (e.g. `{"command":"pnpm test…`). They are
   redacted, but not pretty.
+
+## M8: Deliverables & polish (2026-10-08)
+
+Done:
+- `README.md`: tagline, a GIF of the fixture live stream (`docs/screenshots/live-garden.gif`, 1.2 MB,
+  recorded by `pnpm readme:gif`: Playwright frames + ffmpeg palettegen), six screenshots, the
+  4-line setup from PLAN §10a, vocabulary, privacy, live known-vs-inferred, honest metrics, CLI
+  reference, layout, doc links.
+- `docs/PRD.md` (problem, users, jobs, principles, v1 scope per view, non-goals, the 2026-10-08
+  direction decisions, open questions, next candidates) and `docs/demo-script.md` (6 beats, ~4 min).
+- `docs/schema.md` final pass: store schema version 3 with a migration table; `schema.ts`'s
+  KnowledgeSource id comment corrected to match the code (`stableId('ks', familyId, path)`).
+  `docs/sources.md`: legend covers every tag; superseded hypotheses marked (hook records observed in
+  M2, `instructions` attachment known since K, TypeScript pin resolved); compaction still flagged as
+  unverified on real data.
+- `scripts/fresh-clone-check.sh` (`pnpm check:fresh`): clones HEAD (file://, or `REPO_URL`) into a
+  temp dir, `pnpm install --frozen-lockfile`, `pnpm demo` in its own process group, waits for
+  `/api/health`, checks `/api/garden` has ≥ 6 beds, renders the page in headless Chromium
+  (`window.__garden.ready`, no console errors, no non-loopback requests), then kills and cleans up.
+
+Found and fixed:
+- **The demo counted the repository's own CLAUDE.md** as an always-loaded ancestor of every demo bed
+  (`.garden-demo/projects/*` sit under the repo; Claude Code walks ancestors to `/`). legacy-monolith
+  read ~15k tokens instead of ~13k, shop-api ~2.7k instead of ~0.9k, and every bed got a "42
+  passages … also appear in 5 other beds" finding. New ingest options `--knowledge-boundary <dir>`
+  and `--managed-dir <dir>` (adapter `ancestorBoundary`, `managedDir`); `pnpm demo:data` passes
+  `.garden-demo` and an empty managed dir. Real ingests are unchanged. Unit test added.
+- **Needs-you strip covered the top-left bed** (old `live-garden.png`). `GardenRenderer.fit()` now
+  keeps plants out of a reserved top-left box reported by the strip (ResizeObserver): it fits below
+  or beside it, whichever keeps the garden larger, but never drops into the far zoom for it (far
+  hides plants and the overlay). The reserve only grows, and refits only while the camera is still
+  where fit put it, so the camera never jumps after the user pans or zooms. The strip now shows 3
+  rows before "+N more" (5 made the reserve too tall); an expanded strip reserves nothing.
+- `garden serve` warns when `apps/web/dist` is missing (own-data path without a build).
+
+Verified demo numbers (served `pnpm demo`, read from the API and pages): test-writer 26% (n=102,
+CI 19–36%) vs 92% (n=108, CI 85–96%), −65 points, separated, cost 3.1× ($0.044 → $0.135); compare
+main −24 separated, Explore 0 within noise; router "write unit tests for the invoice totals":
+test-writer 61%, main 28%, per-bed badges 88% shop-api / 61% legacy (n=10 each); seasons shop-api
+main 51% (n=226) → 87% (n=204), +36, separated, boundary "Tighten CLAUDE.md and add test hook"
+(instructions −10,336 bytes); knowledge legacy-monolith ~13.0k tokens, 19 sources, 13 findings,
+shop-api ~0.9k; replay `run_8308c289de49b5b3`: failure, 6 min 5 s, 2 test-writer lanes with 3
+errors each, 1 compaction (127k before), peak context 126,794, 841k tokens, $0.367.
+
+Discrepancies noted:
+- The committed seasons fixture (and m7-seasons.png, fixture mode) shows instructions −10,581 bytes;
+  a fresh demo gives −10,336. The fixture was exported from an older store; the 51% → 87% numbers
+  are identical.
+- The replay fixture (m5 screenshots) shows 844k tokens / $0.369; the served demo shows 841k /
+  $0.367 for the same run id. Same cause.
+- Before the knowledge-boundary fix, PROGRESS K's "~13k" only held for demos generated outside the
+  repo; it now holds for `pnpm demo` too.
+
+Verification:
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm build`: clean. `pnpm test`: 588 tests (47 files), incl.
+  the redaction proof and the new ancestor-boundary test.
+- [x] `E2E_PORT=4491 pnpm e2e`: 22 passed, 1 skipped (the real-session replay, needs
+  `GARDEN_REAL_REPLAY`). All e2e screenshots regenerated; `live-served.png` re-shot against the
+  served demo.
+- [x] `pnpm check:fresh` at the M8 commit: clone → `pnpm install --frozen-lockfile` → `pnpm demo` →
+  health `{"ok":true,"schemaVersion":3,"runs":2041,…,"live":true}` at 24 s → 6 beds, 25 plants →
+  page `window.__garden.ready`, 25 plants drawn, live pill "Live · demo · 5 active", 0 console
+  errors → **PASS** in 29 s, server killed, temp dir removed.
+- [x] Own-data commands as written: `pnpm garden ingest` read `~/.claude` into
+  `~/.agent-garden/garden.db` (14 runs, 7 redactions, 1.4 s); `pnpm garden serve` answered on
+  127.0.0.1:4310 with the live layer tailing `~/.claude/projects` (read-only). No screenshot taken
+  of real data; the store was deleted afterwards.
+- [x] Every committed screenshot reviewed: demo or fixture data only (`*-real.png` stays gitignored).
+
+Known gaps:
+- The served demo's Needs-you strip is dominated by inferred input waits (ended main turns); the
+  permission row appears once per replay cycle. Treating text-only turn ends as idle is still open
+  (PRD open questions).
+- At 1440×900 the bottom row's bed labels sit under the toolbar (as before M8).
+- No static hosted demo (PLAN's optional M8 item): exports cover the garden view only.
+- `pnpm check:fresh` needs port 4310 free and uses the local clone, not GitHub (no network here).

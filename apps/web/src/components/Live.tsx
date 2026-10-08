@@ -67,13 +67,36 @@ export function LivePill() {
   );
 }
 
-const NEEDS_SHOWN = 5;
+/** Rows shown before "+N more": few enough that the garden can fit beside or below the strip. */
+const NEEDS_SHOWN = 3;
 
-/** "Needs you": waiting for permission or input, permission first, longest wait first. */
-export function NeedsYou({ view, onSelect }: { view: GardenView; onSelect: (id: ID) => void }) {
+/**
+ * "Needs you": waiting for permission or input, permission first, longest wait first.
+ * `onBox` reports the strip's outer box (right and bottom edges, relative to its offset parent)
+ * so the garden's fit can keep plants out from under it.
+ */
+export function NeedsYou({
+  view,
+  onSelect,
+  onBox,
+}: {
+  view: GardenView;
+  onSelect: (id: ID) => void;
+  onBox?: (right: number, bottom: number) => void;
+}) {
   const s = useLive();
   const now = useClock(1000);
   const [all, setAll] = useState(false);
+  const [el, setEl] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    // Reserve room for the collapsed strip only: expanding it is a deliberate, temporary look.
+    if (!el || !onBox || all) return;
+    const report = () => onBox(el.offsetLeft + el.offsetWidth, el.offsetTop + el.offsetHeight);
+    report();
+    const ro = new ResizeObserver(report);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [el, onBox, all]);
   if (!s.snapshot) return null;
   const items = attentionQueue(s.snapshot, now);
   if (!items.length) return null;
@@ -81,6 +104,7 @@ export function NeedsYou({ view, onSelect }: { view: GardenView; onSelect: (id: 
   const hidden = items.length - shown.length;
   return (
     <section
+      ref={setEl}
       className="needs-you"
       aria-label="Needs you"
       style={{ '--att-ink': ATTENTION_INK, '--att-fill': ATTENTION_FILL } as CSSProperties}

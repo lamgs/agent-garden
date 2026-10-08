@@ -14,10 +14,12 @@
     "test": "vitest run",
     "garden": "tsx --disable-warning=ExperimentalWarning packages/server/src/cli.ts",
     "router:eval": "tsx --disable-warning=ExperimentalWarning packages/server/src/route-eval-cli.ts",
-    "demo:data": "tsx scripts/demo/src/cli.ts --out .garden-demo && pnpm -s garden ingest --data .garden-demo/data --claude-home .garden-demo/home/.claude --claude-json .garden-demo/home/.claude.json --garden-yaml .garden-demo/garden.yaml",
+    "demo:data": "tsx scripts/demo/src/cli.ts --out .garden-demo && pnpm -s garden ingest --data .garden-demo/data --claude-home .garden-demo/home/.claude --claude-json .garden-demo/home/.claude.json --garden-yaml .garden-demo/garden.yaml --managed-dir .garden-demo/managed --knowledge-boundary .garden-demo",
     "demo": "pnpm -s build && pnpm -s demo:data && pnpm -s garden serve --data .garden-demo/data --garden-yaml .garden-demo/garden.yaml --as-of 2026-10-01T12:00:00Z --live-demo",
     "build": "pnpm -s --filter @garden/web build",
-    "e2e": "pnpm -s --filter @garden/web build && pnpm -s --filter @garden/web e2e"
+    "e2e": "pnpm -s --filter @garden/web build && pnpm -s --filter @garden/web e2e",
+    "check:fresh": "bash scripts/fresh-clone-check.sh",
+    "readme:gif": "pnpm -s build && node apps/web/scripts/readme-gif.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",

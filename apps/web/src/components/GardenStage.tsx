@@ -45,6 +45,8 @@ export interface GardenStageHandle {
   zoomBy(f: number): void;
   fit(): void;
   setZoom(level: ZoomLevel): void;
+  /** Keep plants out of a top-left screen area when fitting (the Needs-you strip). */
+  reserveTopLeft(w: number, h: number): void;
 }
 
 interface Props {
@@ -211,6 +213,7 @@ export const GardenStage = forwardRef<GardenStageHandle, Props>(function GardenS
     zoomBy: (f) => rendererRef.current?.zoomBy(f),
     fit: () => rendererRef.current?.fit(),
     setZoom: (z) => rendererRef.current?.setZoom(z),
+    reserveTopLeft: (w, h) => rendererRef.current?.reserveTopLeft(w, h),
   }));
 
   const desc = hover ? describe(view, hover) : null;

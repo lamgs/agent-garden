@@ -52,6 +52,11 @@ export function App() {
   /** null = closed; '' = open with no preselected bed. */
   const [picker, setPicker] = useState<ID | '' | null>(null);
   const stage = useRef<GardenStageHandle>(null);
+  // The Needs-you strip floats over the garden's top-left corner; fit keeps plants out from under it.
+  const reserveForNeeds = useCallback(
+    (right: number, bottom: number) => stage.current?.reserveTopLeft(right + 10, bottom + 10),
+    [],
+  );
   const routerBox = useRef<RouterBoxHandle>(null);
   const [routed, setRouted] = useState<ReturnType<typeof highlightFor> | null>(null);
   const selRef = useRef<ID | null>(null);
@@ -279,7 +284,13 @@ export function App() {
           label to compare beds
         </p>
 
-        {data && !onPage ? <NeedsYou view={data.view} onSelect={setSelected} /> : null}
+        {data && !onPage ? (
+          <NeedsYou
+            view={data.view}
+            onSelect={setSelected}
+            {...(legendOpen ? {} : { onBox: reserveForNeeds })}
+          />
+        ) : null}
         {data && !onPage ? <EventTicker /> : null}
         {tableOpen && data ? (
           <div className="table-overlay">

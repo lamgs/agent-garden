@@ -240,3 +240,37 @@ describe('knowledge usage from transcripts', () => {
     ).toEqual([]);
   });
 });
+
+describe('scanKnowledge ancestor boundary', () => {
+  it('does not read ancestor CLAUDE.md files above the boundary', async () => {
+    const { mkdirSync, writeFileSync } = await import('node:fs');
+    const outer = join(dir, 'boundary');
+    const demo = join(outer, 'demo');
+    const proj = join(demo, 'projects', 'p');
+    const home = join(demo, 'home', '.claude');
+    mkdirSync(proj, { recursive: true });
+    mkdirSync(home, { recursive: true });
+    writeFileSync(join(outer, 'CLAUDE.md'), '# outer repo instructions\n');
+    writeFileSync(join(demo, 'CLAUDE.md'), '# demo root instructions\n');
+    writeFileSync(join(proj, 'CLAUDE.md'), '# project\n');
+    const scan = (ancestorBoundary?: string) =>
+      scanKnowledge({
+        familyId: 'fam_b',
+        root: proj,
+        claudeHome: home,
+        managedDir: join(demo, 'managed'),
+        user: scanUserConfig(home),
+        project: scanProjectConfig(proj),
+        commits: [],
+        now: '2026-10-01T00:00:00.000Z',
+        ...(ancestorBoundary ? { ancestorBoundary } : {}),
+      }).sources.map((s) => s.path);
+    expect(scan()).toContain(join(outer, 'CLAUDE.md'));
+    const bounded = scan(demo);
+    expect(bounded).not.toContain(join(outer, 'CLAUDE.md'));
+    expect(bounded).toContain(join(demo, 'CLAUDE.md'));
+    expect(bounded).toContain(join(proj, 'CLAUDE.md'));
+    // A boundary the project is not inside is ignored (the full walk applies).
+    expect(scan(join(dir, 'elsewhere'))).toContain(join(outer, 'CLAUDE.md'));
+  });
+});

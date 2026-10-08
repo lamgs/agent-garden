@@ -301,7 +301,7 @@ export const KNOWLEDGE_LAYERS = [
 export type KnowledgeLayer = (typeof KNOWLEDGE_LAYERS)[number];
 
 export interface KnowledgeSource {
-  /** stableId('ks', familyId, kind, path). */
+  /** stableId('ks', familyId, path). */
   id: ID;
   familyId: ID;
   kind: KnowledgeKind;
