@@ -30,6 +30,7 @@ import {
   SHAPE_ROW,
 } from './replay-draw';
 import { drawBadge, drawGlow, drawVeil } from './highlight';
+import { blockHeight, drawRoot, drawSourceBlock, drawSprout, rootCurve } from './knowledge-draw';
 import type { Pen } from './pen';
 
 export interface Swatch {
@@ -56,11 +57,20 @@ export function familyTone(level: number): string {
 }
 
 const bedSwatch = (
-  look: (level: number) => { tone: string; texture: number; strata: number },
+  look: (level: number) => {
+    tone: string;
+    texture: number;
+    strata: number;
+    bands?: number[];
+    weight?: number;
+  },
 ): Swatch => ({
   frame: { x: -4, y: -4, w: 68, h: 52 },
   draw: (pen, level) => drawBed(pen, 0, 0, 60, 44, look(level), 7 + level),
 });
+
+/** bed.strata legend: example band shares for 0, 1, 2, and 3+ layers. */
+const STRATA_SWATCH_BANDS: number[][] = [[], [1], [0.4, 0.6], [0.2, 0.5, 0.3]];
 
 export const SWATCHES: Record<string, Swatch> = {
   'plant.height': plantSwatch((l) => ({ height: l }), { x: -46, y: -150, w: 92, h: 158 }),
@@ -73,7 +83,20 @@ export const SWATCHES: Record<string, Swatch> = {
   'plant.hue': plantSwatch((l) => ({ hue: l, bloom: 3 }), { x: -40, y: -96, w: 80, h: 102 }),
   'bed.tone': bedSwatch((l) => ({ tone: familyTone(l), texture: 1, strata: 1 })),
   'bed.texture': bedSwatch((l) => ({ tone: MODEL_FAMILY_COLORS.other, texture: l, strata: 0 })),
-  'bed.strata': bedSwatch((l) => ({ tone: MODEL_FAMILY_COLORS.other, texture: 0, strata: l })),
+  'bed.strata': bedSwatch((l) => ({
+    tone: MODEL_FAMILY_COLORS.other,
+    texture: 0,
+    strata: l,
+    bands: STRATA_SWATCH_BANDS[l] ?? [],
+    weight: 1,
+  })),
+  'bed.strata_weight': bedSwatch((l) => ({
+    tone: MODEL_FAMILY_COLORS.other,
+    texture: 0,
+    strata: 3,
+    bands: [0.25, 0.45, 0.3],
+    weight: l,
+  })),
   'care_card.size': {
     frame: { x: -12, y: -22, w: 24, h: 26 },
     draw: (pen, l) => drawPacket(pen, 0, 0, l),
@@ -228,6 +251,27 @@ export const SWATCHES: Record<string, Swatch> = {
       if (l === 0) drawBadge(pen, 0, -100, 30);
       else drawVeil(pen, -40, -112, 80, 124);
     },
+  },
+  // ---- knowledge map page (K) ----------------------------------------------------------------
+  'knowledge.column': {
+    frame: { x: -2, y: -2, w: 52, h: 26 },
+    draw: (pen, l) => drawSourceBlock(pen, 0, 0, 48, 22, l),
+  },
+  'knowledge.size': {
+    frame: { x: -2, y: -2, w: 40, h: 72 },
+    height: 52,
+    draw: (pen, l) => {
+      const h = blockHeight([120, 600, 2400, 8000][l] ?? 0);
+      drawSourceBlock(pen, 0, 68 - h, 36, h, 0);
+    },
+  },
+  'knowledge.edge': {
+    frame: { x: 0, y: -14, w: 64, h: 28 },
+    draw: (pen, l) => drawRoot(pen, rootCurve({ x: 4, y: -8 }, { x: 56, y: 8 }), l),
+  },
+  'knowledge.usage': {
+    frame: { x: -12, y: -16, w: 24, h: 20 },
+    draw: (pen, l) => drawSprout(pen, 0, 2, l),
   },
   'ambient.sway': {
     frame: { x: -44, y: -100, w: 88, h: 106 },

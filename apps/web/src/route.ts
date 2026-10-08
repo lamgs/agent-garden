@@ -8,6 +8,7 @@
  *   #/replant?agent=&from=&to=          replant
  *   #/replay/:runId                     time-lapse replay of one run
  *   #/replay?plant=<plantId>            replay of a plant's latest run
+ *   #/knowledge/:bedId                  knowledge map of a bed (K)
  */
 import type { ID } from '@garden/core';
 
@@ -17,6 +18,7 @@ export type Route =
   | { view: 'compare'; left: ID; right: ID }
   | { view: 'replant'; agent: ID; from: ID; to: ID }
   | { view: 'replay'; runId: ID | null; plantId: ID | null }
+  | { view: 'knowledge'; bedId: ID }
   | { view: 'unknown'; hash: string };
 
 export function parseRoute(hash: string): Route {
@@ -45,6 +47,10 @@ export function parseRoute(hash: string): Route {
   if (parts[0] === 'replay' && parts.length === 1 && q.get('plant')) {
     return { view: 'replay', runId: null, plantId: q.get('plant') };
   }
+  // Knowledge map (K)
+  if (parts[0] === 'knowledge' && parts.length === 2 && parts[1]) {
+    return { view: 'knowledge', bedId: decodeURIComponent(parts[1]) };
+  }
   return { view: 'unknown', hash: raw };
 }
 
@@ -62,6 +68,8 @@ export function formatRoute(r: Route): string {
       return r.runId
         ? `#/replay/${encodeURIComponent(r.runId)}`
         : `#/replay?${new URLSearchParams({ plant: r.plantId ?? '' }).toString()}`;
+    case 'knowledge':
+      return `#/knowledge/${encodeURIComponent(r.bedId)}`;
     case 'unknown':
       return `#${r.hash}`;
   }
@@ -74,6 +82,8 @@ export const replantHref = (agent: ID, from: ID, to: ID) =>
 export const replayHref = (runId: ID) => formatRoute({ view: 'replay', runId, plantId: null });
 export const latestReplayHref = (plantId: ID) =>
   formatRoute({ view: 'replay', runId: null, plantId });
+
+export const knowledgeHref = (bedId: ID) => formatRoute({ view: 'knowledge', bedId });
 
 /** Navigate by setting the hash: the browser records history, so back/forward just work. */
 export function navigate(r: Route | string): void {

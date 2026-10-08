@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { defineConfig } from '@playwright/test';
 
 const CHROME = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
-const PORT = 4317;
+const PORT = Number(process.env.E2E_PORT ?? 4317);
 
 export default defineConfig({
   testDir: './e2e',

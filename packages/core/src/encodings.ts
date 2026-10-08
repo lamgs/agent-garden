@@ -27,7 +27,8 @@ export type GardenElement =
   | 'season'
   | 'replay'
   | 'router'
-  | 'ambient';
+  | 'ambient'
+  | 'knowledge';
 
 export interface Encoding<I> {
   id: string;
@@ -136,16 +137,43 @@ export const bedTexture: Encoding<BedSummary> = {
   level: (b) => binIndex(b.soil.toolCount + b.soil.mcpCount, [15, 40, 80]),
 };
 
+/** Always-loaded tokens of a bed: the knowledge scan when present, else CLAUDE.md chain bytes ÷ 4. */
+export function bedAlwaysTokens(b: BedSummary): number {
+  return b.soil.knowledge?.alwaysTokens ?? Math.ceil(b.soil.instructionBytes / 4);
+}
+
+/** Layer shares (0..1, top to bottom) the strata bands are drawn with. */
+export function bedStrataShares(b: BedSummary): number[] {
+  const k = b.soil.knowledge;
+  if (!k) return b.soil.instructionBytes > 0 ? [1] : [];
+  const total = k.layers.reduce((n, l) => n + l.tokens, 0);
+  return total > 0 ? k.layers.filter((l) => l.tokens > 0).map((l) => l.tokens / total) : [];
+}
+
 export const bedStrata: Encoding<BedSummary> = {
   id: 'bed.strata',
   element: 'bed',
-  channel: 'Soil strata lines',
-  metric: 'CLAUDE.md chain size',
-  howComputed: 'Total bytes of instruction files in the current harness version.',
-  action: 'Many strata: instructions may be bloated.',
-  levels: ['None', '< 4 KB', '4–16 KB', '≥ 16 KB'],
-  level: (b) =>
-    b.soil.instructionBytes === 0 ? 0 : 1 + binIndex(b.soil.instructionBytes, [4096, 16384]),
+  channel: 'Soil strata bands (count and thickness)',
+  metric: 'Always-loaded knowledge, by source layer',
+  howComputed:
+    'One band per layer that loads in every session, top to bottom: managed, user CLAUDE.md, project CLAUDE.md, CLAUDE.local.md, rules, @imports, MEMORY.md, skill/agent listings. ' +
+    'Band thickness = that layer’s share of always-loaded tokens (bytes ÷ 4). Beds scanned before the knowledge map show one band for the CLAUDE.md chain.',
+  action: 'Many or lopsided bands: open the bed’s knowledge map to see which layer to trim.',
+  levels: ['No always-loaded knowledge', '1 layer', '2 layers', '3+ layers'],
+  level: (b) => Math.min(3, bedStrataShares(b).length),
+};
+
+export const bedStrataWeight: Encoding<BedSummary> = {
+  id: 'bed.strata_weight',
+  element: 'bed',
+  channel: 'Strata ink weight',
+  metric: 'Always-loaded tokens per session',
+  howComputed:
+    'Sum of always-loaded bytes ÷ 4 (an estimate). 10k tokens is the knowledge budget (≈ 40,000 characters, where Claude Code itself starts recommending trimming).',
+  action:
+    'Heavy, dark strata: every session pays this before the first prompt. Trim or move to on-demand.',
+  levels: ['< 1k tokens', '1k–4k', '4k–10k', '≥ 10k (over budget)'],
+  level: (b) => binIndex(bedAlwaysTokens(b), [1000, 4000, 10_000]),
 };
 
 export const careCardSize: Encoding<SkillCard> = {
@@ -206,16 +234,35 @@ export const beeCount: Encoding<BeeFlow> = {
   level: (b) => binIndex(b.calls, [4, 16]),
 };
 
-const WEED_KINDS: readonly WeedKind[] = ['orphan', 'duplicate', 'unowned'];
+const WEED_KINDS: readonly WeedKind[] = [
+  'orphan',
+  'duplicate',
+  'unowned',
+  'dangling_ref',
+  'orphan_memory',
+  'duplicate_passage',
+  'over_cap',
+];
 export const weedKind: Encoding<{ kind: WeedKind }> = {
   id: 'weed.kind',
   element: 'weed',
   channel: 'Weed',
   metric: 'Hygiene issue',
   howComputed:
-    'Orphan: defined but not run in 30 days. Duplicate: near-identical description or name shadowing. Unowned: missing description or broken reference.',
-  action: 'Pull it: delete, merge, or document.',
-  levels: ['Orphan', 'Duplicate', 'Unowned'],
+    'Orphan: defined but not run in 30 days. Duplicate: near-identical description or name shadowing. Unowned: missing description. ' +
+    'Knowledge weeds: dangling reference (an @import, MEMORY.md link, or path mention to a missing file); orphan memory (a memory file nothing points to and nobody read); ' +
+    'duplicate passage (the same passage, by keyed hash, in two knowledge files); over cap (MEMORY.md past its 200-line / 25 KB load cap).',
+  action:
+    'Pull it: delete, merge, fix the reference, or document. Knowledge weeds link to the bed’s knowledge map.',
+  levels: [
+    'Orphan',
+    'Duplicate',
+    'Unowned',
+    'Dangling reference',
+    'Orphan memory file',
+    'Duplicate passage',
+    'MEMORY.md over cap',
+  ],
   level: (w) => WEED_KINDS.indexOf(w.kind),
 };
 
@@ -391,6 +438,68 @@ export const ambientSway: Encoding<unknown> = {
   level: () => 0,
 };
 
+// ---- Knowledge map page (#/knowledge/:bedId) ----------------------------------------------------
+
+export const KNOWLEDGE_COLUMNS = ['always', 'on_demand', 'path_scoped', 'not_loaded'] as const;
+export const knowledgeColumn: Encoding<{ loadMode: (typeof KNOWLEDGE_COLUMNS)[number] }> = {
+  id: 'knowledge.column',
+  element: 'knowledge',
+  channel: 'Column of the provenance map',
+  metric: 'When a knowledge source reaches the model',
+  howComputed:
+    'From Claude Code’s load chain (docs/sources.md): always = in every session prompt; on demand = read, recalled, invoked, or loaded when working in that directory; path-scoped = a rule with `paths:` globs; not loaded = on disk but never reaches the model (reason shown).',
+  action:
+    'Move what is rarely needed out of the topsoil column; fix or delete what sits in compost.',
+  levels: [
+    'Topsoil: always loaded',
+    'Seed tray: on demand',
+    'Seed tray: path-scoped rule',
+    'Compost: not loaded',
+  ],
+  level: (s) => KNOWLEDGE_COLUMNS.indexOf(s.loadMode),
+};
+
+export const knowledgeSize: Encoding<{ tokens: number }> = {
+  id: 'knowledge.size',
+  element: 'knowledge',
+  channel: 'Block height',
+  metric: 'Approximate tokens of the source',
+  howComputed:
+    'File bytes ÷ 4 (an estimate, labelled “~”). Height grows with the square root of tokens so small files stay visible. For skills and agents, the block is the listing line that is always loaded.',
+  action: 'Tall topsoil blocks are what every session pays for.',
+  levels: ['< 250 tokens', '250–1k', '1k–4k', '≥ 4k'],
+  level: (s) => binIndex(s.tokens, [250, 1000, 4000]),
+};
+
+const EDGE_STATES = ['resolved', 'dangling', 'beyond_cap'] as const;
+export const knowledgeEdge: Encoding<{ state: (typeof EDGE_STATES)[number] }> = {
+  id: 'knowledge.edge',
+  element: 'knowledge',
+  channel: 'Root line between sources',
+  metric: 'Reference state (@import, MEMORY.md link, path mention)',
+  howComputed:
+    'Resolved: the referenced file exists. Dangling: it does not (relative to the referring file, the bed root, or the memory folder). Past the cap: the pointer sits after MEMORY.md’s 200-line / 25 KB load cap, so the agent never sees it.',
+  action: 'Red dashed roots are broken pointers: fix the path or remove the reference.',
+  levels: ['Solid: resolved', 'Red dashed: dangling', 'Faint dotted: past MEMORY.md cap'],
+  level: (e) => EDGE_STATES.indexOf(e.state),
+};
+
+export const knowledgeUsage: Encoding<{ loadMode: string; used: boolean }> = {
+  id: 'knowledge.usage',
+  element: 'knowledge',
+  channel: 'Sprout on a block',
+  metric: 'Loaded at least once in the window',
+  howComputed:
+    'From transcripts: session-start instructions records, nested_memory attachments, relevant_memories recalls, Read calls on the path, Skill calls, subagent runs.',
+  action: 'A bare on-demand block was never used: delete it or reference it where it is needed.',
+  levels: [
+    'Sprout: loaded in the window',
+    'Bare: no load seen',
+    'Always loaded (no sprout needed)',
+  ],
+  level: (s) => (s.loadMode === 'always' ? 2 : s.used ? 0 : 1),
+};
+
 export const ENCODINGS = [
   plantHeight,
   plantBloom,
@@ -400,6 +509,7 @@ export const ENCODINGS = [
   bedTone,
   bedTexture,
   bedStrata,
+  bedStrataWeight,
   careCardSize,
   irrigationFlow,
   irrigationState,
@@ -417,6 +527,10 @@ export const ENCODINGS = [
   replayGap,
   replayProgress,
   routerHighlight,
+  knowledgeColumn,
+  knowledgeSize,
+  knowledgeEdge,
+  knowledgeUsage,
   ambientSway,
 ] as const satisfies readonly Encoding<never>[];
 

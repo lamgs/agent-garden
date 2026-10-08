@@ -255,3 +255,138 @@ export interface Outcome {
   signals: OutcomeSignalResult[];
   manual?: { label: OutcomeLabel; note?: RedactedText; at: ISO };
 }
+
+// ---------------------------------------------------------------------------------------------
+// Knowledge map (milestone K). Where a run's instructions and memory come from. Content is never
+// stored: only paths, sizes, hashes, and derived facts. Formats: docs/sources.md "Knowledge sources".
+// ---------------------------------------------------------------------------------------------
+
+export const KNOWLEDGE_KINDS = [
+  'managed_claude_md',
+  'user_claude_md',
+  'project_claude_md',
+  'local_claude_md',
+  'nested_claude_md',
+  'rule',
+  'import',
+  'memory_index',
+  'memory_topic',
+  'referenced_doc',
+  'skill',
+  'agent_definition',
+] as const;
+export type KnowledgeKind = (typeof KNOWLEDGE_KINDS)[number];
+
+export type KnowledgeScope = 'managed' | 'user' | 'project' | 'local' | 'memory' | 'plugin';
+
+/**
+ * always: in the session prompt of every session. on_demand: loaded when the agent reads it,
+ * invokes it, or works in its directory. path_scoped: a rule with `paths` globs, loaded when a
+ * matching file is touched. not_loaded: present on disk but never reaches the model (reason given).
+ */
+export const KNOWLEDGE_LOAD_MODES = ['always', 'on_demand', 'path_scoped', 'not_loaded'] as const;
+export type KnowledgeLoadMode = (typeof KNOWLEDGE_LOAD_MODES)[number];
+
+/** Layer of the always-loaded stack a source belongs to (soil strata), top to bottom. */
+export const KNOWLEDGE_LAYERS = [
+  'managed',
+  'user',
+  'project',
+  'local',
+  'rules',
+  'imports',
+  'memory',
+  'listings',
+] as const;
+export type KnowledgeLayer = (typeof KNOWLEDGE_LAYERS)[number];
+
+export interface KnowledgeSource {
+  /** stableId('ks', familyId, kind, path). */
+  id: ID;
+  familyId: ID;
+  kind: KnowledgeKind;
+  scope: KnowledgeScope;
+  /** Absolute path, redacted. */
+  path: RedactedText;
+  /** Short path for display: relative to the bed root, `~/.claude/…`, or `memory/…`. */
+  displayPath: RedactedText;
+  /** Skill or agent name (kinds skill / agent_definition). */
+  name?: string;
+  bytes: number;
+  lines: number;
+  /**
+   * Bytes that reach the model in every session: the whole file for `always` sources, the
+   * listing line (name + capped description) for skills and agents, the capped part of MEMORY.md.
+   */
+  alwaysBytes: number;
+  loadMode: KnowledgeLoadMode;
+  /** Why a source is not_loaded, or what loads an on_demand one. Generated text. */
+  loadNote?: RedactedText;
+  /** Import hops from the file that started the chain (imports only). */
+  importDepth?: number;
+  /** `paths` globs of a path-scoped rule. */
+  globs?: RedactedText[];
+  /** Memory topic `type` frontmatter (user | feedback | project | reference), when present. */
+  memoryType?: string;
+  /** sha256 of the file content. */
+  contentHash: string;
+  /** Keyed hashes (per-install HMAC) of normalized passages: duplicate detection without text. */
+  passageHashes: string[];
+  /** Last change: the last git commit touching the file, else its mtime. */
+  lastChangedAt?: ISO;
+  changedVia?: 'git' | 'mtime';
+}
+
+export type KnowledgeEdgeKind = 'import' | 'index_link' | 'mention';
+
+export interface KnowledgeEdge {
+  /** stableId('ke', fromId, kind, target). */
+  id: ID;
+  familyId: ID;
+  fromId: ID;
+  /** Target source when resolved. */
+  toId?: ID;
+  kind: KnowledgeEdgeKind;
+  /** The reference as written (redacted), e.g. `@docs/api.md` or `feedback_testing.md`. */
+  target: RedactedText;
+  resolved: boolean;
+  /** The reference sits past MEMORY.md's load cap, so the agent never sees the pointer. */
+  beyondCap: boolean;
+  /** Why it did not resolve or load. Generated text. */
+  reason?: RedactedText;
+}
+
+/** Always-loaded bytes per layer at one point in time (a git commit, or the current scan). */
+export interface KnowledgeSnapshot {
+  familyId: ID;
+  at: ISO;
+  commitSha?: string;
+  /** git: project layers as committed (user-level files are not versioned). current: every layer, now. */
+  provenance: 'git' | 'current';
+  layers: Partial<Record<KnowledgeLayer, number>>;
+}
+
+export type KnowledgeUsageKind = 'session_load' | 'nested_load' | 'memory_recall' | 'read';
+
+/** Evidence from one session that a knowledge file reached the model. */
+export interface KnowledgeUsage {
+  sessionId: ID;
+  familyId: ID;
+  /** Absolute path as recorded in the transcript, redacted (joins KnowledgeSource.path). */
+  path: RedactedText;
+  kind: KnowledgeUsageKind;
+  count: number;
+  firstAt: ISO;
+  lastAt: ISO;
+}
+
+/** One knowledge scan of a bed (its current files). */
+export interface KnowledgeScan {
+  familyId: ID;
+  scannedAt: ISO;
+  /** Auto-memory directory for this bed, redacted. */
+  memoryDir?: RedactedText;
+  /** `projects[root].hasClaudeMdExternalIncludesApproved` from ~/.claude.json (the only key read for this). */
+  externalImportsApproved: boolean;
+  warnings: RedactedText[];
+}

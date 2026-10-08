@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { realpathSync } from 'node:fs';
 import { relative, resolve, sep } from 'node:path';
 import type { HarnessCommit } from '../contracts';
+import { projectLayersAt } from './knowledge';
 import { isNestedInstruction, scanProjectTree } from './scan';
 import { listedTree } from './tree';
 
@@ -42,7 +43,7 @@ const HARNESS_FILES = [
   '.claude/settings.local.json',
   '.mcp.json',
 ];
-const HARNESS_DIRS = ['.claude/agents', '.claude/skills'];
+const HARNESS_DIRS = ['.claude/agents', '.claude/skills', '.claude/rules'];
 
 function isHarnessPath(rel: string): boolean {
   return (
@@ -58,6 +59,7 @@ function needsContent(rel: string): boolean {
   const segs = rel.split('/');
   if (rel.startsWith('.claude/agents/')) return segs.length === 3 && /\.md$/i.test(rel);
   if (rel.startsWith('.claude/skills/')) return segs.length === 4 && segs[3] === 'SKILL.md';
+  if (rel.startsWith('.claude/rules/')) return /\.md$/i.test(rel);
   return false;
 }
 
@@ -227,6 +229,7 @@ export function gitHarnessHistory(root: string): HarnessCommit[] {
       message: c.message,
       changedPaths: [...c.files].sort(),
       snapshot: scanProjectTree(rootAbs, tree),
+      knowledgeLayers: projectLayersAt(tree),
     };
   });
 }

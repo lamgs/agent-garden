@@ -9,6 +9,7 @@ import {
   type SkillDef,
   bloatedClaudeMd,
 } from './config';
+import { KNOWLEDGE, LEGACY_HEADER, SHOP_MEMORY_SECTION } from './knowledge';
 import { DAY, HOUR, type Rng, startOfUtcDay } from './rng';
 
 export interface Era {
@@ -168,7 +169,7 @@ Acme storefront REST API. Node 22, TypeScript, Fastify, Postgres via Drizzle.
 ## When stuck
 - Use the test-writer agent for test coverage work.
 - Ask before changing a public endpoint's response shape.
-`;
+${SHOP_MEMORY_SECTION}`;
 
 const NORMAL_RULES: Record<string, string> = {
   'data-pipeline': `# data-pipeline
@@ -379,6 +380,7 @@ export function buildProjects(now: number, seed: number): ProjectSpec[] {
     ],
     testWriter: { success: 0.9, respawn: 0.1 },
     sourceFiles: {
+      ...KNOWLEDGE['shop-api']!.files,
       'package.json': `{\n  "name": "shop-api",\n  "private": true,\n  "type": "module",\n  "scripts": {\n    "test": "vitest run",\n    "lint": "eslint .",\n    "typecheck": "tsc --noEmit"\n  }\n}\n`,
       'src/cart/totals.ts': `export interface Line { sku: string; qty: number; unitCents: number }\n\nexport function subtotal(lines: Line[]): number {\n  return lines.reduce((sum, l) => sum + l.qty * l.unitCents, 0);\n}\n`,
       'src/cart/totals.test.ts': `import { expect, test } from 'vitest';\nimport { subtotal } from './totals';\n\ntest('sums lines', () => {\n  expect(subtotal([{ sku: 'A', qty: 2, unitCents: 500 }])).toBe(1000);\n});\n`,
@@ -418,7 +420,7 @@ export function buildProjects(now: number, seed: number): ProjectSpec[] {
         from: before,
         commit: 'Initial commit',
         model: 'opus',
-        claudeMd: bloatedClaudeMd('legacy-monolith', 30_500, seed),
+        claudeMd: LEGACY_HEADER + '\n' + bloatedClaudeMd('legacy-monolith', 30_500, seed),
         allow: ['Bash(npm test:*)', 'mcp__jira', 'mcp__confluence', 'mcp__sentry'],
         agents: [LEGACY_AGENT],
         skills: [],
@@ -446,6 +448,7 @@ export function buildProjects(now: number, seed: number): ProjectSpec[] {
     ],
     testWriter: { success: 0.3, respawn: 0.55 },
     sourceFiles: {
+      ...KNOWLEDGE['legacy-monolith']!.files,
       'package.json': `{\n  "name": "legacy-monolith",\n  "version": "4.12.0",\n  "private": true,\n  "scripts": {\n    "test": "jest --runInBand",\n    "lint:legacy": "eslint -c .eslintrc.legacy.js lib"\n  }\n}\n`,
       'lib/billing/invoice.js': `'use strict';\nconst tax = require('./tax');\n\nfunction total(invoice) {\n  var sum = 0;\n  for (var i = 0; i < invoice.lines.length; i++) sum += invoice.lines[i].amount;\n  return sum + tax.forRegion(invoice.region, sum);\n}\n\nmodule.exports = { total: total };\n`,
       'lib/billing/tax.js': `'use strict';\nvar RATES = { US: 0.07, EU: 0.2, UK: 0.2 };\nexports.forRegion = function (region, amount) {\n  return Math.round(amount * (RATES[region] || 0));\n};\n`,

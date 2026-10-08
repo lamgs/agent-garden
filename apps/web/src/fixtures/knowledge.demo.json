@@ -1,0 +1,826 @@
+{
+  "bed": {
+    "id": "fam_e4f77dae0177d5e5",
+    "name": "legacy-monolith"
+  },
+  "window": {
+    "from": "2026-07-03T12:00:00.000Z",
+    "to": "2026-10-01T12:00:00.000Z"
+  },
+  "generatedAt": "2026-10-01T12:00:00.000Z",
+  "scannedAt": "2026-10-08T03:50:16.535Z",
+  "memoryDir": "~/.claude/projects/<project-slug>/memory",
+  "budget": {
+    "alwaysTokens": 13037,
+    "layers": [
+      {
+        "layer": "user",
+        "tokens": 91,
+        "sources": 1
+      },
+      {
+        "layer": "project",
+        "tokens": 7985,
+        "sources": 1
+      },
+      {
+        "layer": "rules",
+        "tokens": 41,
+        "sources": 1
+      },
+      {
+        "layer": "memory",
+        "tokens": 4634,
+        "sources": 1
+      },
+      {
+        "layer": "listings",
+        "tokens": 286,
+        "sources": 12
+      }
+    ],
+    "budgetTokens": 10000,
+    "method": "Tokens are estimated as bytes ÷ 4 (Claude Code’s own rule of thumb). Always-loaded = files in the session prompt of every session (managed/user/project/local CLAUDE.md, rules without `paths`, their @imports, MEMORY.md up to its 200-line / 25 KB cap) plus the skill and agent listing lines (name + description, capped at 1,536 characters)."
+  },
+  "history": [
+    {
+      "at": "2026-05-24T15:00:00.000Z",
+      "tokens": 8026,
+      "provenance": "git",
+      "commit": "cbdc1f2"
+    },
+    {
+      "at": "2026-10-01T12:00:00.000Z",
+      "tokens": 8026,
+      "provenance": "current"
+    }
+  ],
+  "historyMethod": "Project layers (CLAUDE.md, .claude/CLAUDE.md, CLAUDE.local.md if committed, rules without `paths`) at each commit that touched them, from git; imports and user-level files are not versioned and are left out of the series. Tokens ≈ bytes ÷ 4.",
+  "sources": [
+    {
+      "id": "ks_8288be3f171bc341",
+      "kind": "agent_definition",
+      "scope": "project",
+      "layer": "listings",
+      "displayPath": ".claude/agents/legacy-archaeologist.md",
+      "name": "legacy-archaeologist",
+      "bytes": 354,
+      "lines": 8,
+      "tokens": 89,
+      "alwaysTokens": 32,
+      "loadMode": "on_demand",
+      "loadNote": "Name and description are listed in every session; the body is the subagent’s prompt when it is spawned.",
+      "lastChangedAt": "2026-05-24T15:00:00.000Z",
+      "usage": {
+        "count": 30,
+        "sessions": 0,
+        "lastAt": "2026-09-28T13:34:45.474Z",
+        "kinds": [
+          "agent_run"
+        ]
+      },
+      "findingIds": []
+    },
+    {
+      "id": "ks_1bad01b7511dd884",
+      "kind": "rule",
+      "scope": "project",
+      "layer": "rules",
+      "displayPath": ".claude/rules/billing.md",
+      "bytes": 161,
+      "lines": 4,
+      "tokens": 41,
+      "alwaysTokens": 41,
+      "loadMode": "always",
+      "lastChangedAt": "2026-05-24T15:00:00.000Z",
+      "usage": {
+        "count": 96,
+        "sessions": 96,
+        "lastAt": "2026-09-30T20:34:04.069Z",
+        "kinds": [
+          "session_load"
+        ]
+      },
+      "findingIds": [
+        "kf_duplicate_passage_8b61f34c"
+      ]
+    },
+    {
+      "id": "ks_71463b5eb0edf204",
+      "kind": "project_claude_md",
+      "scope": "project",
+      "layer": "project",
+      "displayPath": "CLAUDE.md",
+      "bytes": 31940,
+      "lines": 482,
+      "tokens": 7985,
+      "alwaysTokens": 7985,
+      "loadMode": "always",
+      "lastChangedAt": "2026-05-24T15:00:00.000Z",
+      "usage": {
+        "count": 96,
+        "sessions": 96,
+        "lastAt": "2026-09-30T20:34:04.069Z",
+        "kinds": [
+          "session_load"
+        ]
+      },
+      "findingIds": [
+        "kf_dangling_ref_03df522b",
+        "kf_large_file_b6264f26",
+        "kf_over_budget_50ae46ec",
+        "kf_duplicate_passage_f81752f8",
+        "kf_duplicate_passage_8b61f34c",
+        "kf_duplicate_passage_3b746441"
+      ]
+    },
+    {
+      "id": "ks_3299a71cb82bc0d1",
+      "kind": "memory_topic",
+      "scope": "memory",
+      "layer": null,
+      "displayPath": "memory/2024_migration_notes.md",
+      "bytes": 208,
+      "lines": 7,
+      "tokens": 52,
+      "alwaysTokens": 0,
+      "loadMode": "on_demand",
+      "loadNote": "Recalled when relevant (first 4,096 bytes) or read by the agent.",
+      "memoryType": "project",
+      "lastChangedAt": "2026-10-08T03:50:11.722Z",
+      "usage": {
+        "count": 0,
+        "sessions": 0,
+        "lastAt": null,
+        "kinds": []
+      },
+      "findingIds": [
+        "kf_orphan_memory_66fdc4b9"
+      ]
+    },
+    {
+      "id": "ks_2ada296b17e51fb1",
+      "kind": "memory_index",
+      "scope": "memory",
+      "layer": "memory",
+      "displayPath": "memory/MEMORY.md",
+      "bytes": 23351,
+      "lines": 260,
+      "tokens": 5838,
+      "alwaysTokens": 4634,
+      "loadMode": "always",
+      "loadNote": "Only the first 200 lines (18,534 bytes) load; Claude Code cuts MEMORY.md at 200 lines or 25,000 bytes.",
+      "lastChangedAt": "2026-10-08T03:50:11.722Z",
+      "usage": {
+        "count": 96,
+        "sessions": 96,
+        "lastAt": "2026-09-30T20:34:04.069Z",
+        "kinds": [
+          "session_load"
+        ]
+      },
+      "findingIds": [
+        "kf_over_cap_eb4987f3",
+        "kf_dangling_ref_3b3a721a",
+        "kf_over_budget_50ae46ec"
+      ]
+    },
+    {
+      "id": "ks_051c724046f4f526",
+      "kind": "memory_topic",
+      "scope": "memory",
+      "layer": null,
+      "displayPath": "memory/billing_quirks.md",
+      "bytes": 215,
+      "lines": 7,
+      "tokens": 54,
+      "alwaysTokens": 0,
+      "loadMode": "on_demand",
+      "loadNote": "Recalled when relevant (first 4,096 bytes) or read by the agent.",
+      "memoryType": "project",
+      "lastChangedAt": "2026-10-08T03:50:11.722Z",
+      "usage": {
+        "count": 0,
+        "sessions": 0,
+        "lastAt": null,
+        "kinds": []
+      },
+      "findingIds": [
+        "kf_unused_on_demand_4efe723e"
+      ]
+    },
+    {
+      "id": "ks_694f4d559a1646fd",
+      "kind": "memory_topic",
+      "scope": "memory",
+      "layer": null,
+      "displayPath": "memory/feedback_deploy_freeze.md",
+      "bytes": 188,
+      "lines": 7,
+      "tokens": 47,
+      "alwaysTokens": 0,
+      "loadMode": "on_demand",
+      "loadNote": "Recalled when relevant (first 4,096 bytes) or read by the agent.",
+      "memoryType": "feedback",
+      "lastChangedAt": "2026-10-08T03:50:11.722Z",
+      "usage": {
+        "count": 48,
+        "sessions": 48,
+        "lastAt": "2026-09-30T20:34:04.069Z",
+        "kinds": [
+          "memory_recall"
+        ]
+      },
+      "findingIds": []
+    },
+    {
+      "id": "ks_6282e21f0b9736f6",
+      "kind": "user_claude_md",
+      "scope": "user",
+      "layer": "user",
+      "displayPath": "~/.claude/CLAUDE.md",
+      "bytes": 361,
+      "lines": 7,
+      "tokens": 91,
+      "alwaysTokens": 91,
+      "loadMode": "always",
+      "lastChangedAt": "2026-10-08T03:50:11.254Z",
+      "usage": {
+        "count": 96,
+        "sessions": 96,
+        "lastAt": "2026-09-30T20:34:04.069Z",
+        "kinds": [
+          "session_load"
+        ]
+      },
+      "findingIds": [
+        "kf_over_budget_50ae46ec",
+        "kf_duplicate_passage_f81752f8"
+      ]
+    },
+    {
+      "id": "ks_1c428c7bb4323cb9",
+      "kind": "agent_definition",
+      "scope": "user",
+      "layer": "listings",
+      "displayPath": "~/.claude/agents/code-reviewer.md",
+      "name": "code-reviewer",
+      "bytes": 344,
+      "lines": 9,
+      "tokens": 86,
+      "alwaysTokens": 26,
+      "loadMode": "on_demand",
+      "loadNote": "Name and description are listed in every session; the body is the subagent’s prompt when it is spawned.",
+      "lastChangedAt": "2026-10-08T03:50:11.259Z",
+      "usage": {
+        "count": 0,
+        "sessions": 0,
+        "lastAt": null,
+        "kinds": []
+      },
+      "findingIds": [
+        "kf_unused_on_demand_f3a01356"
+      ]
+    },
+    {
+      "id": "ks_b92c83360164c221",
+      "kind": "agent_definition",
+      "scope": "user",
+      "layer": "listings",
+      "displayPath": "~/.claude/agents/docs-writer.md",
+      "name": "docs-writer",
+      "bytes": 344,
+      "lines": 9,
+      "tokens": 86,
+      "alwaysTokens": 21,
+      "loadMode": "on_demand",
+      "loadNote": "Name and description are listed in every session; the body is the subagent’s prompt when it is spawned.",
+      "lastChangedAt": "2026-10-08T03:50:11.259Z",
+      "usage": {
+        "count": 0,
+        "sessions": 0,
+        "lastAt": null,
+        "kinds": []
+      },
+      "findingIds": [
+        "kf_unused_on_demand_f3a01356"
+      ]
+    },
+    {
+      "id": "ks_c7eea89d86ceaa53",
+      "kind": "agent_definition",
+      "scope": "user",
+      "layer": "listings",
+      "displayPath": "~/.claude/agents/migration-helper.md",
+      "name": "migration-helper",
+      "bytes": 359,
+      "lines": 9,
+      "tokens": 90,
+      "alwaysTokens": 26,
+      "loadMode": "on_demand",
+      "loadNote": "Name and description are listed in every session; the body is the subagent’s prompt when it is spawned.",
+      "lastChangedAt": "2026-10-08T03:50:11.259Z",
+      "usage": {
+        "count": 0,
+        "sessions": 0,
+        "lastAt": null,
+        "kinds": []
+      },
+      "findingIds": [
+        "kf_unused_on_demand_f3a01356"
+      ]
+    },
+    {
+      "id": "ks_ea32a3653abcc5a2",
+      "kind": "agent_definition",
+      "scope": "user",
+      "layer": "listings",
+      "displayPath": "~/.claude/agents/perf-profiler.md",
+      "name": "perf-profiler",
+      "bytes": 301,
+      "lines": 9,
+      "tokens": 76,
+      "alwaysTokens": 24,
+      "loadMode": "on_demand",
+      "loadNote": "Name and description are listed in every session; the body is the subagent’s prompt when it is spawned.",
+      "lastChangedAt": "2026-10-08T03:50:11.259Z",
+      "usage": {
+        "count": 0,
+        "sessions": 0,
+        "lastAt": null,
+        "kinds": []
+      },
+      "findingIds": [
+        "kf_unused_on_demand_f3a01356"
+      ]
+    },
+    {
+      "id": "ks_3156291fd684a091",
+      "kind": "agent_definition",
+      "scope": "user",
+      "layer": "listings",
+      "displayPath": "~/.claude/agents/release-manager.md",
+      "name": "release-manager",
+      "bytes": 278,
+      "lines": 9,
+      "tokens": 70,
+      "alwaysTokens": 22,
+      "loadMode": "on_demand",
+      "loadNote": "Name and description are listed in every session; the body is the subagent’s prompt when it is spawned.",
+      "lastChangedAt": "2026-10-08T03:50:11.259Z",
+      "usage": {
+        "count": 0,
+        "sessions": 0,
+        "lastAt": null,
+        "kinds": []
+      },
+      "findingIds": [
+        "kf_unused_on_demand_f3a01356"
+      ]
+    },
+    {
+      "id": "ks_d781629867d81cf0",
+      "kind": "agent_definition",
+      "scope": "user",
+      "layer": "listings",
+      "displayPath": "~/.claude/agents/test-writer.md",
+      "name": "test-writer",
+      "bytes": 598,
+      "lines": 14,
+      "tokens": 150,
+      "alwaysTokens": 32,
+      "loadMode": "on_demand",
+      "loadNote": "Name and description are listed in every session; the body is the subagent’s prompt when it is spawned.",
+      "lastChangedAt": "2026-10-08T03:50:11.259Z",
+      "usage": {
+        "count": 102,
+        "sessions": 0,
+        "lastAt": "2026-09-28T13:50:31.984Z",
+        "kinds": [
+          "agent_run"
+        ]
+      },
+      "findingIds": []
+    },
+    {
+      "id": "ks_4cc2211778a60bb5",
+      "kind": "skill",
+      "scope": "user",
+      "layer": "listings",
+      "displayPath": "~/.claude/skills/changelog/SKILL.md",
+      "name": "changelog-writer",
+      "bytes": 305,
+      "lines": 7,
+      "tokens": 77,
+      "alwaysTokens": 29,
+      "loadMode": "on_demand",
+      "loadNote": "Name and description are listed in every session; the body loads when the skill is invoked.",
+      "lastChangedAt": "2026-10-08T03:50:11.259Z",
+      "usage": {
+        "count": 0,
+        "sessions": 0,
+        "lastAt": null,
+        "kinds": []
+      },
+      "findingIds": [
+        "kf_unused_on_demand_ca15d036",
+        "kf_skill_overlap_4c156e6e"
+      ]
+    },
+    {
+      "id": "ks_9f9316f840411dc2",
+      "kind": "skill",
+      "scope": "user",
+      "layer": "listings",
+      "displayPath": "~/.claude/skills/db-migrate/SKILL.md",
+      "name": "db-migrate",
+      "bytes": 212,
+      "lines": 6,
+      "tokens": 53,
+      "alwaysTokens": 22,
+      "loadMode": "on_demand",
+      "loadNote": "Name and description are listed in every session; the body loads when the skill is invoked.",
+      "lastChangedAt": "2026-10-08T03:50:11.259Z",
+      "usage": {
+        "count": 0,
+        "sessions": 0,
+        "lastAt": null,
+        "kinds": []
+      },
+      "findingIds": [
+        "kf_unused_on_demand_ca15d036"
+      ]
+    },
+    {
+      "id": "ks_f5f1680b410bb89a",
+      "kind": "skill",
+      "scope": "user",
+      "layer": "listings",
+      "displayPath": "~/.claude/skills/misc-helpers/SKILL.md",
+      "name": "misc-helpers",
+      "bytes": 120,
+      "lines": 7,
+      "tokens": 30,
+      "alwaysTokens": 4,
+      "loadMode": "on_demand",
+      "loadNote": "Name and description are listed in every session; the body loads when the skill is invoked.",
+      "lastChangedAt": "2026-10-08T03:50:11.259Z",
+      "usage": {
+        "count": 0,
+        "sessions": 0,
+        "lastAt": null,
+        "kinds": []
+      },
+      "findingIds": [
+        "kf_unused_on_demand_ca15d036"
+      ]
+    },
+    {
+      "id": "ks_4a2448a9f32b5bec",
+      "kind": "skill",
+      "scope": "user",
+      "layer": "listings",
+      "displayPath": "~/.claude/skills/release-notes/SKILL.md",
+      "name": "release-notes",
+      "bytes": 217,
+      "lines": 6,
+      "tokens": 55,
+      "alwaysTokens": 28,
+      "loadMode": "on_demand",
+      "loadNote": "Name and description are listed in every session; the body loads when the skill is invoked.",
+      "lastChangedAt": "2026-10-08T03:50:11.259Z",
+      "usage": {
+        "count": 0,
+        "sessions": 0,
+        "lastAt": null,
+        "kinds": []
+      },
+      "findingIds": [
+        "kf_unused_on_demand_ca15d036",
+        "kf_skill_overlap_4c156e6e"
+      ]
+    },
+    {
+      "id": "ks_6e48ce255c0d2848",
+      "kind": "skill",
+      "scope": "user",
+      "layer": "listings",
+      "displayPath": "~/.claude/skills/tag-release/SKILL.md",
+      "name": "tag-release",
+      "bytes": 208,
+      "lines": 6,
+      "tokens": 52,
+      "alwaysTokens": 22,
+      "loadMode": "on_demand",
+      "loadNote": "Name and description are listed in every session; the body loads when the skill is invoked.",
+      "lastChangedAt": "2026-10-08T03:50:11.259Z",
+      "usage": {
+        "count": 0,
+        "sessions": 0,
+        "lastAt": null,
+        "kinds": []
+      },
+      "findingIds": [
+        "kf_unused_on_demand_ca15d036"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "ke_34215d7d635b8dff",
+      "fromId": "ks_2ada296b17e51fb1",
+      "toId": "ks_051c724046f4f526",
+      "kind": "index_link",
+      "target": "billing_quirks.md",
+      "resolved": true,
+      "beyondCap": true
+    },
+    {
+      "id": "ke_4e11402fc08b4397",
+      "fromId": "ks_71463b5eb0edf204",
+      "toId": "ks_051c724046f4f526",
+      "kind": "mention",
+      "target": "memory/billing_quirks.md",
+      "resolved": true,
+      "beyondCap": false
+    },
+    {
+      "id": "ke_925aa0fa13175c5a",
+      "fromId": "ks_2ada296b17e51fb1",
+      "toId": "ks_694f4d559a1646fd",
+      "kind": "index_link",
+      "target": "feedback_deploy_freeze.md",
+      "resolved": true,
+      "beyondCap": false
+    },
+    {
+      "id": "ke_f9174367f2c8464b",
+      "fromId": "ks_2ada296b17e51fb1",
+      "toId": null,
+      "kind": "index_link",
+      "target": "billing_quirks_old.md",
+      "resolved": false,
+      "beyondCap": false,
+      "reason": "no file billing_quirks_old.md in the memory folder"
+    },
+    {
+      "id": "ke_faeae5218fccc914",
+      "fromId": "ks_71463b5eb0edf204",
+      "toId": null,
+      "kind": "import",
+      "target": "@docs/legacy-runbook.md",
+      "resolved": false,
+      "beyondCap": false,
+      "reason": "no file at docs/legacy-runbook.md"
+    }
+  ],
+  "findings": [
+    {
+      "id": "kf_over_cap_eb4987f3",
+      "kind": "over_cap",
+      "edgeIds": [
+        "ke_34215d7d635b8dff"
+      ],
+      "severity": "high",
+      "title": "MEMORY.md is 260 lines; only the first part is loaded",
+      "sourceIds": [
+        "ks_2ada296b17e51fb1"
+      ],
+      "tokensAtStake": 1205,
+      "evidence": [
+        "Claude Code loads MEMORY.md up to 200 lines or 25,000 bytes. This one: 260 lines, 23,351 bytes; ~4,817 bytes are cut.",
+        "1 pointer to topic files sit past the cap and are invisible to the agent."
+      ],
+      "action": "shorten_index",
+      "actionText": "One short line per memory (`- [Title](file.md) — hook`); move detail into the topic files."
+    },
+    {
+      "id": "kf_dangling_ref_03df522b",
+      "kind": "dangling_ref",
+      "edgeIds": [
+        "ke_faeae5218fccc914"
+      ],
+      "severity": "high",
+      "title": "CLAUDE.md points to @docs/legacy-runbook.md, which does not exist",
+      "sourceIds": [
+        "ks_71463b5eb0edf204"
+      ],
+      "tokensAtStake": 0,
+      "evidence": [
+        "@import `@docs/legacy-runbook.md`: no file at docs/legacy-runbook.md.",
+        "The referring file is loaded in every session, so the agent is told about knowledge it cannot find."
+      ],
+      "action": "fix_reference",
+      "actionText": "Fix the path or remove the reference."
+    },
+    {
+      "id": "kf_dangling_ref_3b3a721a",
+      "kind": "dangling_ref",
+      "edgeIds": [
+        "ke_f9174367f2c8464b"
+      ],
+      "severity": "high",
+      "title": "memory/MEMORY.md points to billing_quirks_old.md, which does not exist",
+      "sourceIds": [
+        "ks_2ada296b17e51fb1"
+      ],
+      "tokensAtStake": 0,
+      "evidence": [
+        "MEMORY.md link `billing_quirks_old.md`: no file billing_quirks_old.md in the memory folder.",
+        "The referring file is loaded in every session, so the agent is told about knowledge it cannot find."
+      ],
+      "action": "fix_reference",
+      "actionText": "Fix the path or remove the reference."
+    },
+    {
+      "id": "kf_large_file_b6264f26",
+      "kind": "large_file",
+      "edgeIds": [],
+      "severity": "medium",
+      "title": "CLAUDE.md is 482 lines, loaded in every session",
+      "sourceIds": [
+        "ks_71463b5eb0edf204"
+      ],
+      "tokensAtStake": 7985,
+      "evidence": [
+        "482 lines, 31,940 bytes (~8.0k tokens); the official guidance targets under 200 lines per file."
+      ],
+      "action": "move_to_on_demand",
+      "actionText": "Split it: keep the commands and hard rules, move the rest into path-scoped rules or referenced docs."
+    },
+    {
+      "id": "kf_over_budget_50ae46ec",
+      "kind": "over_budget",
+      "edgeIds": [],
+      "severity": "medium",
+      "title": "Every session starts with ~13k tokens of instructions and memory",
+      "sourceIds": [
+        "ks_71463b5eb0edf204",
+        "ks_2ada296b17e51fb1",
+        "ks_6282e21f0b9736f6"
+      ],
+      "tokensAtStake": 3037,
+      "evidence": [
+        "Always-loaded: ~13,037 tokens (bytes ÷ 4) vs a budget of 10,000.",
+        "By layer: User CLAUDE.md (~/.claude) 91, Project CLAUDE.md 8.0k, Rules (.claude/rules) 41, MEMORY.md index 4.6k, Skill & agent listings 286.",
+        "Largest: CLAUDE.md (~8.0k), memory/MEMORY.md (~4.6k), ~/.claude/CLAUDE.md (~91)."
+      ],
+      "action": "move_to_on_demand",
+      "actionText": "Keep only what every task needs in CLAUDE.md. Move module-specific notes into `.claude/rules/*.md` with `paths:` globs, or into docs or memory files that CLAUDE.md points to, so they load only when relevant."
+    },
+    {
+      "id": "kf_duplicate_passage_f81752f8",
+      "kind": "duplicate_passage",
+      "edgeIds": [],
+      "severity": "medium",
+      "title": "3 passages appear in both ~/.claude/CLAUDE.md and CLAUDE.md",
+      "sourceIds": [
+        "ks_6282e21f0b9736f6",
+        "ks_71463b5eb0edf204"
+      ],
+      "tokensAtStake": 50,
+      "evidence": [
+        "3 identical passages after normalization (case, whitespace, list markers), ~197 bytes. Compared by keyed hash; no text is stored.",
+        "Both files are always loaded, so these tokens are paid twice in every session."
+      ],
+      "action": "dedupe",
+      "actionText": "Delete the copy in CLAUDE.md: ~/.claude/CLAUDE.md already loads it in every bed."
+    },
+    {
+      "id": "kf_duplicate_passage_8b61f34c",
+      "kind": "duplicate_passage",
+      "edgeIds": [],
+      "severity": "medium",
+      "title": "1 passage appears in both .claude/rules/billing.md and CLAUDE.md",
+      "sourceIds": [
+        "ks_1bad01b7511dd884",
+        "ks_71463b5eb0edf204"
+      ],
+      "tokensAtStake": 21,
+      "evidence": [
+        "1 identical passages after normalization (case, whitespace, list markers), ~84 bytes. Compared by keyed hash; no text is stored.",
+        "Both files are always loaded, so these tokens are paid twice in every session."
+      ],
+      "action": "dedupe",
+      "actionText": "Keep it in one place: .claude/rules/billing.md or CLAUDE.md, not both."
+    },
+    {
+      "id": "kf_orphan_memory_66fdc4b9",
+      "kind": "orphan_memory",
+      "edgeIds": [],
+      "severity": "medium",
+      "title": "memory/2024_migration_notes.md is not referenced from MEMORY.md or any CLAUDE.md",
+      "sourceIds": [
+        "ks_3299a71cb82bc0d1"
+      ],
+      "tokensAtStake": 0,
+      "evidence": [
+        "No MEMORY.md link, @import, or mention resolves to it.",
+        "Not recalled or read in 96 sessions in the window."
+      ],
+      "action": "add_reference",
+      "actionText": "Add a one-line pointer to MEMORY.md (`- [Title](file.md) — hook`) or to the CLAUDE.md that needs it, or delete it."
+    },
+    {
+      "id": "kf_duplicate_passage_3b746441",
+      "kind": "duplicate_passage",
+      "edgeIds": [],
+      "severity": "low",
+      "title": "143 passages are repeated inside CLAUDE.md",
+      "sourceIds": [
+        "ks_71463b5eb0edf204"
+      ],
+      "tokensAtStake": 3077,
+      "evidence": [
+        "143 repeats, ~12,305 bytes, by keyed passage hash."
+      ],
+      "action": "dedupe",
+      "actionText": "Say it once."
+    },
+    {
+      "id": "kf_unused_on_demand_f3a01356",
+      "kind": "unused_on_demand",
+      "edgeIds": [],
+      "severity": "low",
+      "title": "5 agent definitions never loaded in 90 days",
+      "sourceIds": [
+        "ks_1c428c7bb4323cb9",
+        "ks_b92c83360164c221",
+        "ks_c7eea89d86ceaa53",
+        "ks_ea32a3653abcc5a2",
+        "ks_3156291fd684a091"
+      ],
+      "tokensAtStake": 119,
+      "evidence": [
+        "code-reviewer, docs-writer, migration-helper, perf-profiler, release-manager: 0 loads across 96 sessions.",
+        "Usage comes from transcripts: session-start instructions records, nested_memory attachments (subdirectory CLAUDE.md and path-scoped rules), relevant_memories recalls, Read calls on the file, Skill calls, and subagent runs. A file read some other way (cat in Bash) is not counted."
+      ],
+      "action": "review",
+      "actionText": "Its listing line still costs tokens in every session. Delete it, or sharpen its description so the agent knows when to use it."
+    },
+    {
+      "id": "kf_unused_on_demand_ca15d036",
+      "kind": "unused_on_demand",
+      "edgeIds": [],
+      "severity": "low",
+      "title": "5 skills never loaded in 90 days",
+      "sourceIds": [
+        "ks_4cc2211778a60bb5",
+        "ks_9f9316f840411dc2",
+        "ks_f5f1680b410bb89a",
+        "ks_4a2448a9f32b5bec",
+        "ks_6e48ce255c0d2848"
+      ],
+      "tokensAtStake": 105,
+      "evidence": [
+        "changelog-writer, db-migrate, misc-helpers, release-notes, tag-release: 0 loads across 96 sessions.",
+        "Usage comes from transcripts: session-start instructions records, nested_memory attachments (subdirectory CLAUDE.md and path-scoped rules), relevant_memories recalls, Read calls on the file, Skill calls, and subagent runs. A file read some other way (cat in Bash) is not counted."
+      ],
+      "action": "review",
+      "actionText": "Its listing line still costs tokens in every session. Delete it, or sharpen its description so the agent knows when to use it."
+    },
+    {
+      "id": "kf_skill_overlap_4c156e6e",
+      "kind": "skill_overlap",
+      "edgeIds": [],
+      "severity": "low",
+      "title": "Skills changelog-writer and release-notes have near-identical descriptions",
+      "sourceIds": [
+        "ks_4cc2211778a60bb5",
+        "ks_4a2448a9f32b5bec"
+      ],
+      "tokensAtStake": 28,
+      "evidence": [
+        "Description similarity 0.83 (threshold 0.5). The model picks between them from the description alone."
+      ],
+      "action": "differentiate",
+      "actionText": "Merge them, or rewrite one description so each says when to use it and when not to."
+    },
+    {
+      "id": "kf_unused_on_demand_4efe723e",
+      "kind": "unused_on_demand",
+      "edgeIds": [],
+      "severity": "low",
+      "title": "1 memory topic file never loaded in 90 days",
+      "sourceIds": [
+        "ks_051c724046f4f526"
+      ],
+      "tokensAtStake": 0,
+      "evidence": [
+        "memory/billing_quirks.md: 0 loads across 96 sessions.",
+        "Usage comes from transcripts: session-start instructions records, nested_memory attachments (subdirectory CLAUDE.md and path-scoped rules), relevant_memories recalls, Read calls on the file, Skill calls, and subagent runs. A file read some other way (cat in Bash) is not counted."
+      ],
+      "action": "delete",
+      "actionText": "Delete or archive it if nothing needs it; if something should, reference it from the CLAUDE.md for that area."
+    }
+  ],
+  "sessions": {
+    "total": 96,
+    "withLoadRecord": 96
+  },
+  "caveats": [
+    "Tokens are estimated as bytes ÷ 4 (Claude Code’s own rule of thumb). Always-loaded = files in the session prompt of every session (managed/user/project/local CLAUDE.md, rules without `paths`, their @imports, MEMORY.md up to its 200-line / 25 KB cap) plus the skill and agent listing lines (name + description, capped at 1,536 characters).",
+    "Usage comes from transcripts: session-start instructions records, nested_memory attachments (subdirectory CLAUDE.md and path-scoped rules), relevant_memories recalls, Read calls on the file, Skill calls, and subagent runs. A file read some other way (cat in Bash) is not counted.",
+    "Load chain verified against Claude Code 2.1.293 (docs/sources.md). Other versions may load differently."
+  ]
+}

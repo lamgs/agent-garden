@@ -7,6 +7,7 @@ import type { LiveHub, Redactor, Store } from '@garden/ingest';
 import { loadGardenData, type GardenData } from './data';
 import { buildGardenView } from './garden';
 import { registerLiveRoutes } from './live';
+import { buildKnowledgeView, loadKnowledgeData, withKnowledge } from './knowledge';
 import { buildCompareView, buildPlantView, buildReplantView, loadStepAggregates } from './plant';
 import { buildReplayView } from './replay';
 import { route as routeQuery } from '@garden/router';
@@ -69,10 +70,13 @@ export function windowData(
 ): { data: GardenData; garden: GardenView } {
   const w = windowFor(days, asOf);
   const data = loadGardenData(opts.store, w.from, w.to);
-  return {
-    data,
-    garden: buildGardenView(data, { ...w, ...(opts.pricing ? { pricing: opts.pricing } : {}) }),
-  };
+  const garden = buildGardenView(data, {
+    ...w,
+    ...(opts.pricing ? { pricing: opts.pricing } : {}),
+  });
+  // Knowledge map (K): soil strata by source layer + knowledge weeds.
+  withKnowledge(garden, loadKnowledgeData(opts.store, w.from, w.to), data, { window: w });
+  return { data, garden };
 }
 
 export function gardenView(
@@ -165,6 +169,22 @@ export function createApp(opts: AppOptions): Hono {
     const v = buildReplayView(opts.store, c.req.param('runId'), opts.pricing);
     return v ? c.json(v) : c.json({ error: 'no such run' }, 404);
   });
+  // ---- Knowledge map (K) ------------------------------------------------------------------------
+  app.get('/api/knowledge/:familyId', (c) => {
+    const p = params(c);
+    if ('error' in p) return c.json({ error: p.error }, 400);
+    const w = windowFor(p.days, p.asOf);
+    const data = loadGardenData(opts.store, w.from, w.to);
+    const v = buildKnowledgeView(
+      c.req.param('familyId'),
+      loadKnowledgeData(opts.store, w.from, w.to),
+      data,
+      { window: w },
+    );
+    return v ? c.json(v) : c.json({ error: 'unknown bed' }, 404);
+  });
+  // ---- end knowledge map ------------------------------------------------------------------------
+
   app.post('/api/runs/:id/label', async (c) => {
     const runId = c.req.param('id');
     let body: z.infer<typeof LabelBody>;

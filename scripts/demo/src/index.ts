@@ -19,6 +19,7 @@ import {
   userSettings,
 } from './config';
 import { buildRepo } from './git';
+import { writeMemory } from './knowledge';
 import { type ProjectSpec, buildProjects, eraAt, storyDates } from './projects';
 import { DAY, HOUR, MINUTE, Rng, iso, startOfUtcDay } from './rng';
 import { demoSecrets } from './secrets';
@@ -335,7 +336,10 @@ export async function generateDemo(outDir: string, opts: DemoOptions = {}): Prom
     interrupts: 0,
     runs: 0,
     subagentRuns: 0,
+    claudeHome,
   };
+  // Knowledge map (K): auto-memory folders next to the transcripts.
+  for (const p of projects) writeMemory(claudeHome, projectRoots[p.name] as string, p.name);
   const plans = planSessions(projects, now, seed, scale);
   const byName = new Map(projects.map((p) => [p.name, p]));
   const lastEnd = new Map<string, number>();

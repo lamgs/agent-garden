@@ -478,6 +478,10 @@ export function drawWeed(outer: Pen, x0: number, y0: number, level: number, scal
     pen.fill({ color: WEED.leaf });
     pen.stroke({ color: WEED.mark, width: 0.8, alpha: 0.9 });
   };
+  if (level >= 3) {
+    drawKnowledgeWeed(pen, level, leaf);
+    return;
+  }
   if (level === 1) {
     for (const dx of [-3.5, 3.5]) {
       leaf(x + dx, y, -0.5, 7);
@@ -510,6 +514,80 @@ export function drawWeed(outer: Pen, x0: number, y0: number, level: number, scal
     pen.poly([x + 3, y - 15, x + 9, y - 15, x + 11, y - 12.5, x + 9, y - 10, x + 3, y - 10]);
     pen.fill({ color: PAPER });
     pen.stroke(inkLine(0.7, 0.8));
+  }
+}
+
+/**
+ * Knowledge weeds (K), weed.kind levels 3–6, at unit size around the origin:
+ * 3 dangling reference: a sprout whose root runs out into a red dashed line ending in ×.
+ * 4 orphan memory: an uprooted seedling lying on its side, roots in the air.
+ * 5 duplicate passage: two identical rosettes with an = between them.
+ * 6 over cap: a rosette whose leaves grow through a dashed cap line, tips past it faded.
+ */
+function drawKnowledgeWeed(
+  pen: Pen,
+  level: number,
+  leaf: (lx: number, ly: number, a: number, len: number) => void,
+): void {
+  // Each glyph stays within x ∈ [-7, 7] so weeds fit their 20 px slot at scale 1.35.
+  if (level === 3) {
+    leaf(-1, 0, -0.7, 6);
+    leaf(-1, 0, 0.7, 6);
+    pen.moveTo(-1, 0);
+    pen.lineTo(-1, -5);
+    pen.stroke({ color: WEED.mark, width: 0.9 });
+    dashPolyline(
+      pen,
+      [
+        { x: -1, y: 1 },
+        { x: 2, y: 3.5 },
+        { x: 4, y: 4 },
+      ],
+      1.4,
+      1.2,
+    );
+    pen.stroke({ color: STATUS.critical, width: 1 });
+    pen.moveTo(4, 2.5);
+    pen.lineTo(7, 5.5);
+    pen.moveTo(7, 2.5);
+    pen.lineTo(4, 5.5);
+    pen.stroke({ color: STATUS.critical, width: 1.2 });
+  } else if (level === 4) {
+    pen.moveTo(-6, 0);
+    pen.lineTo(4, -1);
+    pen.stroke({ color: WEED.mark, width: 0.9 });
+    leaf(-2, -0.4, -2.2, 5);
+    leaf(1, -0.7, -1.0, 5);
+    for (const a of [-0.5, 0, 0.5]) {
+      pen.moveTo(4, -1);
+      pen.lineTo(4 + Math.cos(a) * 3, -1 + Math.sin(a) * 3 - 1.5);
+    }
+    pen.stroke({ color: INK.secondary, width: 0.7 });
+  } else if (level === 5) {
+    for (const dx of [-4, 4]) for (const a of [-0.9, 0, 0.9]) leaf(dx, 0, a, 4.5);
+    pen.moveTo(-1.4, -8);
+    pen.lineTo(1.4, -8);
+    pen.moveTo(-1.4, -6.2);
+    pen.lineTo(1.4, -6.2);
+    pen.stroke({ color: INK.primary, width: 0.9 });
+  } else {
+    for (const a of [-1.0, -0.4, 0.4, 1.0]) leaf(0, 0, a, 8.5);
+    pen.moveTo(0, 0);
+    pen.lineTo(0, -13);
+    pen.stroke({ color: WEED.mark, width: 0.9 });
+    dashPolyline(
+      pen,
+      [
+        { x: -7, y: -6 },
+        { x: 7, y: -6 },
+      ],
+      1.8,
+      1.3,
+    );
+    pen.stroke({ color: INK.primary, width: 0.9 });
+    pen.circle(0, -14, 1.8);
+    pen.fill({ color: PAPER, alpha: 0.6 });
+    pen.stroke({ color: WEED.mark, width: 0.6, alpha: 0.5 });
   }
 }
 
@@ -683,9 +761,64 @@ export interface BedLook {
   tone: string;
   texture: number;
   strata: number;
+  /**
+   * Knowledge map (K): strata band shares, top to bottom (bedStrataShares). When present, the face
+   * is drawn as one band per always-loaded layer instead of `strata` evenly spaced lines.
+   */
+  bands?: readonly number[];
+  /** bed.strata_weight level: ink weight of the band boundaries (total always-loaded tokens). */
+  weight?: number;
 }
 
 export const BED_FACE = 18;
+
+/** bed.strata_weight level → band-boundary stroke width / alpha, and band shading strength. */
+export const STRATA_WEIGHT = [
+  { width: 0.6, alpha: 0.4, shade: 0.06 },
+  { width: 0.9, alpha: 0.55, shade: 0.12 },
+  { width: 1.4, alpha: 0.7, shade: 0.2 },
+  { width: 2.1, alpha: 0.9, shade: 0.32 },
+] as const;
+
+/** Bands of a bed's front face: alternating soil tones with wavy boundaries (shares sum to 1). */
+export function drawStrataBands(
+  pen: Pen,
+  x: number,
+  top: number,
+  w: number,
+  h: number,
+  bands: readonly number[],
+  weight: number,
+  seed: number,
+): void {
+  const wt = STRATA_WEIGHT[Math.max(0, Math.min(3, weight))]!;
+  const rnd = mulberry32(seed);
+  const total = bands.reduce((a, b) => a + b, 0) || 1;
+  const min = bands.length ? Math.min(3, h / bands.length) : 0;
+  // Minimum visible thickness per band, the rest proportional to the share.
+  const free = Math.max(0, h - min * bands.length);
+  let y0 = top;
+  const bounds: number[] = [];
+  bands.forEach((b, i) => {
+    const bh = min + (free * b) / total;
+    pen.rect(x, y0, w, bh);
+    pen.fill({ color: i % 2 === 0 ? SOIL.strata : mix(SOIL.strata, INK.secondary, wt.shade) });
+    y0 += bh;
+    if (i < bands.length - 1) bounds.push(y0);
+  });
+  for (const sy of bounds) {
+    const amp = 0.5 + rnd() * 0.6;
+    const ph = rnd() * 6;
+    pen.moveTo(x, sy);
+    for (let sx = x; sx <= x + w; sx += 8) pen.lineTo(sx, sy + Math.sin(sx * 0.05 + ph) * amp);
+  }
+  if (bounds.length) pen.stroke({ color: INK.secondary, width: wt.width, alpha: wt.alpha });
+  else if (bands.length) {
+    pen.moveTo(x, top + h - 1);
+    pen.lineTo(x + w, top + h - 1);
+    pen.stroke({ color: INK.secondary, width: wt.width, alpha: wt.alpha });
+  }
+}
 
 /** A raised allotment bed: soil top (texture), front face (strata), edging boards (model family). */
 export function drawBed(
@@ -701,7 +834,18 @@ export function drawBed(
   pen.roundRect(x, y + h - BED_FACE - 4, w, BED_FACE + 4, 5);
   pen.fill({ color: SOIL.strata });
   const rnd = mulberry32(seed);
-  const strata = look.strata;
+  if (look.bands)
+    drawStrataBands(
+      pen,
+      x + 3,
+      y + h - BED_FACE,
+      w - 6,
+      BED_FACE - 3,
+      look.bands,
+      look.weight ?? 0,
+      seed,
+    );
+  const strata = look.bands ? 0 : look.strata;
   for (let i = 0; i < strata; i++) {
     const sy = y + h - BED_FACE + ((i + 1) * BED_FACE) / (strata + 1);
     const amp = 0.8 + rnd() * 0.8;

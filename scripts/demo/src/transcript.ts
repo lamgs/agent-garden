@@ -4,6 +4,7 @@
  * block each) that all repeat the identical full `usage`, tool results as user lines with
  * `toolUseResult`, subagent transcripts as separate sidechain files with a `.meta.json` sidecar.
  */
+import { createHash } from 'node:crypto';
 import { MINUTE, type Rng, iso } from './rng';
 
 export const CLI_VERSION = '2.1.293';
@@ -116,6 +117,23 @@ export class TranscriptWriter {
 
   advance(ms: number): void {
     this.t += Math.max(1, Math.round(ms));
+  }
+
+  private fixedCount = 0;
+
+  /**
+   * An attachment that consumes no RNG draws (deterministic uuid, same timestamp as the previous line), so adding it
+   * leaves the rest of the session's lines unchanged. Used for the knowledge-map records (K).
+   */
+  fixedAttachment(attachment: Record<string, unknown>): string {
+    const h = createHash('sha256')
+      .update(`${this.opts.sessionId}:${this.opts.agentId ?? 'main'}:${this.fixedCount++}`)
+      .digest('hex');
+    const uuid = `${h.slice(0, 8)}-${h.slice(8, 12)}-4${h.slice(13, 16)}-a${h.slice(17, 20)}-${h.slice(20, 32)}`;
+    const o: Line = { ...this.base('attachment'), attachment, uuid, timestamp: iso(this.t) };
+    this.lines.push(o);
+    this.parent = uuid;
+    return uuid;
   }
 
   attachment(attachment: Record<string, unknown>): string {

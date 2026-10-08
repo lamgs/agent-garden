@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { GardenView, ID } from '@garden/core';
 import { bedLabel } from '../format';
-import { compareHref, navigate } from '../route';
+import { compareHref, knowledgeHref, navigate } from '../route';
 import { bedToneOf } from './Specimen';
 
 /** "Compare beds" picker: the first bed is preselected (from a bed label click), choose the second. */
@@ -105,6 +105,12 @@ export function BedPicker({
                 ))}
             </select>
           </label>
+          <p className="picker-knowledge">
+            <a href={knowledgeHref(left)} onClick={onClose}>
+              Knowledge map of {beds.find((b) => b.id === left)?.name ?? 'this bed'} →
+            </a>{' '}
+            <span className="muted">where its instructions and memory come from</span>
+          </p>
           <div className="picker-actions">
             <button type="button" onClick={onClose}>
               Cancel

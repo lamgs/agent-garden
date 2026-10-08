@@ -12,7 +12,7 @@ Status log per milestone. A milestone is marked done only when its verification 
 | M5 Time-lapse replay | ✅ done | 426 tests + 13 e2e green; context fill = raw dedupe (fixture + real data); m5-replay-*; see below |
 | M6 Router | ✅ done | 441 tests + 13 e2e green; eval top-3 97% (holdout 100%); m6-router.png; see below |
 | L Live layer | ✅ server + client done; garden overlay in progress | 438 tests; line → event p50 20 ms on real data; see below |
-| K Knowledge map | 🔄 in progress | |
+| K Knowledge map | ✅ done | 547 tests + 17 e2e green; formats verified in the CC 2.1.293 binary; k-knowledge.png; see below |
 | M7 Seasons v1 | ⬜ not started | |
 | M8 Deliverables & polish | ⬜ not started | |
 
@@ -483,3 +483,60 @@ Known gaps:
 - Fixture mode answers only the 5 bundled questions. Static exports have no router.
 - The router box adds about 18 px to the header, so earlier m3/m4 screenshots (not regenerated in
   this commit) are slightly out of date.
+
+## K: Knowledge map (2026-10-08)
+
+Goal (user): use knowledge efficiently, avoid bloat, clear provenance; each project's CLAUDE.md
+maps to the right memory files.
+
+Done:
+- **Formats verified** in the installed CC 2.1.293 binary (official docs are blocked here) plus this
+  container's transcript: the full load chain (managed / user / ancestor project dirs /
+  `CLAUDE.local.md` / `.claude/rules` / AGENTS.md fallback / auto memory), `@path` import rules (regex,
+  code spans and comments excluded, depth limit 5, external-import approval), rule `paths:`,
+  MEMORY.md caps (200 lines, 25,000 bytes), topic recall (4,096 bytes), skill listing caps, and the
+  transcript records that show loading (`instructions` [observed], `nested_memory` and
+  `relevant_memories` [binary]). All in docs/sources.md with confidence.
+- **Ingest**: `config/knowledge.ts` builds a per-bed graph (12 source kinds, load mode with notes,
+  bytes, lines, content hash, keyed passage hashes) and edges (imports, MEMORY.md links, `.md` mentions,
+  resolved/dangling/past-the-cap). Git history records always-loaded project layers per commit
+  (rules are now tracked harness files). The transcript parser extracts paths (never content) from
+  load attachments and Read calls. Migration 3 adds 5 tables (docs/schema.md).
+- **Checks** (`packages/core/src/knowledge.ts`, pure): over budget, large file, budget growth,
+  duplicate passages (between files, within a file, across beds), dangling references, orphan memory
+  files, MEMORY.md over cap (incl. pointers past the cap), on-demand sources never used, stale files
+  while outcomes dropped (correlation caveat), overlapping skill descriptions, not-loaded files. Each
+  finding has evidence, tokens at stake, and an action.
+- **API + page**: `GET /api/knowledge/:familyId`, `#/knowledge/:bedId` (linked from the bed picker,
+  plant view, and compare page): soil-profile provenance map (topsoil / seed tray / compost, roots,
+  red dashed dangling roots, sprouts for usage), findings, layer budget and its history, sources table.
+- **Garden**: soil strata are now one band per always-loaded layer (thickness = token share) with ink
+  weight = total tokens (`bed.strata`, new `bed.strata_weight`); four knowledge weed kinds (one weed
+  per kind per bed). Four `knowledge.*` channels. All in the legend with swatches drawn by the same
+  code (a new SvgPen lets the DOM page share the Pen drawing functions).
+- **Demo**: shop-api is lean (CLAUDE.md → memory files, short index, path-scoped rule, subdirectory
+  CLAUDE.md, all used); legacy-monolith repeats user rules, imports a missing runbook, has a
+  260-line MEMORY.md with a link past the cap, and an orphan memory file. Load attachments use no RNG
+  draws, so the story numbers are unchanged.
+
+Verification:
+- [x] typecheck, lint, 547 tests (42 files) incl. story gate and redaction proof, build, 17 e2e (1 skipped upstream).
+- [x] Redaction proof: planted secrets in CLAUDE.md, memory files, a memory file name, an @import
+  target, transcript load attachments, and every free-text knowledge field: none in the DB bytes.
+  Passage hashes are stored keyed (16 hex), not raw sha256.
+- [x] Demo: legacy-monolith ~13k always-loaded tokens, 19 sources, 5 edges, 13 findings;
+  shop-api ~0.9k tokens, 0 dangling, its history shows ~3.0k → ~0.4k at "Tighten CLAUDE.md".
+- [x] Real data (this container): 1 bed; 6 sources (project CLAUDE.md always ~1.8k tokens, 4
+  referenced docs, 1 skill); 4 resolved mentions, 0 dangling; 10 session_load + 2 read events; 3 low
+  findings. `inspect`: 0 unknown shapes (`instructions` is now a known attachment).
+- [x] Screenshots reviewed: `k-knowledge.png`, `k-knowledge-focus.png`, `k-garden-weeds.png`.
+
+Known gaps:
+- Knowledge is rescanned only for beds touched in an ingest pass (`--full` rescans all).
+- Imports and user-level files are not versioned, so the budget history covers project layers only.
+- `claudeMdExcludes`, `--add-dir`, plugin agents, nested `.claude/rules`, and 4-space indented code
+  blocks are not modeled. Ancestor-directory and AGENTS.md handling is medium confidence.
+- `nested_memory` / `relevant_memories` shapes come from the binary; no real instance seen yet.
+- Bare-name mentions are flagged as dangling only when they look like memory files (heuristic).
+- Rules are not part of the harness bundle, so adding a rule does not start a new season.
+- m3/m4 screenshots predate the new strata bands (not regenerated, to avoid binary churn).

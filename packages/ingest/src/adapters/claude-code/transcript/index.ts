@@ -2,7 +2,7 @@ import { createReadStream } from 'node:fs';
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { basename, dirname, join } from 'node:path';
 import { createInterface } from 'node:readline';
-import type { ParsedRun, ParsedSession } from '../contracts';
+import type { KnowledgeEvent, ParsedRun, ParsedSession } from '../contracts';
 import { stableId } from '../../../ids';
 import { SessionContext, type SpawnRef } from './context';
 import { AgentMetaSchema, LineSchema, type AgentMeta, type Line } from './schema';
@@ -39,6 +39,10 @@ export const KNOWN_ATTACHMENT_TYPES = new Set([
   'command_permissions',
   'queued_command',
   'edited_text_file',
+  // Knowledge map (K): paths are read, content is dropped.
+  'instructions',
+  'nested_memory',
+  'relevant_memories',
 ]);
 
 export const KNOWN_SYSTEM_SUBTYPES = new Set(['compact_boundary', 'stop_hook_summary']);
@@ -115,6 +119,49 @@ function censusLine(line: Line, ctx: SessionContext): void {
     ctx.count(`system.subtype=${st}`);
     if (!KNOWN_SYSTEM_SUBTYPES.has(st)) ctx.unknown(`system.subtype=${st} (unknown)`);
   }
+}
+
+const isRec = (v: unknown): v is Record<string, unknown> =>
+  typeof v === 'object' && v !== null && !Array.isArray(v);
+const pathOf = (v: unknown): string | undefined =>
+  isRec(v) && typeof v.path === 'string' && v.path ? v.path : undefined;
+
+/**
+ * Knowledge-usage evidence in one line: paths only. `instructions` / `nested_memory` /
+ * `relevant_memories` attachments also carry file content; it is never read past `path`.
+ */
+export function knowledgeEvents(line: Line): KnowledgeEvent[] {
+  const at = line.timestamp ?? '';
+  if (!at) return [];
+  const out: KnowledgeEvent[] = [];
+  if (line.type === 'attachment' && isRec(line.attachment)) {
+    const a = line.attachment;
+    if (a.type === 'instructions' && Array.isArray(a.files)) {
+      for (const f of a.files) {
+        const p = pathOf(f);
+        if (p) out.push({ kind: 'session_load', path: p, at });
+      }
+    } else if (a.type === 'nested_memory') {
+      const p = pathOf(a) ?? pathOf(a.content);
+      if (p) out.push({ kind: 'nested_load', path: p, at });
+    } else if (a.type === 'relevant_memories' && Array.isArray(a.memories)) {
+      for (const m of a.memories) {
+        const p = pathOf(m);
+        if (p) out.push({ kind: 'memory_recall', path: p, at });
+      }
+    }
+  } else if (
+    line.type === 'assistant' &&
+    isRec(line.message) &&
+    Array.isArray(line.message.content)
+  ) {
+    for (const b of line.message.content) {
+      if (!isRec(b) || b.type !== 'tool_use' || b.name !== 'Read' || !isRec(b.input)) continue;
+      const p = b.input.file_path;
+      if (typeof p === 'string' && /\.md$/i.test(p)) out.push({ kind: 'read', path: p, at });
+    }
+  }
+  return out;
 }
 
 interface SubThread {
@@ -219,7 +266,9 @@ export async function parseSession(mainPath: string): Promise<ParsedSession> {
   // Main file. Inline sidechain lines (older format) are grouped by agentId, else by block.
   const inline = new Map<string, SubThread>();
   let blockKey: string | undefined;
+  const knowledge: KnowledgeEvent[] = [];
   let bytesRead = await streamFile(mainPath, ctx, (line, lineNo) => {
+    knowledge.push(...knowledgeEvents(line));
     if (line.cwd && ctx.firstCwd === undefined) ctx.firstCwd = line.cwd;
     if (line.gitBranch && ctx.firstGitBranch === undefined) ctx.firstGitBranch = line.gitBranch;
     if (line.entrypoint && ctx.firstEntrypoint === undefined) {
@@ -253,7 +302,10 @@ export async function parseSession(mainPath: string): Promise<ParsedSession> {
     const t: SubThread = { parser: new ThreadParser(ctx, 'subagent', agentId, runId), agentId };
     const meta = await readMeta(path.replace(/\.jsonl$/, '.meta.json'), ctx);
     if (meta) t.meta = meta;
-    bytesRead += await streamFile(path, ctx, (line, lineNo) => t.parser.feed(line, lineNo));
+    bytesRead += await streamFile(path, ctx, (line, lineNo) => {
+      knowledge.push(...knowledgeEvents(line));
+      t.parser.feed(line, lineNo);
+    });
     subThreads.push(t);
   }
   for (const t of inline.values()) {
@@ -295,6 +347,7 @@ export async function parseSession(mainPath: string): Promise<ParsedSession> {
     census: ctx.census,
     warnings: ctx.warnings,
     bytesRead,
+    knowledge,
   };
   if (ctx.lastVersion) session.cliVersion = ctx.lastVersion;
   if (ctx.firstEntrypoint) session.entrypoint = ctx.firstEntrypoint;

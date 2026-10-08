@@ -6,6 +6,11 @@ import type {
   HarnessDiff,
   ID,
   ISO,
+  KnowledgeEdgeKind,
+  KnowledgeKind,
+  KnowledgeLayer,
+  KnowledgeLoadMode,
+  KnowledgeScope,
   LoopTier,
   OutcomeLabel,
   StepKind,
@@ -31,6 +36,8 @@ export interface SoilSummary {
   mcpCount: number;
   hookCount: number;
   instructionBytes: number;
+  /** Knowledge map (K): always-loaded tokens by source layer. Absent when the bed was never scanned. */
+  knowledge?: BedKnowledgeSoil;
 }
 
 export interface BedSummary {
@@ -92,12 +99,20 @@ export interface BeeFlow {
   calls: number;
 }
 
-export type WeedKind = 'orphan' | 'duplicate' | 'unowned';
+/** The last four are knowledge-map findings (K): see KnowledgeFinding. */
+export type WeedKind =
+  | 'orphan'
+  | 'duplicate'
+  | 'unowned'
+  | 'dangling_ref'
+  | 'orphan_memory'
+  | 'duplicate_passage'
+  | 'over_cap';
 
 export interface Weed {
   id: ID;
   kind: WeedKind;
-  subject: { type: 'agent' | 'skill' | 'hook' | 'mcp_server'; id: ID };
+  subject: { type: 'agent' | 'skill' | 'hook' | 'mcp_server' | 'knowledge_source'; id: ID };
   bedId?: ID;
   reason: string;
 }
@@ -481,4 +496,118 @@ export interface RouterResult {
     corpusSize: number;
   };
   candidates: RouterCandidate[];
+}
+
+// =============================================================================================
+// Knowledge map (milestone K): GET /api/knowledge/:familyId and the garden's soil strata/weeds.
+// =============================================================================================
+
+/** Always-loaded knowledge of a bed, per layer (drawn as soil strata). */
+export interface BedKnowledgeSoil {
+  /** Approximate tokens (bytes ÷ 4, an estimate) every session pays before the first prompt. */
+  alwaysTokens: number;
+  layers: { layer: KnowledgeLayer; tokens: number }[];
+  /** Knowledge findings in this bed (all kinds, including ones not drawn as weeds). */
+  findingCount: number;
+}
+
+export type KnowledgeFindingKind =
+  | 'over_budget'
+  | 'budget_growth'
+  | 'large_file'
+  | 'duplicate_passage'
+  | 'dangling_ref'
+  | 'orphan_memory'
+  | 'over_cap'
+  | 'unused_on_demand'
+  | 'stale'
+  | 'skill_overlap'
+  | 'not_loaded';
+
+export type KnowledgeAction =
+  | 'move_to_on_demand'
+  | 'dedupe_into_user'
+  | 'dedupe'
+  | 'add_reference'
+  | 'fix_reference'
+  | 'shorten_index'
+  | 'differentiate'
+  | 'delete'
+  | 'review';
+
+export interface KnowledgeFinding {
+  id: ID;
+  kind: KnowledgeFindingKind;
+  severity: 'high' | 'medium' | 'low';
+  title: string;
+  sourceIds: ID[];
+  edgeIds: ID[];
+  /** Approximate always-loaded tokens this finding is about (0 when it costs nothing up front). */
+  tokensAtStake: number;
+  /** Inputs, thresholds, and counts behind the finding. Never file content. */
+  evidence: string[];
+  action: KnowledgeAction;
+  actionText: string;
+  /** e.g. "correlation, not causation" for stale findings. */
+  caveat?: string;
+}
+
+export interface KnowledgeSourceRow {
+  id: ID;
+  kind: KnowledgeKind;
+  scope: KnowledgeScope;
+  /** Always-loaded layer, null for sources that are not always loaded. */
+  layer: KnowledgeLayer | null;
+  displayPath: string;
+  name?: string;
+  bytes: number;
+  lines: number;
+  /** Approximate tokens of the whole file (bytes ÷ 4). */
+  tokens: number;
+  /** Approximate tokens that reach the model in every session. */
+  alwaysTokens: number;
+  loadMode: KnowledgeLoadMode;
+  loadNote?: string;
+  importDepth?: number;
+  globs?: string[];
+  memoryType?: string;
+  lastChangedAt: ISO | null;
+  /** Evidence it reached the model in the window (load records, recalls, Reads, invocations). */
+  usage: { count: number; sessions: number; lastAt: ISO | null; kinds: string[] };
+  findingIds: ID[];
+}
+
+export interface KnowledgeEdgeRow {
+  id: ID;
+  fromId: ID;
+  toId: ID | null;
+  kind: KnowledgeEdgeKind;
+  target: string;
+  resolved: boolean;
+  beyondCap: boolean;
+  reason?: string;
+}
+
+export interface KnowledgeView {
+  bed: { id: ID; name: string };
+  window: { from: ISO; to: ISO };
+  generatedAt: ISO;
+  /** null when the bed's knowledge was never scanned (ingested before K). */
+  scannedAt: ISO | null;
+  memoryDir: string | null;
+  budget: {
+    alwaysTokens: number;
+    layers: { layer: KnowledgeLayer; tokens: number; sources: number }[];
+    budgetTokens: number;
+    method: string;
+  };
+  /** Always-loaded project tokens per harness commit, then the current full stack. */
+  history: { at: ISO; tokens: number; provenance: 'git' | 'current'; commit?: string }[];
+  historyMethod: string;
+  sources: KnowledgeSourceRow[];
+  edges: KnowledgeEdgeRow[];
+  findings: KnowledgeFinding[];
+  /** Sessions in the window, and how many carry a session-start instructions record. */
+  sessions: { total: number; withLoadRecord: number };
+  caveats: string[];
 }

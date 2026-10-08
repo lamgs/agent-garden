@@ -118,6 +118,7 @@ function session(...runs: ParsedRun[]): ParsedSession {
     census: { recordTypes: {}, unknownFields: {}, versions: {} },
     warnings: [],
     bytesRead: 0,
+    knowledge: [],
   };
 }
 

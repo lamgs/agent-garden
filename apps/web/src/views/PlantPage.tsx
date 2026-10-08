@@ -39,7 +39,7 @@ import {
   shortModel,
   truncate,
 } from '../format';
-import { plantHref, replantHref, replayHref } from '../route';
+import { knowledgeHref, plantHref, replantHref, replayHref } from '../route';
 import { PlantSprite, SoilPlot } from '../components/Specimen';
 import {
   BedTag,
@@ -225,6 +225,9 @@ function PlantBody({
           </Card>
           <Card title="Harness (the soil)" kicker={`Bed ${v.bed.name}`}>
             <HarnessFacts harness={v.harness} />
+            <p className="quiet-link">
+              <a href={knowledgeHref(v.bed.id)}>Knowledge map of {v.bed.name} →</a>
+            </p>
           </Card>
         </div>
       </div>

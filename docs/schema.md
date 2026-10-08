@@ -185,6 +185,45 @@ partial = 0.5, failure = 0, and excludes unknown.
 | shipped | +0.10 | all |
 | parent_respawned | −0.20 | subagent |
 
+### Knowledge map (milestone K, migration 3)
+
+Where a run's instructions and memory come from. **Content is never stored**: only paths, sizes,
+line counts, a sha256 content hash, keyed passage hashes, and derived facts. Load-chain facts are
+in docs/sources.md ("Knowledge sources").
+
+**KnowledgeSource**: one file Claude Code can load for a bed.
+| Field | Type | Notes |
+|---|---|---|
+| id, familyId | ID | id = stableId('ks', familyId, path) |
+| kind | KnowledgeKind | `managed_claude_md`, `user_claude_md`, `project_claude_md`, `local_claude_md`, `nested_claude_md`, `rule`, `import`, `memory_index`, `memory_topic`, `referenced_doc`, `skill`, `agent_definition` |
+| scope | `managed` \| `user` \| `project` \| `local` \| `memory` \| `plugin` | |
+| path, displayPath | RedactedText | Absolute path; short path (`CLAUDE.md`, `~/.claude/…`, `memory/…`) |
+| name? | string | Skill or agent name |
+| bytes, lines | number | |
+| alwaysBytes | number | Bytes in every session prompt: the whole file for `always`, the listing line for skills/agents, the capped part of MEMORY.md |
+| loadMode | `always` \| `on_demand` \| `path_scoped` \| `not_loaded` | |
+| loadNote? | RedactedText | Why not loaded, or what loads it (generated) |
+| importDepth?, globs?, memoryType? | number, RedactedText[], string | Import hops; rule `paths`; memory `type` frontmatter |
+| contentHash | string | sha256 of the file |
+| passageHashes | string[] | `<16-hex HMAC>:<bytes>` per normalized passage, keyed per install (Redactor.keyedDigest) |
+| lastChangedAt?, changedVia? | ISO, `git` \| `mtime` | |
+
+**KnowledgeEdge**: `id`, `familyId`, `fromId`, `toId?`, `kind` (`import` \| `index_link` \| `mention`),
+`target: RedactedText` (as written), `resolved`, `beyondCap` (pointer past MEMORY.md's 200-line /
+25 KB cap), `reason?`.
+
+**KnowledgeSnapshot**: `familyId`, `at`, `commitSha?`, `provenance` (`git`: project layers as
+committed; `current`: every layer now), `layers` (always-loaded bytes per KnowledgeLayer: `managed`,
+`user`, `project`, `local`, `rules`, `imports`, `memory`, `listings`).
+
+**KnowledgeUsage**: one session's evidence that a file reached the model: `sessionId`, `familyId`,
+`path: RedactedText`, `kind` (`session_load` from the `instructions` attachment, `nested_load` from
+`nested_memory`, `memory_recall` from `relevant_memories`, `read` from a Read call on a `.md`),
+`count`, `firstAt`, `lastAt`. Paths only; the attachments' content is dropped by the parser.
+
+**KnowledgeScan**: `familyId`, `scannedAt`, `memoryDir?`, `externalImportsApproved` (the one
+boolean read from `~/.claude.json` for this), `warnings`.
+
 ## SQLite tables
 
 | Table | Holds |
@@ -203,6 +242,11 @@ partial = 0.5, failure = 0, and excludes unknown.
 | `outcomes` | Heuristic outcome per run (`signals_json`) |
 | `manual_labels` | Human labels. Never touched by ingestion |
 | `ingest_files` | Per-file size, mtime, and byte offset for incremental ingestion |
+| `knowledge_scans` | KnowledgeScan, one row per bed (K) |
+| `knowledge_sources` | KnowledgeSource (`passage_hashes_json`, `globs_json`). Replaced per bed on every scan |
+| `knowledge_edges` | KnowledgeEdge |
+| `knowledge_snapshots` | KnowledgeSnapshot (`layers_json`), keyed by bed + time + commit |
+| `knowledge_usage` | KnowledgeUsage, replaced per session on re-parse |
 
 ## Adapter contract
 

@@ -2,6 +2,7 @@ import type {
   Agent,
   HarnessFamily,
   HarnessVersion,
+  KnowledgeUsage,
   Loop,
   Outcome,
   Playbook,
@@ -13,7 +14,7 @@ import type {
 } from '@garden/core';
 import type { Adapter, NormalizedRecord } from './adapter';
 import type { Redactor } from './redact';
-import type { Store } from './store/store';
+import type { KnowledgeBundle, Store } from './store/store';
 
 export interface IngestReport {
   adapter: string;
@@ -48,6 +49,22 @@ export function writeRecord(store: Store, redactor: Redactor, rec: NormalizedRec
     case 'outcome':
       return store.putHeuristicOutcome(
         redactor.deep<Omit<Outcome, 'source' | 'manual'>>(rec.value),
+      );
+    case 'knowledge': {
+      // Re-key passage hashes (`<sha256>:<bytes>`) with the install key before anything is stored.
+      const sources = rec.value.sources.map((s) => ({
+        ...s,
+        passageHashes: s.passageHashes.map((p) => {
+          const i = p.lastIndexOf(':');
+          return `${redactor.keyedDigest(i < 0 ? p : p.slice(0, i))}:${i < 0 ? 0 : p.slice(i + 1)}`;
+        }),
+      }));
+      return store.putKnowledge(redactor.deep<KnowledgeBundle>({ ...rec.value, sources }));
+    }
+    case 'knowledge_usage':
+      return store.putKnowledgeUsage(
+        rec.value.sessionId,
+        redactor.deep<KnowledgeUsage[]>(rec.value.rows),
       );
     case 'file_state':
       // Paths of the user's own files on the local machine; used only for incremental reads.

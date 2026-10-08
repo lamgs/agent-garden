@@ -21,6 +21,8 @@ import {
 import {
   beeCount,
   bedStrata,
+  bedStrataShares,
+  bedStrataWeight,
   bedTexture,
   bedTone,
   careCardSize,
@@ -341,6 +343,9 @@ export class GardenRenderer {
           tone: familyTone(bedTone.level(bed)),
           texture: bedTexture.level(bed),
           strata: bedStrata.level(bed),
+          // Knowledge map (K): one band per always-loaded layer, ink weight = total tokens.
+          bands: bedStrataShares(bed),
+          weight: bedStrataWeight.level(bed),
         },
         hashString(bed.id),
       );

@@ -7,6 +7,7 @@ import type {
   Agent,
   HarnessFamily,
   HarnessVersion,
+  KnowledgeUsage,
   Loop,
   Outcome,
   Playbook,
@@ -17,7 +18,7 @@ import type {
   Step,
 } from '@garden/core';
 import type { Unredacted } from './redact';
-import type { FileState } from './store/store';
+import type { FileState, KnowledgeBundle } from './store/store';
 
 export type NormalizedRecord =
   | { type: 'source'; value: Unredacted<Source> }
@@ -31,6 +32,10 @@ export type NormalizedRecord =
   | { type: 'run'; value: Unredacted<Run> }
   | { type: 'step'; value: Unredacted<Step> }
   | { type: 'outcome'; value: Unredacted<Omit<Outcome, 'source' | 'manual'>> }
+  /** One bed's knowledge graph (K). Passage hashes are plain sha256 here; the pipeline keys them. */
+  | { type: 'knowledge'; value: Unredacted<KnowledgeBundle> }
+  /** One session's knowledge-usage evidence (K). Emitted after its session record. */
+  | { type: 'knowledge_usage'; value: { sessionId: string; rows: Unredacted<KnowledgeUsage>[] } }
   /** Emitted after a file is fully consumed; enables incremental re-ingestion. */
   | { type: 'file_state'; value: FileState };
 
