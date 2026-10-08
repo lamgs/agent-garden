@@ -116,6 +116,34 @@ error records, user interrupts.
 - Subagents spawned with worktree isolation run with `cwd` = `<repo>/.claude/worktrees/<name>`. → These
   fold into the repository's bed (`canonicalProjectRoot`), including after the worktree is deleted.
 
+## Live tailing [ran + observed, CC v2.1.293, 2026-10-08, this container]
+
+- [ran] `fs.watch(~/.claude/projects, {recursive: true})` works on Node 22.22.0 / Linux here and fires
+  for appends to transcripts and subagent files. `garden live:probe` while this session's subagents
+  were working: 18 events in 25 s, latency from the line's `timestamp` to the emitted event p50 20 ms,
+  p90 70 ms, max 92 ms (includes CC's own 30–70 ms write lag). Polling only (`--no-watch`, 250 ms):
+  8 events, p50 190 ms, p90/max 279 ms. Both are within the 1 s target.
+- [observed] Whole-history census through the live parser (3,273 lines, 23 MB, 9 files): 0 malformed
+  lines; one unknown shape, `attachment.type=instructions` (9 lines, counted and skipped). Seeding from
+  a 256 KB tail produces one `tool_result without tool_use in the tailed range` (the call was before the
+  seed window), counted, not thrown.
+- [observed] `stop_reason` is repeated on every line of a main-thread message (also on its `thinking`
+  line), so `turn_end` is emitted once per `message.id`. Subagent lines keep `stop_reason: null`.
+- [observed] Background `Agent` calls: the parent's `tool_result` has `toolUseResult.status:
+  "async_launched"`, `isAsync: true`; completion arrives as a `queued_command` attachment whose prompt is
+  a `<task-notification>` with `<tool-use-id>` (= the spawn's `tool_use.id`) and `<status>`.
+  Sidecar `agent-<id>.meta.json` keys here: `agentType`, `worktreePath`, `spawnedWithWorktree`,
+  `worktreeBranch`, `description`, `toolUseId`, `spawnDepth`, `requestShape`, `requestNonInteractive`.
+- [observed] `tool_result` lines carry `permissionDecision: {decision, source, reasonType}` (seen
+  `accept` / `config` / `rule|classifier|mode`; docs/research/live-signals.md). Only short enum-like values
+  are kept by the live layer.
+- [observed] Session registry `~/.claude/sessions/<pid>.json` keys: `pid, sessionId, cwd, startedAt,
+  procStart, version, peerProtocol, peerFeatures, kind, entrypoint, pidDomain, messagingSocketPath, name,
+  nameSource, nameSince, updatedAt, status, statusUpdatedAt` (`status: idle`, `kind: interactive`; the pid
+  is alive from this process's view). The live layer reads only `<digits>.json`, only `pid, sessionId,
+  status, waitingFor`, and never opens the sibling `*.key` file. `waitingFor` values were not observable
+  here (this container auto-approves), so registry-based permission detection is untested on real data.
+
 ## Skills [observed]
 
 - `~/.claude/skills/<dir>/SKILL.md` with YAML frontmatter `name`, `description`.
