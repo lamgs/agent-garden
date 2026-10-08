@@ -295,3 +295,30 @@ Known gaps:
 - Signal names and tier descriptions are duplicated in the web app rather than served.
 - `pnpm demo:data` run *inside a git worktree* collapses projects into one bed (paths resolve to the
   worktree root). From the main checkout it's correct.
+
+## Live layer: transcript tailer, live state machine, SSE API, demo live source
+
+Status: built (backend only; the pixel-art renderer consumes `/api/live/stream`). No view changed, so
+no screenshot.
+
+- [x] `packages/ingest/src/live/`: `LiveTailer` (fs.watch recursive + 250 ms poll, per-file offsets,
+  partial-line buffer, truncation/rotation, 30-min start window seeded from 256 KB tails, subagent
+  files linked by `.meta.json` `toolUseId` with retry, optional session registry), pure
+  `reduceLive` / `tickLive` (tested with an injected clock), `LiveHub`, `DemoLiveSource`.
+- [x] Server: `GET /api/live`, `GET /api/live/stream` (snapshot, then event/agent/gone, 15 s heartbeat,
+  unsubscribe on disconnect). `garden serve` live on by default, `--no-live`, `--live-demo`;
+  `pnpm demo` uses `--live-demo`. `garden live:probe` for verification.
+- [x] Privacy: planted secrets written into a tailed transcript are absent from every emitted message,
+  the snapshot, and the SSE bytes; thinking text never emitted; previews ≤ 120 chars; nothing written.
+- [x] Real data (this container): events within p50 20 ms / max 92 ms of the line timestamp with
+  fs.watch, p50 190 ms / max 279 ms polling only. One unknown shape (`attachment.type=instructions`).
+  Live `bedId` / `plantId` join the stored history (checked against the store).
+- [x] Demo replay over a 6-bed demo store: first minute showed all six beds, subagent forks, an error,
+  a compaction, and a waiting_permission moment.
+
+Known gaps:
+- Permission waits are inferred (timer, registry `waiting`); no real permission prompt could be
+  produced here (auto-approve), so the registry `waitingFor` path is untested on real data.
+- `loop` on LiveAgent is never set; `LiveAgent.plantId` only for plantings already in the store.
+- Inline sidechain lines (older CC format) become child agents but are not linked to a spawn call.
+- Demo: one stalled call per cycle; `turn_end` is synthesized at the end of each replayed run.

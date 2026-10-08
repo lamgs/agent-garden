@@ -8,7 +8,8 @@
     "./derive": "./src/store/derive.ts",
     "./cli": "./src/cli.ts",
     "./harness": "./src/adapters/claude-code/harness.ts",
-    "./planted-secrets": "./src/redact/planted-secrets.ts"
+    "./planted-secrets": "./src/redact/planted-secrets.ts",
+    "./live-fixtures": "./src/live/fixtures.ts"
   },
   "bin": {
     "garden": "./src/cli.ts"

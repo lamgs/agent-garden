@@ -3,9 +3,10 @@ import { serveStatic } from '@hono/node-server/serve-static';
 import { Hono } from 'hono';
 import { z } from 'zod';
 import { OUTCOME_LABELS, legend, type GardenView, type ModelPrice } from '@garden/core';
-import type { Redactor, Store } from '@garden/ingest';
+import type { LiveHub, Redactor, Store } from '@garden/ingest';
 import { loadGardenData, type GardenData } from './data';
 import { buildGardenView } from './garden';
+import { registerLiveRoutes } from './live';
 import { buildCompareView, buildPlantView, buildReplantView, loadStepAggregates } from './plant';
 
 export interface AppOptions {
@@ -17,6 +18,10 @@ export interface AppOptions {
   webDist?: string;
   /** Redacts free-text label notes before they reach the store. Required to accept notes. */
   redactor?: Redactor;
+  /** Live layer (transcript tailer or demo source). Omitted: /api/live* answer 404. */
+  live?: LiveHub;
+  /** SSE heartbeat interval override (tests). */
+  liveHeartbeatMs?: number;
 }
 
 /** Hostnames the server answers to. Anything else (e.g. a DNS-rebinding domain) is refused. */
@@ -184,6 +189,9 @@ export function createApp(opts: AppOptions): Hono {
     if (asOf !== undefined && Number.isNaN(Date.parse(asOf)))
       return c.json({ error: 'asOf must be an ISO date' }, 400);
     return c.json(gardenView(opts, days, asOf ?? opts.asOf));
+  });
+  registerLiveRoutes(app, opts.live, {
+    ...(opts.liveHeartbeatMs ? { heartbeatMs: opts.liveHeartbeatMs } : {}),
   });
   app.all('/api/*', (c) => c.json({ error: 'not found' }, 404));
 
