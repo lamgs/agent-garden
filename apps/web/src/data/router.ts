@@ -33,7 +33,10 @@ export function highlightFor(result: RouterResult | null): {
 } {
   const best = new Map<ID, number>();
   for (const c of result?.candidates ?? [])
-    for (const id of c.plantIds) best.set(id, Math.max(best.get(id) ?? 0, c.confidence));
+    for (const id of c.plantIds) {
+      const own = c.plantings?.find((p) => p.plantId === id)?.confidence ?? c.confidence;
+      best.set(id, Math.max(best.get(id) ?? 0, own));
+    }
   const badges: Record<ID, string> = {};
   for (const [id, conf] of best) badges[id] = formatConfidence(conf);
   return { plantIds: [...best.keys()], badges };

@@ -375,7 +375,7 @@ export const routerHighlight: Encoding<{ candidate: boolean }> = {
   metric: 'Router suggestion for the current “Which one do I call?” question',
   howComputed:
     'Glowing plants run a suggested agent or skill. Score = 0.45·BM25 (normalized) + 0.35·TF-IDF+LSA cosine + ' +
-    '0.20·Beta(2,2)-smoothed success on the k most similar past runs. The badge is the calibrated confidence: ' +
+    '0.20·Beta(2,2)-smoothed success on the k most similar past runs. Each plant’s badge recomputes the outcome part from that bed’s own similar runs, so the same agent can read high in one bed and low in another. The badge is the calibrated confidence: ' +
     'a logistic fit of score and margin over #2 on the eval queries. Open “how computed” in the results list for the inputs and n.',
   action:
     'Call the glowing plant with the highest badge; check n before trusting a low-evidence suggestion.',

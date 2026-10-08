@@ -200,3 +200,41 @@ describe('fitLogistic', () => {
     expect(fit.wMargin).toBeCloseTo(truth.wMargin, 0);
   });
 });
+
+describe('per-planting outcome', () => {
+  it('gives each bed its own outcome and confidence from that bed’s similar runs only', () => {
+    const tw = candidateKey('agent', 'tw');
+    const mk = (bed: string, labels: OutcomeLabel[]) =>
+      labels.map((label, i) => ({
+        id: `${bed}-${i}`,
+        preview: 'Write unit tests for the invoice totals module',
+        label,
+        plantId: bed,
+        candidateKeys: [tw],
+      }));
+    const idx = buildRouterIndex({
+      candidates: [
+        {
+          kind: 'agent',
+          id: 'tw',
+          name: 'test-writer',
+          description: 'Writes focused unit tests for a module.',
+          plantIds: ['shop', 'legacy'],
+        },
+      ],
+      runs: [
+        ...mk('shop', ['success', 'success', 'success', 'success']),
+        ...mk('legacy', ['failure', 'failure', 'failure', 'failure']),
+      ],
+    });
+    const [c] = route(idx, 'write unit tests for invoice totals').candidates;
+    const shop = c!.plantings!.find((p) => p.plantId === 'shop')!;
+    const legacy = c!.plantings!.find((p) => p.plantId === 'legacy')!;
+    expect(shop.n).toBe(4);
+    expect(legacy.n).toBe(4);
+    expect(shop.outcome).toBeCloseTo((4 + 2) / (4 + 4)); // Beta(2,2)
+    expect(legacy.outcome).toBeCloseTo(2 / 8);
+    expect(shop.confidence).toBeGreaterThan(c!.confidence);
+    expect(legacy.confidence).toBeLessThan(c!.confidence);
+  });
+});

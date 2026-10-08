@@ -463,6 +463,11 @@ export interface RouterCandidate {
   /** 0..1, calibrated on the eval set (see `RouterResult.method.calibration`). */
   confidence: number;
   reasons: { kind: 'description_match' | 'similar_past_task' | 'outcome_history'; text: string }[];
+  /**
+   * Per planting (the same candidate in each bed): the outcome component recomputed from that bed's
+   * similar past runs only, and the confidence that gives. Lexical and embedding are shared.
+   */
+  plantings?: { plantId: ID; outcome: number; n: number; confidence: number }[];
 }
 
 export interface RouterResult {
