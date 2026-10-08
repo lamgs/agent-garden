@@ -6,3 +6,4 @@ export * from './export';
 export * from './plant';
 export * from './live';
 export * from './replay';
+export * from './route';

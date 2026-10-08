@@ -9,8 +9,12 @@
   "dependencies": {
     "@garden/core": "workspace:*",
     "@garden/ingest": "workspace:*",
+    "@garden/router": "workspace:*",
     "@hono/node-server": "^2.1.3",
     "hono": "^4.13.13",
     "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@garden/demo": "workspace:*"
   }
 }

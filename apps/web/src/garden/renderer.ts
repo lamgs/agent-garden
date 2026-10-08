@@ -24,6 +24,7 @@ import {
   bedTexture,
   bedTone,
   careCardSize,
+  HIGHLIGHT,
   INK,
   irrigationFlow,
   irrigationState,
@@ -65,6 +66,7 @@ import {
   STEM_LENGTH,
 } from './draw';
 import { GenotypeCache, genotypeKey, genotypeOf } from './genotype';
+import { drawBadge, drawGlow } from './highlight';
 import { beeArc, beePoint, computeLayout, type GardenLayout, type Pt } from './layout';
 import { familyTone } from './swatches';
 
@@ -145,6 +147,13 @@ export class GardenRenderer {
   private destroyed = false;
   private plaqueByBed = new Map<ID, Container>();
   private cleanup: (() => void)[] = [];
+  /** Router highlight (encoding router.highlight): glows under plants, badges on top. */
+  private hl = {
+    under: new Container(),
+    over: new Container(),
+    ids: [] as ID[],
+    badges: {} as Readonly<Record<ID, string>>,
+  };
 
   constructor(private readonly cb: RendererCallbacks) {}
 
@@ -171,6 +180,7 @@ export class GardenRenderer {
       L.flow,
       L.playbook,
       L.focus,
+      this.hl.under,
       L.plants,
       L.weeds,
       L.markers,
@@ -178,6 +188,7 @@ export class GardenRenderer {
       L.near,
       L.plaques,
       L.far,
+      this.hl.over,
     );
     this.app.stage.addChild(this.world);
     this.app.stage.eventMode = 'static';
@@ -272,6 +283,7 @@ export class GardenRenderer {
     this.buildNear(view, layout);
     this.buildFar(view, layout);
     this.fit();
+    this.highlight(this.hl.ids, this.hl.badges);
   }
 
   private interactive(obj: Container, target: HoverTarget, hit?: Rectangle): void {
@@ -693,6 +705,7 @@ export class GardenRenderer {
       const k = Math.min(max, Math.max(1, base / s));
       obj.scale.set(k);
     }
+    for (const b of this.hl.over.children) b.scale.set(Math.min(3, Math.max(1, 1 / s)));
     if (z !== this.zoom) {
       this.zoom = z;
       this.cb.onZoomLevel(z);
@@ -805,6 +818,44 @@ export class GardenRenderer {
     const pp = id ? this.layout?.plants.get(id) : undefined;
     if (!pp) return;
     g.ellipse(pp.x, pp.y + 1, 26, 7).stroke({ color: INK.primary, width: 1.4, alpha: 0.75 });
+  }
+
+  /**
+   * Router highlight: `plantIds` glow, each with its badge text (e.g. "72%"); everything else
+   * dims to 1 − HIGHLIGHT.veilAlpha. An empty list clears it. Survives `setData`.
+   */
+  highlight(plantIds: readonly ID[], badges: Readonly<Record<ID, string>> = {}): void {
+    this.hl.ids = [...plantIds];
+    this.hl.badges = badges;
+    for (const layer of [this.hl.under, this.hl.over])
+      for (const c of layer.removeChildren()) c.destroy({ children: true });
+    const on = new Set(plantIds.filter((id) => this.layout?.plants.has(id)));
+    const dim = on.size ? 1 - HIGHLIGHT.veilAlpha : 1;
+    for (const [name, layer] of Object.entries(this.layers))
+      if (name !== 'plants' && name !== 'focus') layer.alpha = dim;
+    for (const n of this.plantNodes) n.sprite.alpha = on.has(n.id) || !on.size ? 1 : dim;
+    for (const id of on) {
+      const pp = this.layout!.plants.get(id)!;
+      const g = new Graphics();
+      drawGlow(g, pp.x, pp.y, pp.y - pp.topY);
+      this.hl.under.addChild(g);
+      const label = badges[id];
+      if (!label) continue;
+      const badge = new Container();
+      const t = this.text(label, 10, { weight: '700', color: PAPER });
+      t.anchor.set(0.5);
+      const bg = new Graphics();
+      drawBadge(bg, 0, 0, Math.max(30, t.width + 12));
+      badge.addChild(bg, t);
+      badge.position.set(pp.x, pp.topY - 18);
+      badge.label = `router-badge:${id}`;
+      this.hl.over.addChild(badge);
+    }
+    if (this.view) this.applyCamera();
+  }
+
+  get highlighted(): readonly ID[] {
+    return this.hl.ids;
   }
 
   // ---- interaction -------------------------------------------------------------------------

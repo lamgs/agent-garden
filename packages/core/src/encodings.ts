@@ -26,6 +26,7 @@ export type GardenElement =
   | 'playbook'
   | 'season'
   | 'replay'
+  | 'router'
   | 'ambient';
 
 export interface Encoding<I> {
@@ -363,6 +364,22 @@ export const replayProgress: Encoding<{ reached: boolean }> = {
   level: (p) => (p.reached ? 0 : 1),
 };
 
+/** Only drawn while a "Which one do I call?" query is active (M6). */
+export const routerHighlight: Encoding<{ candidate: boolean }> = {
+  id: 'router.highlight',
+  element: 'router',
+  channel: 'Glow + confidence badge (everything else dims)',
+  metric: 'Router suggestion for the current “Which one do I call?” question',
+  howComputed:
+    'Glowing plants run a suggested agent or skill. Score = 0.45·BM25 (normalized) + 0.35·TF-IDF+LSA cosine + ' +
+    '0.20·Beta(2,2)-smoothed success on the k most similar past runs. The badge is the calibrated confidence: ' +
+    'a logistic fit of score and margin over #2 on the eval queries. Open “how computed” in the results list for the inputs and n.',
+  action:
+    'Call the glowing plant with the highest badge; check n before trusting a low-evidence suggestion.',
+  levels: ['Suggested: glow + confidence %', 'Not suggested: dimmed'],
+  level: (x) => (x.candidate ? 0 : 1),
+};
+
 export const ambientSway: Encoding<unknown> = {
   id: 'ambient.sway',
   element: 'ambient',
@@ -399,6 +416,7 @@ export const ENCODINGS = [
   replayLane,
   replayGap,
   replayProgress,
+  routerHighlight,
   ambientSway,
 ] as const satisfies readonly Encoding<never>[];
 

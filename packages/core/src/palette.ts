@@ -63,3 +63,6 @@ export const REPLAY = {
   context: ['#5aa9c9', '#fab219', '#ec835a'],
   window: '#2b2a26',
 } as const;
+
+/** Router highlight: a warm sunlight halo (not a data hue; the confidence badge carries the number). */
+export const HIGHLIGHT = { glow: '#f3c64f', veilAlpha: 0.62 } as const;

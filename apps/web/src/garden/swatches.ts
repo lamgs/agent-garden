@@ -29,6 +29,7 @@ import {
   drawStepMark,
   SHAPE_ROW,
 } from './replay-draw';
+import { drawBadge, drawGlow, drawVeil } from './highlight';
 import type { Pen } from './pen';
 
 export interface Swatch {
@@ -216,6 +217,16 @@ export const SWATCHES: Record<string, Swatch> = {
       drawStepMark(pen, 12, 16, 0, 0, 3.5, a);
       drawStepMark(pen, 26, 16, 1, 0, 3.5, a);
       if (l === 0) drawPlayhead(pen, 38, 8, 26);
+    },
+  },
+  'router.highlight': {
+    frame: { x: -40, y: -112, w: 80, h: 124 },
+    height: 64,
+    draw: (pen, l) => {
+      if (l === 0) drawGlow(pen, 0, 0, 80);
+      drawPlant(pen, BASE);
+      if (l === 0) drawBadge(pen, 0, -100, 30);
+      else drawVeil(pen, -40, -112, 80, 124);
     },
   },
   'ambient.sway': {

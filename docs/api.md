@@ -14,8 +14,13 @@ contracts in `packages/core/src/views.ts`. Every response carries a strict Conte
 | GET | `/api/replant?agent=<agentId>&from=<bedId>&to=<bedId>&days=` | `ReplantView` |
 | GET | `/api/replay/:runId` | `ReplayView`: frames with deduped context fill and cumulative tokens/cost, child runs to depth 3 (404 for an unknown run; no window filter) |
 | POST | `/api/runs/:runId/label` | `{ runId, outcome }`, body `{ label: success\|partial\|failure\|unknown\|clear, note? }` |
+| GET | `/api/route?q=<task>&days=&limit=` | `RouterResult` ("Which one do I call?"). `q` 1..500 chars (trimmed), `limit` 1..20 (default 5) |
 
 `days` is 1..3650 (default 90). `asOf` pins "now". The demo uses the dataset's end date.
+
+The router index (BM25 + TF-IDF/LSA + outcome kNN, `packages/router`) is built from the window's
+runs on first use and cached per `days|asOf` (4 windows, LRU). A manual label clears the cache so
+the outcome component sees it. The query is never stored or logged.
 
 ## Guards (local-only by construction)
 

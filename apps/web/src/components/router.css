@@ -1,0 +1,223 @@
+/* "Which one do I call?" router box (M6). Colors from palette.ts via theme.ts custom properties. */
+/* Lives in the header, above the window/source controls; results drop over the garden. */
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.router-slot[hidden] {
+  display: none;
+}
+.router-box {
+  position: relative;
+  width: min(500px, 46vw);
+  font-size: 13px;
+  color: var(--ink);
+}
+.router-box form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 3px 3px 10px;
+  background: var(--paper);
+  border: 1px solid rgb(43 42 38 / 0.35);
+  border-radius: 7px;
+}
+.router-label {
+  font-family: var(--serif);
+  font-size: 15px;
+  white-space: nowrap;
+}
+.router-box input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  color: inherit;
+  padding: 5px 8px;
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-radius: 5px;
+}
+.router-box input:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+.router-kbd {
+  font-family: var(--sans);
+  font-size: 11px;
+  padding: 0 5px;
+  border: 1px solid var(--hairline);
+  border-radius: 3px;
+  color: var(--ink-2);
+}
+.router-box form button {
+  height: 26px;
+  padding: 0 12px;
+  background: var(--ink);
+  color: var(--paper);
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.router-box form button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.router-results {
+  position: absolute;
+  z-index: 9;
+  top: calc(100% + 6px);
+  right: 0;
+  width: min(540px, calc(100vw - 40px));
+  max-height: calc(100vh - 170px);
+  overflow: auto;
+  padding: 10px 14px 8px;
+  background: var(--paper);
+  background-image: var(--grain);
+  border: 1px solid rgb(43 42 38 / 0.3);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+.router-msg {
+  margin: 2px 0 6px;
+  color: var(--ink-2);
+}
+.router-examples {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.router-examples button,
+.linkish {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--hairline);
+  text-underline-offset: 2px;
+  cursor: pointer;
+  text-align: left;
+}
+.router-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.router-cand {
+  padding: 8px 0 10px;
+  border-bottom: 1px solid var(--hairline);
+}
+.router-cand:last-child {
+  border-bottom: 0;
+}
+.router-cand-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.router-rank {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.router-name {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 500;
+}
+.router-kind {
+  font-size: 11px;
+  padding: 0 6px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  color: var(--ink-2);
+}
+.router-conf {
+  margin-left: auto;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 0 0 1.5px var(--glow);
+}
+.router-meter {
+  height: 3px;
+  margin: 5px 0 4px;
+  background: var(--hairline);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.router-meter span {
+  display: block;
+  height: 100%;
+  background: var(--ink-2);
+}
+.router-beds {
+  margin: 0 0 4px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.router-reasons {
+  margin: 0;
+  padding-left: 16px;
+  color: var(--ink);
+}
+.router-reasons li {
+  margin: 1px 0;
+}
+.router-reasons b {
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.router-how {
+  margin-top: 4px;
+}
+.router-how summary {
+  cursor: pointer;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+.router-how table {
+  border-collapse: collapse;
+  margin: 6px 0;
+  font-variant-numeric: tabular-nums;
+  width: 100%;
+}
+.router-how th,
+.router-how td {
+  text-align: left;
+  padding: 2px 8px 2px 0;
+  border-bottom: 1px solid var(--hairline);
+  vertical-align: top;
+}
+.router-how th small {
+  display: block;
+  font-weight: 400;
+  color: var(--ink-3);
+  font-size: 11px;
+}
+.router-how .router-sum th,
+.router-how .router-sum td {
+  font-weight: 700;
+  border-bottom: 0;
+}
+.router-how p {
+  margin: 4px 0;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.router-foot {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.router-foot kbd {
+  font-family: var(--sans);
+  font-size: 10px;
+  padding: 0 3px;
+  border: 1px solid var(--hairline);
+  border-radius: 3px;
+}
