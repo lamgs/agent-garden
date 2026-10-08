@@ -1,0 +1,956 @@
+{
+ "agent": {
+  "id": "agt_c02389e440c4e177",
+  "name": "test-writer",
+  "kind": "subagent",
+  "description": "Writes focused unit tests for a module and runs them until they pass. Use after implementing or fixing a change."
+ },
+ "from": {
+  "bed": {
+   "id": "fam_77320afbea5626a6",
+   "name": "shop-api",
+   "soil": {
+    "model": "claude-sonnet-5-5",
+    "effort": "high",
+    "permissionMode": "acceptEdits",
+    "toolCount": 12,
+    "mcpCount": 1,
+    "hookCount": 2,
+    "instructionBytes": 1859
+   },
+   "currentHarnessVersionId": "hv_6cfb7b6d5f2474ff",
+   "seasonCount": 2,
+   "plantIds": [
+    "plt_ff3cf3eb8c753cda",
+    "plt_81ec76c7104d4e0b",
+    "plt_33d5665ce1f3aa59",
+    "plt_5f39547dea82bd11"
+   ]
+  },
+  "plant": {
+   "id": "plt_5f39547dea82bd11",
+   "agentId": "agt_c02389e440c4e177",
+   "agentKind": "subagent",
+   "bedId": "fam_77320afbea5626a6",
+   "name": "test-writer",
+   "runs": 108,
+   "success": {
+    "value": 0.9166666666666666,
+    "n": 108,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.8491694181597665,
+     0.9555400995867606
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0.08333333333333333,
+   "costPerRunUsd": 0.04395995,
+   "totalCostUsd": 5.087738099999998,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-09-30T18:09:11.896Z",
+   "staleDays": 0,
+   "skillIds": []
+  },
+  "harness": {
+   "versionId": "hv_d329f190dddc395c",
+   "validFrom": "2026-08-17T19:21:34.841Z",
+   "provenance": "git",
+   "model": "claude-sonnet-5-5",
+   "effort": "high",
+   "permissionMode": "acceptEdits",
+   "instructionBytes": 1859,
+   "toolCount": 0,
+   "tools": [],
+   "mcpServers": [
+    "github"
+   ],
+   "skillCount": 6,
+   "hookCount": 2,
+   "commitMessage": "Tighten CLAUDE.md and add test hook",
+   "changes": [
+    "permissions ∅ → acceptEdits",
+    "instructions −10,581 bytes",
+    "hooks changed"
+   ]
+  },
+  "recent": [
+   {
+    "runId": "run_1fd05865aabc34ed",
+    "startedAt": "2026-09-30T18:09:11.896Z",
+    "durationMs": 59347,
+    "taskPreview": "Write unit tests for the order webhooks in src/webhooks/orders.ts. Cover the edge cases and run them until they pass.",
+    "trigger": "subagent",
+    "outcome": {
+     "label": "success",
+     "score": 0.95,
+     "source": "heuristic",
+     "heuristicLabel": "success",
+     "signals": [
+      {
+       "id": "tests_passed_after_last_edit",
+       "fired": true,
+       "weight": 0.35,
+       "detail": "`pnpm test -- src/webhooks/orders.test.ts` passed at step 11, after last edit at step 8."
+      },
+      {
+       "id": "tests_failing_at_end",
+       "fired": false,
+       "weight": -0.35,
+       "detail": "Last test command `pnpm test -- src/webhooks/orders.test.ts` passed at step 11."
+      },
+      {
+       "id": "clean_finish",
+       "fired": true,
+       "weight": 0.1,
+       "detail": "Final assistant message ended with end_turn."
+      },
+      {
+       "id": "errors_in_tail",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "No unrecovered error in the last 5 steps."
+      },
+      {
+       "id": "user_retried",
+       "fired": null,
+       "weight": -0.3,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "user_moved_on",
+       "fired": null,
+       "weight": 0.1,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "shipped",
+       "fired": false,
+       "weight": 0.1,
+       "detail": "No git commit, git push, or gh pr create in this run."
+      },
+      {
+       "id": "parent_respawned",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "Parent did not respawn test-writer with a similar prompt."
+      }
+     ]
+    },
+    "totalTokens": 57282,
+    "costUsd": 0.0294668,
+    "costEstimated": false,
+    "model": "claude-sonnet-5-5",
+    "toolCallCount": 4,
+    "errorCount": 0,
+    "childCount": 0
+   },
+   {
+    "runId": "run_496ab811c25d8550",
+    "startedAt": "2026-09-28T19:42:37.509Z",
+    "durationMs": 53168,
+    "taskPreview": "Write unit tests for the cart totals in src/cart/totals.ts. Cover the edge cases and run them until they pass.",
+    "trigger": "subagent",
+    "outcome": {
+     "label": "success",
+     "score": 0.95,
+     "source": "heuristic",
+     "heuristicLabel": "success",
+     "signals": [
+      {
+       "id": "tests_passed_after_last_edit",
+       "fired": true,
+       "weight": 0.35,
+       "detail": "`pnpm test -- src/cart/totals.test.ts` passed at step 11, after last edit at step 8."
+      },
+      {
+       "id": "tests_failing_at_end",
+       "fired": false,
+       "weight": -0.35,
+       "detail": "Last test command `pnpm test -- src/cart/totals.test.ts` passed at step 11."
+      },
+      {
+       "id": "clean_finish",
+       "fired": true,
+       "weight": 0.1,
+       "detail": "Final assistant message ended with end_turn."
+      },
+      {
+       "id": "errors_in_tail",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "No unrecovered error in the last 5 steps."
+      },
+      {
+       "id": "user_retried",
+       "fired": null,
+       "weight": -0.3,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "user_moved_on",
+       "fired": null,
+       "weight": 0.1,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "shipped",
+       "fired": false,
+       "weight": 0.1,
+       "detail": "No git commit, git push, or gh pr create in this run."
+      },
+      {
+       "id": "parent_respawned",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "Parent did not respawn test-writer with a similar prompt."
+      }
+     ]
+    },
+    "totalTokens": 61959,
+    "costUsd": 0.0340566,
+    "costEstimated": false,
+    "model": "claude-sonnet-5-5",
+    "toolCallCount": 4,
+    "errorCount": 0,
+    "childCount": 0
+   },
+   {
+    "runId": "run_83dd6e17e4ccdac7",
+    "startedAt": "2026-09-28T18:27:42.352Z",
+    "durationMs": 51416,
+    "taskPreview": "Write unit tests for the inventory sync in src/inventory/sync.ts. Cover the edge cases and run them until they pass.",
+    "trigger": "subagent",
+    "outcome": {
+     "label": "success",
+     "score": 0.95,
+     "source": "heuristic",
+     "heuristicLabel": "success",
+     "signals": [
+      {
+       "id": "tests_passed_after_last_edit",
+       "fired": true,
+       "weight": 0.35,
+       "detail": "`pnpm test -- src/inventory/sync.test.ts` passed at step 12, after last edit at step 8."
+      },
+      {
+       "id": "tests_failing_at_end",
+       "fired": false,
+       "weight": -0.35,
+       "detail": "Last test command `pnpm test -- src/inventory/sync.test.ts` passed at step 12."
+      },
+      {
+       "id": "clean_finish",
+       "fired": true,
+       "weight": 0.1,
+       "detail": "Final assistant message ended with end_turn."
+      },
+      {
+       "id": "errors_in_tail",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "No unrecovered error in the last 5 steps."
+      },
+      {
+       "id": "user_retried",
+       "fired": null,
+       "weight": -0.3,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "user_moved_on",
+       "fired": null,
+       "weight": 0.1,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "shipped",
+       "fired": false,
+       "weight": 0.1,
+       "detail": "No git commit, git push, or gh pr create in this run."
+      },
+      {
+       "id": "parent_respawned",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "Parent did not respawn test-writer with a similar prompt."
+      }
+     ]
+    },
+    "totalTokens": 66444,
+    "costUsd": 0.042804,
+    "costEstimated": false,
+    "model": "claude-sonnet-5-5",
+    "toolCallCount": 4,
+    "errorCount": 0,
+    "childCount": 0
+   },
+   {
+    "runId": "run_f4ba2d23280efd17",
+    "startedAt": "2026-09-25T15:25:38.956Z",
+    "durationMs": 86455,
+    "taskPreview": "Write unit tests for the order webhooks in src/webhooks/orders.ts. Cover the edge cases and run them until they pass.",
+    "trigger": "subagent",
+    "outcome": {
+     "label": "success",
+     "score": 0.95,
+     "source": "heuristic",
+     "heuristicLabel": "success",
+     "signals": [
+      {
+       "id": "tests_passed_after_last_edit",
+       "fired": true,
+       "weight": 0.35,
+       "detail": "`pnpm test -- src/webhooks/orders.test.ts` passed at step 11, after last edit at step 8."
+      },
+      {
+       "id": "tests_failing_at_end",
+       "fired": false,
+       "weight": -0.35,
+       "detail": "Last test command `pnpm test -- src/webhooks/orders.test.ts` passed at step 11."
+      },
+      {
+       "id": "clean_finish",
+       "fired": true,
+       "weight": 0.1,
+       "detail": "Final assistant message ended with end_turn."
+      },
+      {
+       "id": "errors_in_tail",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "No unrecovered error in the last 5 steps."
+      },
+      {
+       "id": "user_retried",
+       "fired": null,
+       "weight": -0.3,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "user_moved_on",
+       "fired": null,
+       "weight": 0.1,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "shipped",
+       "fired": false,
+       "weight": 0.1,
+       "detail": "No git commit, git push, or gh pr create in this run."
+      },
+      {
+       "id": "parent_respawned",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "Parent did not respawn test-writer with a similar prompt."
+      }
+     ]
+    },
+    "totalTokens": 59918,
+    "costUsd": 0.031323800000000006,
+    "costEstimated": false,
+    "model": "claude-sonnet-5-5",
+    "toolCallCount": 4,
+    "errorCount": 0,
+    "childCount": 0
+   },
+   {
+    "runId": "run_28f38fa9edcaf26b",
+    "startedAt": "2026-09-22T20:41:15.665Z",
+    "durationMs": 95527,
+    "taskPreview": "Write unit tests for the auth middleware in src/middleware/auth.ts. Cover the edge cases and run them until they pass.",
+    "trigger": "subagent",
+    "outcome": {
+     "label": "success",
+     "score": 0.95,
+     "source": "heuristic",
+     "heuristicLabel": "success",
+     "signals": [
+      {
+       "id": "tests_passed_after_last_edit",
+       "fired": true,
+       "weight": 0.35,
+       "detail": "`pnpm test -- src/middleware/auth.test.ts` passed at step 17, after last edit at step 14."
+      },
+      {
+       "id": "tests_failing_at_end",
+       "fired": false,
+       "weight": -0.35,
+       "detail": "Last test command `pnpm test -- src/middleware/auth.test.ts` passed at step 17."
+      },
+      {
+       "id": "clean_finish",
+       "fired": true,
+       "weight": 0.1,
+       "detail": "Final assistant message ended with end_turn."
+      },
+      {
+       "id": "errors_in_tail",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "No unrecovered error in the last 5 steps."
+      },
+      {
+       "id": "user_retried",
+       "fired": null,
+       "weight": -0.3,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "user_moved_on",
+       "fired": null,
+       "weight": 0.1,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "shipped",
+       "fired": false,
+       "weight": 0.1,
+       "detail": "No git commit, git push, or gh pr create in this run."
+      },
+      {
+       "id": "parent_respawned",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "Parent did not respawn test-writer with a similar prompt."
+      }
+     ]
+    },
+    "totalTokens": 86560,
+    "costUsd": 0.0530348,
+    "costEstimated": false,
+    "model": "claude-sonnet-5-5",
+    "toolCallCount": 6,
+    "errorCount": 1,
+    "childCount": 0
+   }
+  ]
+ },
+ "to": {
+  "bed": {
+   "id": "fam_e4f77dae0177d5e5",
+   "name": "legacy-monolith",
+   "soil": {
+    "model": "claude-opus-5-5",
+    "effort": "xhigh",
+    "toolCount": 12,
+    "mcpCount": 8,
+    "hookCount": 1,
+    "instructionBytes": 31948
+   },
+   "currentHarnessVersionId": "hv_ef9c336bb430210c",
+   "seasonCount": 1,
+   "plantIds": [
+    "plt_74f6b9c8234e6f8e",
+    "plt_9bf3ced2ad883242",
+    "plt_8143e4aa8474a2c2",
+    "plt_88d143cd7476c408",
+    "plt_0afdf741a0daed53"
+   ]
+  },
+  "plant": {
+   "id": "plt_0afdf741a0daed53",
+   "agentId": "agt_c02389e440c4e177",
+   "agentKind": "subagent",
+   "bedId": "fam_e4f77dae0177d5e5",
+   "name": "test-writer",
+   "runs": 102,
+   "success": {
+    "value": 0.2647058823529412,
+    "n": 102,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.188762815237447,
+     0.3577293012838453
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0.875,
+   "costPerRunUsd": 0.13485789999999998,
+   "totalCostUsd": 14.985717599999994,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-09-28T13:50:31.984Z",
+   "staleDays": 2,
+   "skillIds": []
+  },
+  "harness": {
+   "versionId": "hv_a2dff7ab0006a3f0",
+   "validFrom": "2026-07-03T14:57:23.572Z",
+   "provenance": "git",
+   "model": "claude-opus-5-5",
+   "effort": "xhigh",
+   "instructionBytes": 31948,
+   "toolCount": 0,
+   "tools": [],
+   "mcpServers": [
+    "browser",
+    "confluence",
+    "datadog",
+    "github",
+    "jira",
+    "mysql-legacy",
+    "sentry",
+    "slack"
+   ],
+   "skillCount": 5,
+   "hookCount": 1,
+   "commitMessage": "Initial commit",
+   "changes": []
+  },
+  "recent": [
+   {
+    "runId": "run_1b1209c5f6183de0",
+    "startedAt": "2026-09-28T13:50:31.984Z",
+    "durationMs": 119471,
+    "taskPreview": "Write unit tests for the email templates in lib/mailer/templates.js. Cover the edge cases and run them until they pass.",
+    "trigger": "subagent",
+    "outcome": {
+     "label": "failure",
+     "score": 0.05,
+     "source": "heuristic",
+     "heuristicLabel": "failure",
+     "signals": [
+      {
+       "id": "tests_passed_after_last_edit",
+       "fired": false,
+       "weight": 0.35,
+       "detail": "No test command after the last edit at step 18 returned without error (1 tried)."
+      },
+      {
+       "id": "tests_failing_at_end",
+       "fired": true,
+       "weight": -0.35,
+       "detail": "Last test command `npm test -- test/mailer/templates.test.js` returned an error at step 21."
+      },
+      {
+       "id": "clean_finish",
+       "fired": true,
+       "weight": 0.1,
+       "detail": "Final assistant message ended with end_turn."
+      },
+      {
+       "id": "errors_in_tail",
+       "fired": true,
+       "weight": -0.2,
+       "detail": "Edit error at step 19: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+      },
+      {
+       "id": "user_retried",
+       "fired": null,
+       "weight": -0.3,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "user_moved_on",
+       "fired": null,
+       "weight": 0.1,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "shipped",
+       "fired": false,
+       "weight": 0.1,
+       "detail": "No git commit, git push, or gh pr create in this run."
+      },
+      {
+       "id": "parent_respawned",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "Parent did not respawn test-writer with a similar prompt."
+      }
+     ]
+    },
+    "totalTokens": 208126,
+    "costUsd": 0.137433,
+    "costEstimated": false,
+    "model": "claude-opus-5-5",
+    "toolCallCount": 8,
+    "errorCount": 3,
+    "childCount": 0
+   },
+   {
+    "runId": "run_7362aa2834f35447",
+    "startedAt": "2026-09-28T13:45:02.032Z",
+    "durationMs": 124711,
+    "taskPreview": "Write unit tests for the email templates in lib/mailer/templates.js. Cover the edge cases and run them until they pass.",
+    "trigger": "subagent",
+    "outcome": {
+     "label": "failure",
+     "score": 0.05,
+     "source": "heuristic",
+     "heuristicLabel": "failure",
+     "signals": [
+      {
+       "id": "tests_passed_after_last_edit",
+       "fired": false,
+       "weight": 0.35,
+       "detail": "No test command after the last edit at step 17 returned without error (1 tried)."
+      },
+      {
+       "id": "tests_failing_at_end",
+       "fired": true,
+       "weight": -0.35,
+       "detail": "Last test command `npm test -- test/mailer/templates.test.js` returned an error at step 23."
+      },
+      {
+       "id": "clean_finish",
+       "fired": true,
+       "weight": 0.1,
+       "detail": "Final assistant message ended with end_turn."
+      },
+      {
+       "id": "errors_in_tail",
+       "fired": true,
+       "weight": -0.2,
+       "detail": "Bash error at step 21: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+      },
+      {
+       "id": "user_retried",
+       "fired": null,
+       "weight": -0.3,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "user_moved_on",
+       "fired": null,
+       "weight": 0.1,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "shipped",
+       "fired": false,
+       "weight": 0.1,
+       "detail": "No git commit, git push, or gh pr create in this run."
+      },
+      {
+       "id": "parent_respawned",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "Parent did not respawn test-writer with a similar prompt."
+      }
+     ]
+    },
+    "totalTokens": 188667,
+    "costUsd": 0.111885,
+    "costEstimated": false,
+    "model": "claude-opus-5-5",
+    "toolCallCount": 8,
+    "errorCount": 3,
+    "childCount": 0
+   },
+   {
+    "runId": "run_29a0de1db7501930",
+    "startedAt": "2026-09-28T13:39:07.867Z",
+    "durationMs": 164697,
+    "taskPreview": "Write unit tests for the email templates in lib/mailer/templates.js. Cover the edge cases and run them until they pass.",
+    "trigger": "subagent",
+    "outcome": {
+     "label": "failure",
+     "score": 0.05,
+     "source": "heuristic",
+     "heuristicLabel": "failure",
+     "signals": [
+      {
+       "id": "tests_passed_after_last_edit",
+       "fired": false,
+       "weight": 0.35,
+       "detail": "No test command after the last edit at step 17 returned without error (1 tried)."
+      },
+      {
+       "id": "tests_failing_at_end",
+       "fired": true,
+       "weight": -0.35,
+       "detail": "Last test command `npm test -- test/mailer/templates.test.js` returned an error at step 22."
+      },
+      {
+       "id": "clean_finish",
+       "fired": true,
+       "weight": 0.1,
+       "detail": "Final assistant message ended with end_turn."
+      },
+      {
+       "id": "errors_in_tail",
+       "fired": true,
+       "weight": -0.2,
+       "detail": "Bash error at step 20: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+      },
+      {
+       "id": "user_retried",
+       "fired": null,
+       "weight": -0.3,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "user_moved_on",
+       "fired": null,
+       "weight": 0.1,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "shipped",
+       "fired": false,
+       "weight": 0.1,
+       "detail": "No git commit, git push, or gh pr create in this run."
+      },
+      {
+       "id": "parent_respawned",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "Parent did not respawn test-writer with a similar prompt."
+      }
+     ]
+    },
+    "totalTokens": 204487,
+    "costUsd": 0.13400220000000002,
+    "costEstimated": false,
+    "model": "claude-opus-5-5",
+    "toolCallCount": 8,
+    "errorCount": 3,
+    "childCount": 0
+   },
+   {
+    "runId": "run_18ffe7920e3f1c73",
+    "startedAt": "2026-09-25T15:05:05.736Z",
+    "durationMs": 117998,
+    "taskPreview": "Write unit tests for the order import in lib/orders/import.js. Cover the edge cases and run them until they pass.",
+    "trigger": "subagent",
+    "outcome": {
+     "label": "failure",
+     "score": 0.05,
+     "source": "heuristic",
+     "heuristicLabel": "failure",
+     "signals": [
+      {
+       "id": "tests_passed_after_last_edit",
+       "fired": false,
+       "weight": 0.35,
+       "detail": "No test command after the last edit at step 15 returned without error (1 tried)."
+      },
+      {
+       "id": "tests_failing_at_end",
+       "fired": true,
+       "weight": -0.35,
+       "detail": "Last test command `npm test -- test/orders/import.test.js` returned an error at step 21."
+      },
+      {
+       "id": "clean_finish",
+       "fired": true,
+       "weight": 0.1,
+       "detail": "Final assistant message ended with end_turn."
+      },
+      {
+       "id": "errors_in_tail",
+       "fired": true,
+       "weight": -0.2,
+       "detail": "Bash error at step 19: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+      },
+      {
+       "id": "user_retried",
+       "fired": null,
+       "weight": -0.3,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "user_moved_on",
+       "fired": null,
+       "weight": 0.1,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "shipped",
+       "fired": false,
+       "weight": 0.1,
+       "detail": "No git commit, git push, or gh pr create in this run."
+      },
+      {
+       "id": "parent_respawned",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "Parent did not respawn test-writer with a similar prompt."
+      }
+     ]
+    },
+    "totalTokens": 202103,
+    "costUsd": 0.1323522,
+    "costEstimated": false,
+    "model": "claude-opus-5-5",
+    "toolCallCount": 8,
+    "errorCount": 3,
+    "childCount": 0
+   },
+   {
+    "runId": "run_ef6dab420092e733",
+    "startedAt": "2026-09-23T13:06:15.445Z",
+    "durationMs": 105027,
+    "taskPreview": "Write unit tests for the session handling in lib/auth/session.js. Cover the edge cases and run them until they pass.",
+    "trigger": "subagent",
+    "outcome": {
+     "label": "failure",
+     "score": 0.05,
+     "source": "heuristic",
+     "heuristicLabel": "failure",
+     "signals": [
+      {
+       "id": "tests_passed_after_last_edit",
+       "fired": false,
+       "weight": 0.35,
+       "detail": "No test command after the last edit at step 18 returned without error (1 tried)."
+      },
+      {
+       "id": "tests_failing_at_end",
+       "fired": true,
+       "weight": -0.35,
+       "detail": "Last test command `npm test -- test/auth/session.test.js` returned an error at step 25."
+      },
+      {
+       "id": "clean_finish",
+       "fired": true,
+       "weight": 0.1,
+       "detail": "Final assistant message ended with end_turn."
+      },
+      {
+       "id": "errors_in_tail",
+       "fired": true,
+       "weight": -0.2,
+       "detail": "Bash error at step 22: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+      },
+      {
+       "id": "user_retried",
+       "fired": null,
+       "weight": -0.3,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "user_moved_on",
+       "fired": null,
+       "weight": 0.1,
+       "detail": "Applies to main runs only; this is a subagent run."
+      },
+      {
+       "id": "shipped",
+       "fired": false,
+       "weight": 0.1,
+       "detail": "No git commit, git push, or gh pr create in this run."
+      },
+      {
+       "id": "parent_respawned",
+       "fired": false,
+       "weight": -0.2,
+       "detail": "Parent did not respawn test-writer with a similar prompt."
+      }
+     ]
+    },
+    "totalTokens": 347796,
+    "costUsd": 0.2716944,
+    "costEstimated": false,
+    "model": "claude-opus-5-5",
+    "toolCallCount": 8,
+    "errorCount": 3,
+    "childCount": 0
+   }
+  ]
+ },
+ "harnessDiff": {
+  "toolsAdded": [],
+  "toolsRemoved": [],
+  "skillsAdded": [],
+  "skillsRemoved": [
+   "skl_c2c4fb0252e0766a"
+  ],
+  "mcpAdded": [
+   "browser",
+   "confluence",
+   "datadog",
+   "jira",
+   "mysql-legacy",
+   "sentry",
+   "slack"
+  ],
+  "mcpRemoved": [],
+  "hooksChanged": true,
+  "settingsChanged": true,
+  "instructionBytesDelta": 30089,
+  "modelChanged": {
+   "from": "claude-sonnet-5-5",
+   "to": "claude-opus-5-5"
+  },
+  "effortChanged": {
+   "from": "high",
+   "to": "xhigh"
+  },
+  "permissionModeChanged": {
+   "from": "acceptEdits"
+  }
+ },
+ "harnessChanges": [
+  "model claude-sonnet-5-5 → claude-opus-5-5",
+  "effort high → xhigh",
+  "permissions acceptEdits → ∅",
+  "instructions +30,089 bytes",
+  "hooks changed",
+  "settings changed",
+  "skills +0 −1",
+  "MCP +browser, +confluence, +datadog, +jira, +mysql-legacy, +sentry, +slack −0"
+ ],
+ "success": {
+  "delta": -0.6519607843137254,
+  "separated": true
+ },
+ "costRatio": 3.067744617543923,
+ "signals": [
+  {
+   "id": "tests_passed_after_last_edit",
+   "weight": 0.35,
+   "fromShare": 0.9166666666666666,
+   "toShare": 0.2647058823529412
+  },
+  {
+   "id": "tests_failing_at_end",
+   "weight": -0.35,
+   "fromShare": 0.08333333333333333,
+   "toShare": 0.7352941176470589
+  },
+  {
+   "id": "clean_finish",
+   "weight": 0.1,
+   "fromShare": 1,
+   "toShare": 1
+  },
+  {
+   "id": "errors_in_tail",
+   "weight": -0.2,
+   "fromShare": 0.08333333333333333,
+   "toShare": 0.7352941176470589
+  },
+  {
+   "id": "user_retried",
+   "weight": -0.3,
+   "fromShare": null,
+   "toShare": null
+  },
+  {
+   "id": "user_moved_on",
+   "weight": 0.1,
+   "fromShare": null,
+   "toShare": null
+  },
+  {
+   "id": "shipped",
+   "weight": 0.1,
+   "fromShare": 0,
+   "toShare": 0
+  },
+  {
+   "id": "parent_respawned",
+   "weight": -0.2,
+   "fromShare": 0,
+   "toShare": 0.28431372549019607
+  }
+ ],
+ "caveat": "Correlation, not causation: the two sides may have handled different kinds of tasks. Compare the recent tasks before concluding the harness made the difference."
+}

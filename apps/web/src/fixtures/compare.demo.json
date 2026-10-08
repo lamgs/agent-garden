@@ -1,0 +1,609 @@
+{
+ "left": {
+  "bed": {
+   "id": "fam_77320afbea5626a6",
+   "name": "shop-api",
+   "soil": {
+    "model": "claude-sonnet-5-5",
+    "effort": "high",
+    "permissionMode": "acceptEdits",
+    "toolCount": 12,
+    "mcpCount": 1,
+    "hookCount": 2,
+    "instructionBytes": 1859
+   },
+   "currentHarnessVersionId": "hv_6cfb7b6d5f2474ff",
+   "seasonCount": 2,
+   "plantIds": [
+    "plt_ff3cf3eb8c753cda",
+    "plt_81ec76c7104d4e0b",
+    "plt_33d5665ce1f3aa59",
+    "plt_5f39547dea82bd11"
+   ]
+  },
+  "plants": [
+   {
+    "id": "plt_ff3cf3eb8c753cda",
+    "agentId": "agt_0d6e4079e36703eb",
+    "agentKind": "main",
+    "bedId": "fam_77320afbea5626a6",
+    "name": "main",
+    "runs": 534,
+    "success": {
+     "value": 0.7105769230769231,
+     "n": 520,
+     "nUnknown": 14,
+     "nManual": 0,
+     "ci95": [
+      0.6701665248522026,
+      0.7478987834394641
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0.06666666666666667,
+    "costPerRunUsd": 0.0694905,
+    "totalCostUsd": 35.773481200000006,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-10-01T02:08:14.058Z",
+    "staleDays": 0,
+    "skillIds": [
+     "skl_18d8be0c880ea784",
+     "skl_c2c4fb0252e0766a",
+     "skl_fe901e85872e182d"
+    ]
+   },
+   {
+    "id": "plt_81ec76c7104d4e0b",
+    "agentId": "agt_e08ba693bb6ad36a",
+    "agentKind": "subagent",
+    "bedId": "fam_77320afbea5626a6",
+    "name": "code-reviewer",
+    "runs": 45,
+    "success": {
+     "value": 0.5,
+     "n": 45,
+     "nUnknown": 0,
+     "nManual": 0,
+     "ci95": [
+      0.3597731641761813,
+      0.6402268358238187
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0,
+    "costPerRunUsd": 0.0251193,
+    "totalCostUsd": 1.1589897,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-09-24T14:11:04.729Z",
+    "staleDays": 6,
+    "skillIds": []
+   },
+   {
+    "id": "plt_33d5665ce1f3aa59",
+    "agentId": "agt_3b73900b8d29f963",
+    "agentKind": "subagent",
+    "bedId": "fam_77320afbea5626a6",
+    "name": "Explore",
+    "runs": 36,
+    "success": {
+     "value": 0.5,
+     "n": 36,
+     "nUnknown": 0,
+     "nManual": 0,
+     "ci95": [
+      0.34474067624730526,
+      0.6552593237526947
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0,
+    "costPerRunUsd": 0.001291215,
+    "totalCostUsd": 0.04869140500000001,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-09-29T13:10:10.762Z",
+    "staleDays": 1,
+    "skillIds": []
+   },
+   {
+    "id": "plt_5f39547dea82bd11",
+    "agentId": "agt_c02389e440c4e177",
+    "agentKind": "subagent",
+    "bedId": "fam_77320afbea5626a6",
+    "name": "test-writer",
+    "runs": 108,
+    "success": {
+     "value": 0.9166666666666666,
+     "n": 108,
+     "nUnknown": 0,
+     "nManual": 0,
+     "ci95": [
+      0.8491694181597665,
+      0.9555400995867606
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0.08333333333333333,
+    "costPerRunUsd": 0.04395995,
+    "totalCostUsd": 5.087738099999998,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-09-30T18:09:11.896Z",
+    "staleDays": 0,
+    "skillIds": []
+   }
+  ],
+  "harness": {
+   "versionId": "hv_6cfb7b6d5f2474ff",
+   "validFrom": "2026-08-17T19:20:58.088Z",
+   "provenance": "git",
+   "model": "claude-sonnet-5-5",
+   "effort": "high",
+   "permissionMode": "acceptEdits",
+   "instructionBytes": 1859,
+   "toolCount": 12,
+   "tools": [
+    "Agent",
+    "Bash",
+    "Edit",
+    "Glob",
+    "Grep",
+    "NotebookEdit",
+    "Read",
+    "Skill",
+    "TodoWrite",
+    "WebFetch",
+    "WebSearch",
+    "Write"
+   ],
+   "mcpServers": [
+    "github"
+   ],
+   "skillCount": 6,
+   "hookCount": 2,
+   "commitMessage": "Tighten CLAUDE.md and add test hook",
+   "changes": [
+    "permissions ∅ → acceptEdits",
+    "instructions −10,581 bytes",
+    "hooks changed"
+   ]
+  }
+ },
+ "right": {
+  "bed": {
+   "id": "fam_e4f77dae0177d5e5",
+   "name": "legacy-monolith",
+   "soil": {
+    "model": "claude-opus-5-5",
+    "effort": "xhigh",
+    "toolCount": 12,
+    "mcpCount": 8,
+    "hookCount": 1,
+    "instructionBytes": 31948
+   },
+   "currentHarnessVersionId": "hv_ef9c336bb430210c",
+   "seasonCount": 1,
+   "plantIds": [
+    "plt_74f6b9c8234e6f8e",
+    "plt_9bf3ced2ad883242",
+    "plt_8143e4aa8474a2c2",
+    "plt_88d143cd7476c408",
+    "plt_0afdf741a0daed53"
+   ]
+  },
+  "plants": [
+   {
+    "id": "plt_74f6b9c8234e6f8e",
+    "agentId": "agt_0d6e4079e36703eb",
+    "agentKind": "main",
+    "bedId": "fam_e4f77dae0177d5e5",
+    "name": "main",
+    "runs": 295,
+    "success": {
+     "value": 0.4753521126760563,
+     "n": 284,
+     "nUnknown": 11,
+     "nManual": 0,
+     "ci95": [
+      0.41798741719937726,
+      0.5333747208654473
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0.391304347826087,
+    "costPerRunUsd": 0.1410844,
+    "totalCostUsd": 42.51580219999999,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-09-30T20:45:07.114Z",
+    "staleDays": 0,
+    "skillIds": []
+   },
+   {
+    "id": "plt_9bf3ced2ad883242",
+    "agentId": "agt_3b73900b8d29f963",
+    "agentKind": "subagent",
+    "bedId": "fam_e4f77dae0177d5e5",
+    "name": "Explore",
+    "runs": 41,
+    "success": {
+     "value": 0.5,
+     "n": 41,
+     "nUnknown": 0,
+     "nManual": 0,
+     "ci95": [
+      0.35365242667803864,
+      0.6463475733219614
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0,
+    "costPerRunUsd": 0.0019822999999999998,
+    "totalCostUsd": 0.09052048,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-09-30T20:42:17.585Z",
+    "staleDays": 0,
+    "skillIds": []
+   },
+   {
+    "id": "plt_8143e4aa8474a2c2",
+    "agentId": "agt_ad89bb82d011832a",
+    "agentKind": "subagent",
+    "bedId": "fam_e4f77dae0177d5e5",
+    "name": "legacy-archaeologist",
+    "runs": 30,
+    "success": {
+     "value": 0.5,
+     "n": 30,
+     "nUnknown": 0,
+     "nManual": 0,
+     "ci95": [
+      0.33153851227173764,
+      0.6684614877282624
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0,
+    "costPerRunUsd": 0.069158,
+    "totalCostUsd": 2.164294,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-09-28T13:34:45.474Z",
+    "staleDays": 2,
+    "skillIds": []
+   },
+   {
+    "id": "plt_88d143cd7476c408",
+    "agentId": "agt_fa8ed0bdabdd6bcb",
+    "agentKind": "subagent",
+    "bedId": "fam_e4f77dae0177d5e5",
+    "name": "Plan",
+    "runs": 12,
+    "success": {
+     "value": 0.5,
+     "n": 12,
+     "nUnknown": 0,
+     "nManual": 0,
+     "ci95": [
+      0.2537781703934222,
+      0.7462218296065778
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0,
+    "costPerRunUsd": 0.0629961,
+    "totalCostUsd": 0.7669914,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-09-26T16:16:13.726Z",
+    "staleDays": 4,
+    "skillIds": []
+   },
+   {
+    "id": "plt_0afdf741a0daed53",
+    "agentId": "agt_c02389e440c4e177",
+    "agentKind": "subagent",
+    "bedId": "fam_e4f77dae0177d5e5",
+    "name": "test-writer",
+    "runs": 102,
+    "success": {
+     "value": 0.2647058823529412,
+     "n": 102,
+     "nUnknown": 0,
+     "nManual": 0,
+     "ci95": [
+      0.188762815237447,
+      0.3577293012838453
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0.875,
+    "costPerRunUsd": 0.13485789999999998,
+    "totalCostUsd": 14.985717599999994,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-09-28T13:50:31.984Z",
+    "staleDays": 2,
+    "skillIds": []
+   }
+  ],
+  "harness": {
+   "versionId": "hv_ef9c336bb430210c",
+   "validFrom": "2026-07-03T14:56:22.075Z",
+   "provenance": "git",
+   "model": "claude-opus-5-5",
+   "effort": "xhigh",
+   "instructionBytes": 31948,
+   "toolCount": 12,
+   "tools": [
+    "Agent",
+    "Bash",
+    "Edit",
+    "Glob",
+    "Grep",
+    "NotebookEdit",
+    "Read",
+    "Skill",
+    "TodoWrite",
+    "WebFetch",
+    "WebSearch",
+    "Write"
+   ],
+   "mcpServers": [
+    "browser",
+    "confluence",
+    "datadog",
+    "github",
+    "jira",
+    "mysql-legacy",
+    "sentry",
+    "slack"
+   ],
+   "skillCount": 5,
+   "hookCount": 1,
+   "commitMessage": "Initial commit",
+   "changes": []
+  }
+ },
+ "harnessDiff": {
+  "toolsAdded": [],
+  "toolsRemoved": [],
+  "skillsAdded": [],
+  "skillsRemoved": [
+   "skl_c2c4fb0252e0766a"
+  ],
+  "mcpAdded": [
+   "browser",
+   "confluence",
+   "datadog",
+   "jira",
+   "mysql-legacy",
+   "sentry",
+   "slack"
+  ],
+  "mcpRemoved": [],
+  "hooksChanged": true,
+  "settingsChanged": true,
+  "instructionBytesDelta": 30089,
+  "modelChanged": {
+   "from": "claude-sonnet-5-5",
+   "to": "claude-opus-5-5"
+  },
+  "effortChanged": {
+   "from": "high",
+   "to": "xhigh"
+  },
+  "permissionModeChanged": {
+   "from": "acceptEdits"
+  }
+ },
+ "harnessChanges": [
+  "model claude-sonnet-5-5 → claude-opus-5-5",
+  "effort high → xhigh",
+  "permissions acceptEdits → ∅",
+  "instructions +30,089 bytes",
+  "hooks changed",
+  "settings changed",
+  "skills +0 −1",
+  "MCP +browser, +confluence, +datadog, +jira, +mysql-legacy, +sentry, +slack −0"
+ ],
+ "sharedAgents": [
+  {
+   "agentId": "agt_0d6e4079e36703eb",
+   "name": "main",
+   "left": {
+    "id": "plt_ff3cf3eb8c753cda",
+    "agentId": "agt_0d6e4079e36703eb",
+    "agentKind": "main",
+    "bedId": "fam_77320afbea5626a6",
+    "name": "main",
+    "runs": 534,
+    "success": {
+     "value": 0.7105769230769231,
+     "n": 520,
+     "nUnknown": 14,
+     "nManual": 0,
+     "ci95": [
+      0.6701665248522026,
+      0.7478987834394641
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0.06666666666666667,
+    "costPerRunUsd": 0.0694905,
+    "totalCostUsd": 35.773481200000006,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-10-01T02:08:14.058Z",
+    "staleDays": 0,
+    "skillIds": [
+     "skl_18d8be0c880ea784",
+     "skl_c2c4fb0252e0766a",
+     "skl_fe901e85872e182d"
+    ]
+   },
+   "right": {
+    "id": "plt_74f6b9c8234e6f8e",
+    "agentId": "agt_0d6e4079e36703eb",
+    "agentKind": "main",
+    "bedId": "fam_e4f77dae0177d5e5",
+    "name": "main",
+    "runs": 295,
+    "success": {
+     "value": 0.4753521126760563,
+     "n": 284,
+     "nUnknown": 11,
+     "nManual": 0,
+     "ci95": [
+      0.41798741719937726,
+      0.5333747208654473
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0.391304347826087,
+    "costPerRunUsd": 0.1410844,
+    "totalCostUsd": 42.51580219999999,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-09-30T20:45:07.114Z",
+    "staleDays": 0,
+    "skillIds": []
+   },
+   "success": {
+    "delta": -0.2352248104008668,
+    "separated": true
+   },
+   "costRatio": 2.0302688856750204
+  },
+  {
+   "agentId": "agt_3b73900b8d29f963",
+   "name": "Explore",
+   "left": {
+    "id": "plt_33d5665ce1f3aa59",
+    "agentId": "agt_3b73900b8d29f963",
+    "agentKind": "subagent",
+    "bedId": "fam_77320afbea5626a6",
+    "name": "Explore",
+    "runs": 36,
+    "success": {
+     "value": 0.5,
+     "n": 36,
+     "nUnknown": 0,
+     "nManual": 0,
+     "ci95": [
+      0.34474067624730526,
+      0.6552593237526947
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0,
+    "costPerRunUsd": 0.001291215,
+    "totalCostUsd": 0.04869140500000001,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-09-29T13:10:10.762Z",
+    "staleDays": 1,
+    "skillIds": []
+   },
+   "right": {
+    "id": "plt_9bf3ced2ad883242",
+    "agentId": "agt_3b73900b8d29f963",
+    "agentKind": "subagent",
+    "bedId": "fam_e4f77dae0177d5e5",
+    "name": "Explore",
+    "runs": 41,
+    "success": {
+     "value": 0.5,
+     "n": 41,
+     "nUnknown": 0,
+     "nManual": 0,
+     "ci95": [
+      0.35365242667803864,
+      0.6463475733219614
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0,
+    "costPerRunUsd": 0.0019822999999999998,
+    "totalCostUsd": 0.09052048,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-09-30T20:42:17.585Z",
+    "staleDays": 0,
+    "skillIds": []
+   },
+   "success": {
+    "delta": 0,
+    "separated": false
+   },
+   "costRatio": 1.5352207029813003
+  },
+  {
+   "agentId": "agt_c02389e440c4e177",
+   "name": "test-writer",
+   "left": {
+    "id": "plt_5f39547dea82bd11",
+    "agentId": "agt_c02389e440c4e177",
+    "agentKind": "subagent",
+    "bedId": "fam_77320afbea5626a6",
+    "name": "test-writer",
+    "runs": 108,
+    "success": {
+     "value": 0.9166666666666666,
+     "n": 108,
+     "nUnknown": 0,
+     "nManual": 0,
+     "ci95": [
+      0.8491694181597665,
+      0.9555400995867606
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0.08333333333333333,
+    "costPerRunUsd": 0.04395995,
+    "totalCostUsd": 5.087738099999998,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-09-30T18:09:11.896Z",
+    "staleDays": 0,
+    "skillIds": []
+   },
+   "right": {
+    "id": "plt_0afdf741a0daed53",
+    "agentId": "agt_c02389e440c4e177",
+    "agentKind": "subagent",
+    "bedId": "fam_e4f77dae0177d5e5",
+    "name": "test-writer",
+    "runs": 102,
+    "success": {
+     "value": 0.2647058823529412,
+     "n": 102,
+     "nUnknown": 0,
+     "nManual": 0,
+     "ci95": [
+      0.188762815237447,
+      0.3577293012838453
+     ],
+     "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+    },
+    "recentFailureShare": 0.875,
+    "costPerRunUsd": 0.13485789999999998,
+    "totalCostUsd": 14.985717599999994,
+    "costEstimated": false,
+    "unpricedRuns": 0,
+    "lastRunAt": "2026-09-28T13:50:31.984Z",
+    "staleDays": 2,
+    "skillIds": []
+   },
+   "success": {
+    "delta": -0.6519607843137254,
+    "separated": true
+   },
+   "costRatio": 3.067744617543923
+  }
+ ],
+ "caveat": "Correlation, not causation: the two sides may have handled different kinds of tasks. Compare the recent tasks before concluding the harness made the difference."
+}

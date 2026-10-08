@@ -1,0 +1,3030 @@
+{
+ "plant": {
+  "id": "plt_0afdf741a0daed53",
+  "agentId": "agt_c02389e440c4e177",
+  "agentKind": "subagent",
+  "bedId": "fam_e4f77dae0177d5e5",
+  "name": "test-writer",
+  "runs": 102,
+  "success": {
+   "value": 0.2647058823529412,
+   "n": 102,
+   "nUnknown": 0,
+   "nManual": 0,
+   "ci95": [
+    0.188762815237447,
+    0.3577293012838453
+   ],
+   "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+  },
+  "recentFailureShare": 0.875,
+  "costPerRunUsd": 0.13485789999999998,
+  "totalCostUsd": 14.985717599999994,
+  "costEstimated": false,
+  "unpricedRuns": 0,
+  "lastRunAt": "2026-09-28T13:50:31.984Z",
+  "staleDays": 2,
+  "skillIds": []
+ },
+ "bed": {
+  "id": "fam_e4f77dae0177d5e5",
+  "name": "legacy-monolith",
+  "soil": {
+   "model": "claude-opus-5-5",
+   "effort": "xhigh",
+   "toolCount": 12,
+   "mcpCount": 8,
+   "hookCount": 1,
+   "instructionBytes": 31948
+  },
+  "currentHarnessVersionId": "hv_ef9c336bb430210c",
+  "seasonCount": 1,
+  "plantIds": [
+   "plt_74f6b9c8234e6f8e",
+   "plt_9bf3ced2ad883242",
+   "plt_8143e4aa8474a2c2",
+   "plt_88d143cd7476c408",
+   "plt_0afdf741a0daed53"
+  ]
+ },
+ "agent": {
+  "id": "agt_c02389e440c4e177",
+  "name": "test-writer",
+  "kind": "subagent",
+  "definition": {
+   "scope": "user",
+   "path": "/home/user/agent-garden/.garden-demo/home/.claude/agents/test-writer.md",
+   "contentHash": "bfd4837189e5b8d2ee1958b7811900db4b6c77dac8892c0e07ad1d747a9d483b",
+   "description": "Writes focused unit tests for a module and runs them until they pass. Use after implementing or fixing a change.",
+   "tools": [
+    "Read",
+    "Write",
+    "Edit",
+    "Bash",
+    "Grep",
+    "Glob"
+   ],
+   "model": "inherit"
+  }
+ },
+ "harness": {
+  "versionId": "hv_a2dff7ab0006a3f0",
+  "validFrom": "2026-07-03T14:57:23.572Z",
+  "provenance": "git",
+  "model": "claude-opus-5-5",
+  "effort": "xhigh",
+  "instructionBytes": 31948,
+  "toolCount": 0,
+  "tools": [],
+  "mcpServers": [
+   "browser",
+   "confluence",
+   "datadog",
+   "github",
+   "jira",
+   "mysql-legacy",
+   "sentry",
+   "slack"
+  ],
+  "skillCount": 5,
+  "hookCount": 1,
+  "commitMessage": "Initial commit",
+  "changes": []
+ },
+ "capabilities": {
+  "skills": [],
+  "mcpServers": [],
+  "tools": [
+   {
+    "name": "Bash",
+    "calls": 230
+   },
+   {
+    "name": "Read",
+    "calls": 204
+   },
+   {
+    "name": "Edit",
+    "calls": 119
+   },
+   {
+    "name": "Glob",
+    "calls": 102
+   },
+   {
+    "name": "Write",
+    "calls": 102
+   }
+  ]
+ },
+ "runs": [
+  {
+   "runId": "run_1b1209c5f6183de0",
+   "startedAt": "2026-09-28T13:50:31.984Z",
+   "durationMs": 119471,
+   "taskPreview": "Write unit tests for the email templates in lib/mailer/templates.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 18 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/mailer/templates.test.js` returned an error at step 21."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 19: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 208126,
+   "costUsd": 0.137433,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_7362aa2834f35447",
+   "startedAt": "2026-09-28T13:45:02.032Z",
+   "durationMs": 124711,
+   "taskPreview": "Write unit tests for the email templates in lib/mailer/templates.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 17 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/mailer/templates.test.js` returned an error at step 23."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 21: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 188667,
+   "costUsd": 0.111885,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_29a0de1db7501930",
+   "startedAt": "2026-09-28T13:39:07.867Z",
+   "durationMs": 164697,
+   "taskPreview": "Write unit tests for the email templates in lib/mailer/templates.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 17 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/mailer/templates.test.js` returned an error at step 22."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 20: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 204487,
+   "costUsd": 0.13400220000000002,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_18ffe7920e3f1c73",
+   "startedAt": "2026-09-25T15:05:05.736Z",
+   "durationMs": 117998,
+   "taskPreview": "Write unit tests for the order import in lib/orders/import.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 15 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/orders/import.test.js` returned an error at step 21."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 19: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 202103,
+   "costUsd": 0.1323522,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_ef6dab420092e733",
+   "startedAt": "2026-09-23T13:06:15.445Z",
+   "durationMs": 105027,
+   "taskPreview": "Write unit tests for the session handling in lib/auth/session.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 18 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/auth/session.test.js` returned an error at step 25."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 22: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 347796,
+   "costUsd": 0.2716944,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_925586ff456c0964",
+   "startedAt": "2026-09-21T13:20:45.361Z",
+   "durationMs": 116548,
+   "taskPreview": "Write unit tests for the job scheduler in lib/jobs/scheduler.js. Cover the edge cases and run them until they pass. The previous attempt left failing tests.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 19 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/jobs/scheduler.test.js` returned an error at step 22."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 20: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 210268,
+   "costUsd": 0.168423,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_213e282fb424c9b4",
+   "startedAt": "2026-09-21T13:18:25.873Z",
+   "durationMs": 130598,
+   "taskPreview": "Write unit tests for the job scheduler in lib/jobs/scheduler.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 21 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/jobs/scheduler.test.js` returned an error at step 24."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 22: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Parent spawned test-writer again at step 15 with a similar prompt (similarity 0.80)."
+     }
+    ]
+   },
+   "totalTokens": 216715,
+   "costUsd": 0.1688172,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_29a40e2cc33e82f3",
+   "startedAt": "2026-09-18T13:27:52.505Z",
+   "durationMs": 82051,
+   "taskPreview": "Write unit tests for the order import in lib/orders/import.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "success",
+    "score": 0.95,
+    "source": "heuristic",
+    "heuristicLabel": "success",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": true,
+      "weight": 0.35,
+      "detail": "`npm test -- test/orders/import.test.js` passed at step 14, after last edit at step 11."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": false,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/orders/import.test.js` passed at step 14."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "No unrecovered error in the last 5 steps."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 132866,
+   "costUsd": 0.1115482,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 5,
+   "errorCount": 0,
+   "childCount": 0
+  },
+  {
+   "runId": "run_2ea09803ff5992b6",
+   "startedAt": "2026-09-14T14:15:11.139Z",
+   "durationMs": 59726,
+   "taskPreview": "Write unit tests for the customer search in lib/customers/search.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "success",
+    "score": 0.95,
+    "source": "heuristic",
+    "heuristicLabel": "success",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": true,
+      "weight": 0.35,
+      "detail": "`npm test -- test/customers/search.test.js` passed at step 13, after last edit at step 10."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": false,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/customers/search.test.js` passed at step 13."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "No unrecovered error in the last 5 steps."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 132208,
+   "costUsd": 0.1078098,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 5,
+   "errorCount": 0,
+   "childCount": 0
+  },
+  {
+   "runId": "run_215f04258a55d674",
+   "startedAt": "2026-09-07T22:08:39.350Z",
+   "durationMs": 110485,
+   "taskPreview": "Write unit tests for the report export in lib/reports/export.js. Cover the edge cases and run them until they pass. The previous attempt left failing tests.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 16 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/reports/export.test.js` returned an error at step 22."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 19: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 212400,
+   "costUsd": 0.12694560000000002,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_67f0d0b241daba48",
+   "startedAt": "2026-09-07T22:06:15.826Z",
+   "durationMs": 138348,
+   "taskPreview": "Write unit tests for the report export in lib/reports/export.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 19 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/reports/export.test.js` returned an error at step 22."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 20: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Parent spawned test-writer again at step 21 with a similar prompt (similarity 0.80)."
+     }
+    ]
+   },
+   "totalTokens": 202120,
+   "costUsd": 0.1459528,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_fcc84803577641f9",
+   "startedAt": "2026-09-07T21:59:59.133Z",
+   "durationMs": 123860,
+   "taskPreview": "Write unit tests for the report export in lib/reports/export.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 17 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/reports/export.test.js` returned an error at step 24."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 21: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 190395,
+   "costUsd": 0.1198664,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_8ebb012f78355f53",
+   "startedAt": "2026-09-07T21:32:43.245Z",
+   "durationMs": 119597,
+   "taskPreview": "Write unit tests for the customer search in lib/customers/search.js. Cover the edge cases and run them until they pass. The previous attempt left failing tests.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "success",
+    "score": 0.95,
+    "source": "heuristic",
+    "heuristicLabel": "success",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": true,
+      "weight": 0.35,
+      "detail": "`npm test -- test/customers/search.test.js` passed at step 19, after last edit at step 16."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": false,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/customers/search.test.js` passed at step 19."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "No unrecovered error in the last 5 steps."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 188943,
+   "costUsd": 0.14497120000000002,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 7,
+   "errorCount": 1,
+   "childCount": 0
+  },
+  {
+   "runId": "run_6f7bc2824d138daf",
+   "startedAt": "2026-09-07T21:30:10.047Z",
+   "durationMs": 144113,
+   "taskPreview": "Write unit tests for the customer search in lib/customers/search.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 20 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/customers/search.test.js` returned an error at step 23."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 21: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Parent spawned test-writer again at step 15 with a similar prompt (similarity 0.80)."
+     }
+    ]
+   },
+   "totalTokens": 193174,
+   "costUsd": 0.1321444,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_99dc65d9eaea1283",
+   "startedAt": "2026-09-04T19:40:54.091Z",
+   "durationMs": 102679,
+   "taskPreview": "Write unit tests for the job scheduler in lib/jobs/scheduler.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "success",
+    "score": 0.95,
+    "source": "heuristic",
+    "heuristicLabel": "success",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": true,
+      "weight": 0.35,
+      "detail": "`npm test -- test/jobs/scheduler.test.js` passed at step 18, after last edit at step 15."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": false,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/jobs/scheduler.test.js` passed at step 18."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "No unrecovered error in the last 5 steps."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 181647,
+   "costUsd": 0.12145,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 7,
+   "errorCount": 1,
+   "childCount": 0
+  },
+  {
+   "runId": "run_b55eb0adb1144df2",
+   "startedAt": "2026-09-03T20:47:46.861Z",
+   "durationMs": 68644,
+   "taskPreview": "Write unit tests for the tax rules in lib/billing/tax.js. Cover the edge cases and run them until they pass. The previous attempt left failing tests.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "success",
+    "score": 0.95,
+    "source": "heuristic",
+    "heuristicLabel": "success",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": true,
+      "weight": 0.35,
+      "detail": "`npm test -- test/billing/tax.test.js` passed at step 14, after last edit at step 11."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": false,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/billing/tax.test.js` passed at step 14."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "No unrecovered error in the last 5 steps."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 127089,
+   "costUsd": 0.1066038,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 5,
+   "errorCount": 0,
+   "childCount": 0
+  },
+  {
+   "runId": "run_af8d18d6f9e0d3ac",
+   "startedAt": "2026-09-03T20:45:37.418Z",
+   "durationMs": 123429,
+   "taskPreview": "Write unit tests for the tax rules in lib/billing/tax.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 18 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/billing/tax.test.js` returned an error at step 21."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 19: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Parent spawned test-writer again at step 20 with a similar prompt (similarity 0.80)."
+     }
+    ]
+   },
+   "totalTokens": 211541,
+   "costUsd": 0.145458,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_7c367ffb02ffb0b8",
+   "startedAt": "2026-09-03T19:56:13.301Z",
+   "durationMs": 127914,
+   "taskPreview": "Write unit tests for the session handling in lib/auth/session.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 16 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/auth/session.test.js` returned an error at step 21."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 19: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 191038,
+   "costUsd": 0.127875,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_695f715decb91503",
+   "startedAt": "2026-09-03T19:50:53.437Z",
+   "durationMs": 91784,
+   "taskPreview": "Write unit tests for the session handling in lib/auth/session.js. Cover the edge cases and run them until they pass. The previous attempt left failing tests.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "success",
+    "score": 0.95,
+    "source": "heuristic",
+    "heuristicLabel": "success",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": true,
+      "weight": 0.35,
+      "detail": "`npm test -- test/auth/session.test.js` passed at step 19, after last edit at step 16."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": false,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/auth/session.test.js` passed at step 19."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "No unrecovered error in the last 5 steps."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 187077,
+   "costUsd": 0.133443,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 7,
+   "errorCount": 1,
+   "childCount": 0
+  },
+  {
+   "runId": "run_101e0c404ab3f67f",
+   "startedAt": "2026-09-03T19:48:43.914Z",
+   "durationMs": 113268,
+   "taskPreview": "Write unit tests for the session handling in lib/auth/session.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 15 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/auth/session.test.js` returned an error at step 21."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 18: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Parent spawned test-writer again at step 19 with a similar prompt (similarity 0.80)."
+     }
+    ]
+   },
+   "totalTokens": 197494,
+   "costUsd": 0.12335920000000002,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_ed2e33ced154d174",
+   "startedAt": "2026-09-03T19:40:15.772Z",
+   "durationMs": 111457,
+   "taskPreview": "Write unit tests for the session handling in lib/auth/session.js. Cover the edge cases and run them until they pass. The previous attempt left failing tests.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 18 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/auth/session.test.js` returned an error at step 21."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 19: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 212616,
+   "costUsd": 0.14774520000000002,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_37060f56047773cc",
+   "startedAt": "2026-09-03T19:38:05.539Z",
+   "durationMs": 118892,
+   "taskPreview": "Write unit tests for the session handling in lib/auth/session.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 19 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/auth/session.test.js` returned an error at step 23."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 20: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Parent spawned test-writer again at step 16 with a similar prompt (similarity 0.80)."
+     }
+    ]
+   },
+   "totalTokens": 200713,
+   "costUsd": 0.140442,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_c3d48b9b1c1202d1",
+   "startedAt": "2026-09-03T19:32:59.003Z",
+   "durationMs": 74514,
+   "taskPreview": "Write unit tests for the session handling in lib/auth/session.js. Cover the edge cases and run them until they pass. The previous attempt left failing tests.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "success",
+    "score": 0.95,
+    "source": "heuristic",
+    "heuristicLabel": "success",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": true,
+      "weight": 0.35,
+      "detail": "`npm test -- test/auth/session.test.js` passed at step 13, after last edit at step 10."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": false,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/auth/session.test.js` passed at step 13."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "No unrecovered error in the last 5 steps."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 138613,
+   "costUsd": 0.1182566,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 5,
+   "errorCount": 0,
+   "childCount": 0
+  },
+  {
+   "runId": "run_2734c7dd0774e42b",
+   "startedAt": "2026-09-03T19:30:49.314Z",
+   "durationMs": 115600,
+   "taskPreview": "Write unit tests for the session handling in lib/auth/session.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 15 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/auth/session.test.js` returned an error at step 20."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 18: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Parent spawned test-writer again at step 18 with a similar prompt (similarity 0.80)."
+     }
+    ]
+   },
+   "totalTokens": 206311,
+   "costUsd": 0.13826739999999998,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_d86defb652459891",
+   "startedAt": "2026-08-31T14:25:15.799Z",
+   "durationMs": 125468,
+   "taskPreview": "Write unit tests for the email templates in lib/mailer/templates.js. Cover the edge cases and run them until they pass. The previous attempt left failing tests.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 16 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/mailer/templates.test.js` returned an error at step 21."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 19: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 343046,
+   "costUsd": 0.2399114,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_20d5080672213bed",
+   "startedAt": "2026-08-31T14:22:50.654Z",
+   "durationMs": 132305,
+   "taskPreview": "Write unit tests for the email templates in lib/mailer/templates.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 20 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/mailer/templates.test.js` returned an error at step 24."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 21: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Parent spawned test-writer again at step 18 with a similar prompt (similarity 0.80)."
+     }
+    ]
+   },
+   "totalTokens": 373710,
+   "costUsd": 0.28274059999999995,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_8060bfccdc7eb8b0",
+   "startedAt": "2026-08-31T13:57:03.297Z",
+   "durationMs": 124627,
+   "taskPreview": "Write unit tests for the invoice totals in lib/billing/invoice.js. Cover the edge cases and run them until they pass. The previous attempt left failing tests.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 16 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/billing/invoice.test.js` returned an error at step 22."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 20: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 440493,
+   "costUsd": 0.3451532,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_4b55219b788f2542",
+   "startedAt": "2026-08-31T13:54:27.898Z",
+   "durationMs": 145073,
+   "taskPreview": "Write unit tests for the invoice totals in lib/billing/invoice.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 16 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/billing/invoice.test.js` returned an error at step 21."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 19: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Parent spawned test-writer again at step 15 with a similar prompt (similarity 0.80)."
+     }
+    ]
+   },
+   "totalTokens": 311046,
+   "costUsd": 0.2272506,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_19f1821e8d687144",
+   "startedAt": "2026-08-31T13:46:23.197Z",
+   "durationMs": 132635,
+   "taskPreview": "Write unit tests for the invoice totals in lib/billing/invoice.js. Cover the edge cases and run them until they pass. The previous attempt left failing tests.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 18 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/billing/invoice.test.js` returned an error at step 21."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 19: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 267345,
+   "costUsd": 0.2094008,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_2969feff429017be",
+   "startedAt": "2026-08-31T13:44:18.327Z",
+   "durationMs": 116327,
+   "taskPreview": "Write unit tests for the invoice totals in lib/billing/invoice.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 15 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/billing/invoice.test.js` returned an error at step 20."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 18: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Parent spawned test-writer again at step 18 with a similar prompt (similarity 0.80)."
+     }
+    ]
+   },
+   "totalTokens": 299499,
+   "costUsd": 0.205407,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_e4ebe8ce65ccd8c5",
+   "startedAt": "2026-08-31T13:38:04.652Z",
+   "durationMs": 133981,
+   "taskPreview": "Write unit tests for the invoice totals in lib/billing/invoice.js. Cover the edge cases and run them until they pass. The previous attempt left failing tests.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 20 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/billing/invoice.test.js` returned an error at step 23."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 21: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 316221,
+   "costUsd": 0.23469120000000002,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_0162597168940298",
+   "startedAt": "2026-08-31T13:35:27.066Z",
+   "durationMs": 152505,
+   "taskPreview": "Write unit tests for the invoice totals in lib/billing/invoice.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 19 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/billing/invoice.test.js` returned an error at step 23."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 20: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Parent spawned test-writer again at step 18 with a similar prompt (similarity 0.80)."
+     }
+    ]
+   },
+   "totalTokens": 308390,
+   "costUsd": 0.2535524,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_e8bedc12ad1a485d",
+   "startedAt": "2026-08-31T13:23:41.993Z",
+   "durationMs": 144130,
+   "taskPreview": "Write unit tests for the invoice totals in lib/billing/invoice.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 16 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/billing/invoice.test.js` returned an error at step 23."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 20: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 387849,
+   "costUsd": 0.30523340000000004,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_1ec1d4d4c393e5ea",
+   "startedAt": "2026-08-31T13:20:00.948Z",
+   "durationMs": 90731,
+   "taskPreview": "Write unit tests for the invoice totals in lib/billing/invoice.js. Cover the edge cases and run them until they pass. The previous attempt left failing tests.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 16 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/billing/invoice.test.js` returned an error at step 21."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 19: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 454883,
+   "costUsd": 0.3572646,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_b2d83eb8042f5ba9",
+   "startedAt": "2026-08-31T13:17:51.281Z",
+   "durationMs": 124569,
+   "taskPreview": "Write unit tests for the invoice totals in lib/billing/invoice.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 20 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/billing/invoice.test.js` returned an error at step 23."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 21: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Parent spawned test-writer again at step 18 with a similar prompt (similarity 0.80)."
+     }
+    ]
+   },
+   "totalTokens": 285686,
+   "costUsd": 0.23300520000000002,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_82eb17fddb6a9842",
+   "startedAt": "2026-08-28T14:40:04.395Z",
+   "durationMs": 67959,
+   "taskPreview": "Write unit tests for the email templates in lib/mailer/templates.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "success",
+    "score": 0.95,
+    "source": "heuristic",
+    "heuristicLabel": "success",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": true,
+      "weight": 0.35,
+      "detail": "`npm test -- test/mailer/templates.test.js` passed at step 15, after last edit at step 11."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": false,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/mailer/templates.test.js` passed at step 15."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "No unrecovered error in the last 5 steps."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 123253,
+   "costUsd": 0.09198619999999999,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 5,
+   "errorCount": 0,
+   "childCount": 0
+  },
+  {
+   "runId": "run_7fd4a2acb9253095",
+   "startedAt": "2026-08-26T19:03:40.044Z",
+   "durationMs": 103295,
+   "taskPreview": "Write unit tests for the tax rules in lib/billing/tax.js. Cover the edge cases and run them until they pass. The previous attempt left failing tests.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "success",
+    "score": 0.95,
+    "source": "heuristic",
+    "heuristicLabel": "success",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": true,
+      "weight": 0.35,
+      "detail": "`npm test -- test/billing/tax.test.js` passed at step 18, after last edit at step 15."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": false,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/billing/tax.test.js` passed at step 18."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "No unrecovered error in the last 5 steps."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 182728,
+   "costUsd": 0.1221982,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 7,
+   "errorCount": 1,
+   "childCount": 0
+  },
+  {
+   "runId": "run_09f8a00e4fa2b9dd",
+   "startedAt": "2026-08-26T19:01:08.992Z",
+   "durationMs": 136852,
+   "taskPreview": "Write unit tests for the tax rules in lib/billing/tax.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 16 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/billing/tax.test.js` returned an error at step 23."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Bash error at step 20: Exit code 1 Error: connect ECONNREFUSED 127.0.0.1:3306 at T… (never followed by a successful Bash)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Parent spawned test-writer again at step 16 with a similar prompt (similarity 0.80)."
+     }
+    ]
+   },
+   "totalTokens": 222268,
+   "costUsd": 0.15312679999999998,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_0a8cc72a632203f6",
+   "startedAt": "2026-08-26T16:53:13.577Z",
+   "durationMs": 121487,
+   "taskPreview": "Write unit tests for the report export in lib/reports/export.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 19 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/reports/export.test.js` returned an error at step 22."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 20: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 194889,
+   "costUsd": 0.1365942,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  },
+  {
+   "runId": "run_83045474db10dcd9",
+   "startedAt": "2026-08-26T16:48:35.482Z",
+   "durationMs": 99510,
+   "taskPreview": "Write unit tests for the report export in lib/reports/export.js. Cover the edge cases and run them until they pass.",
+   "trigger": "subagent",
+   "outcome": {
+    "label": "failure",
+    "score": 0.05,
+    "source": "heuristic",
+    "heuristicLabel": "failure",
+    "signals": [
+     {
+      "id": "tests_passed_after_last_edit",
+      "fired": false,
+      "weight": 0.35,
+      "detail": "No test command after the last edit at step 20 returned without error (1 tried)."
+     },
+     {
+      "id": "tests_failing_at_end",
+      "fired": true,
+      "weight": -0.35,
+      "detail": "Last test command `npm test -- test/reports/export.test.js` returned an error at step 23."
+     },
+     {
+      "id": "clean_finish",
+      "fired": true,
+      "weight": 0.1,
+      "detail": "Final assistant message ended with end_turn."
+     },
+     {
+      "id": "errors_in_tail",
+      "fired": true,
+      "weight": -0.2,
+      "detail": "Edit error at step 21: <tool_use_error>String to replace not found in file. String… (never followed by a successful Edit)."
+     },
+     {
+      "id": "user_retried",
+      "fired": null,
+      "weight": -0.3,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "user_moved_on",
+      "fired": null,
+      "weight": 0.1,
+      "detail": "Applies to main runs only; this is a subagent run."
+     },
+     {
+      "id": "shipped",
+      "fired": false,
+      "weight": 0.1,
+      "detail": "No git commit, git push, or gh pr create in this run."
+     },
+     {
+      "id": "parent_respawned",
+      "fired": false,
+      "weight": -0.2,
+      "detail": "Parent did not respawn test-writer with a similar prompt."
+     }
+    ]
+   },
+   "totalTokens": 208105,
+   "costUsd": 0.1526254,
+   "costEstimated": false,
+   "model": "claude-opus-5-5",
+   "toolCallCount": 8,
+   "errorCount": 3,
+   "childCount": 0
+  }
+ ],
+ "runsTotal": 102,
+ "outcomeMix": {
+  "success": 27,
+  "partial": 0,
+  "failure": 75,
+  "unknown": 0
+ },
+ "signalStats": [
+  {
+   "id": "tests_passed_after_last_edit",
+   "weight": 0.35,
+   "description": "A test command ran after the last file edit and returned without error.",
+   "fired": 27,
+   "notFired": 75,
+   "notApplicable": 0
+  },
+  {
+   "id": "tests_failing_at_end",
+   "weight": -0.35,
+   "description": "The last test command in the run returned an error.",
+   "fired": 75,
+   "notFired": 27,
+   "notApplicable": 0
+  },
+  {
+   "id": "clean_finish",
+   "weight": 0.1,
+   "description": "The final assistant message ended normally, with no interrupt.",
+   "fired": 102,
+   "notFired": 0,
+   "notApplicable": 0
+  },
+  {
+   "id": "errors_in_tail",
+   "weight": -0.2,
+   "description": "A tool or API error in the last 5 steps was never followed by a success of the same tool.",
+   "fired": 75,
+   "notFired": 27,
+   "notApplicable": 0
+  },
+  {
+   "id": "user_retried",
+   "weight": -0.3,
+   "description": "The next human prompt came within 10 minutes and reads as a correction, or the user interrupted.",
+   "fired": 0,
+   "notFired": 0,
+   "notApplicable": 102
+  },
+  {
+   "id": "user_moved_on",
+   "weight": 0.1,
+   "description": "The next human prompt is an acknowledgement or a new topic.",
+   "fired": 0,
+   "notFired": 0,
+   "notApplicable": 102
+  },
+  {
+   "id": "shipped",
+   "weight": 0.1,
+   "description": "git commit, git push, or PR creation succeeded during the run.",
+   "fired": 0,
+   "notFired": 102,
+   "notApplicable": 0
+  },
+  {
+   "id": "parent_respawned",
+   "weight": -0.2,
+   "description": "The parent spawned the same subagent type with a similar prompt again in the same turn.",
+   "fired": 29,
+   "notFired": 73,
+   "notApplicable": 0
+  }
+ ],
+ "tierBreakdown": {
+  "agent": 1897,
+  "verification": 376,
+  "application": 0,
+  "hill_climbing": 0
+ },
+ "otherBeds": [
+  {
+   "id": "plt_5f39547dea82bd11",
+   "agentId": "agt_c02389e440c4e177",
+   "agentKind": "subagent",
+   "bedId": "fam_77320afbea5626a6",
+   "name": "test-writer",
+   "runs": 108,
+   "success": {
+    "value": 0.9166666666666666,
+    "n": 108,
+    "nUnknown": 0,
+    "nManual": 0,
+    "ci95": [
+     0.8491694181597665,
+     0.9555400995867606
+    ],
+    "method": "success = 1, partial = 0.5, failure = 0 over runs with a known label (manual labels override heuristics h1); unknown runs excluded; 95% Wilson interval on the credit sum."
+   },
+   "recentFailureShare": 0.08333333333333333,
+   "costPerRunUsd": 0.04395995,
+   "totalCostUsd": 5.087738099999998,
+   "costEstimated": false,
+   "unpricedRuns": 0,
+   "lastRunAt": "2026-09-30T18:09:11.896Z",
+   "staleDays": 0,
+   "skillIds": []
+  }
+ ]
+}
