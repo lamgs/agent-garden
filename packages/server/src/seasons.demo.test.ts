@@ -166,7 +166,7 @@ describe('seasons on the demo store (M7 gate)', () => {
     expect(chain[1]!.diffSummary).toEqual(
       expect.arrayContaining([
         'hooks changed',
-        expect.stringMatching(/^instructions −10,581 bytes/),
+        expect.stringMatching(/^instructions −[\d,]+ bytes/), // shrank (exact size moves with demo content)
       ]),
     );
     const [before, after] = main.perSeason;

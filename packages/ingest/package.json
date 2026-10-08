@@ -9,7 +9,8 @@
     "./cli": "./src/cli.ts",
     "./harness": "./src/adapters/claude-code/harness.ts",
     "./planted-secrets": "./src/redact/planted-secrets.ts",
-    "./live-fixtures": "./src/live/fixtures.ts"
+    "./live-fixtures": "./src/live/fixtures.ts",
+    "./knowledge-fixture": "./src/adapters/claude-code/config/knowledge-fixture.ts"
   },
   "bin": {
     "garden": "./src/cli.ts"

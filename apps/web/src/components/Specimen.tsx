@@ -4,7 +4,15 @@
  * just at a larger scale; the bed look comes from the same registry levels the renderer uses.
  */
 import { useEffect, useRef } from 'react';
-import { bedStrata, bedTexture, bedTone, type BedSummary, type PlantSummary } from '@garden/core';
+import {
+  bedStrata,
+  bedStrataShares,
+  bedStrataWeight,
+  bedTexture,
+  bedTone,
+  type BedSummary,
+  type PlantSummary,
+} from '@garden/core';
 import { BED_FACE, drawBed, drawPlant, hashString, PLANT_FRAME } from '../garden/draw';
 import { genotypeKey, genotypeOf } from '../garden/genotype';
 import { CanvasPen, type Pen } from '../garden/pen';
@@ -15,6 +23,8 @@ export function bedLook(bed: BedSummary) {
     tone: familyTone(bedTone.level(bed)),
     texture: bedTexture.level(bed),
     strata: bedStrata.level(bed),
+    bands: bedStrataShares(bed),
+    weight: bedStrataWeight.level(bed),
   };
 }
 
@@ -129,6 +139,8 @@ export function SoilPlot({
     look.tone,
     look.texture,
     look.strata,
+    look.bands.map((b) => b.toFixed(3)).join(','),
+    look.weight,
     k,
     ...plants.map((p) => `${p.at}:${genotypeKey(genotypeOf(p.plant))}`),
   ].join('|');

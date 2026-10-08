@@ -3,6 +3,7 @@ import {
   ENCODINGS,
   binIndex,
   bedStrata,
+  bedStrataWeight,
   costUsd,
   legend,
   plantBloom,
@@ -176,6 +177,24 @@ describe('encodings registry', () => {
     const bed = {
       soil: { instructionBytes: 5000, toolCount: 0, mcpCount: 0, hookCount: 0 },
     } as BedSummary;
-    expect(bedStrata.level(bed)).toBe(2);
+    // No knowledge scan: one band for the CLAUDE.md chain, weight from bytes ÷ 4.
+    expect(bedStrata.level(bed)).toBe(1);
+    expect(bedStrataWeight.level(bed)).toBe(1);
+    const scanned = {
+      soil: {
+        ...bed.soil,
+        knowledge: {
+          alwaysTokens: 12_000,
+          findingCount: 0,
+          layers: [
+            { layer: 'user', tokens: 300 },
+            { layer: 'project', tokens: 11_000 },
+            { layer: 'memory', tokens: 700 },
+          ],
+        },
+      },
+    } as BedSummary;
+    expect(bedStrata.level(scanned)).toBe(3);
+    expect(bedStrataWeight.level(scanned)).toBe(3);
   });
 });

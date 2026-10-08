@@ -130,6 +130,20 @@ export interface TranscriptCensus {
   versions: Record<string, number>;
 }
 
+/**
+ * Evidence that a knowledge file reached the model (milestone K). Paths only: the attachments that
+ * carry these also carry the file content, which the parser drops.
+ *   session_load   `instructions` attachment (session-start CLAUDE.md/rules/MEMORY.md list) [observed]
+ *   nested_load    `nested_memory` attachment (subdirectory CLAUDE.md, path-scoped rule) [binary]
+ *   memory_recall  `relevant_memories` attachment (memories[].path) [binary]
+ *   read           Read tool call on a `.md` file [observed]
+ */
+export interface KnowledgeEvent {
+  kind: 'session_load' | 'nested_load' | 'memory_recall' | 'read';
+  path: string;
+  at: string;
+}
+
 export interface ParsedSession {
   /** stableId('ses', rawSessionId) */
   id: string;
@@ -148,6 +162,8 @@ export interface ParsedSession {
   warnings: string[];
   /** Total bytes read across the main file and subagent files. */
   bytesRead: number;
+  /** Knowledge-usage evidence (paths and times only). */
+  knowledge: KnowledgeEvent[];
 }
 
 /** Characters kept from any raw text before redaction (redaction then truncates to 2000). */
@@ -236,6 +252,8 @@ export interface HarnessCommit {
   changedPaths: string[];
   /** Project config as of this commit (read via `git show <sha>:<path>`). */
   snapshot: ScannedConfig;
+  /** Always-loaded project bytes per knowledge layer in this commit (CLAUDE.md files, rules without `paths`). */
+  knowledgeLayers?: Partial<Record<'project' | 'local' | 'rules', number>>;
 }
 
 // ---------------------------------------------------------------------------------------------

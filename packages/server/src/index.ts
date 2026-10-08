@@ -8,3 +8,4 @@ export * from './seasons';
 export * from './live';
 export * from './replay';
 export * from './route';
+export * from './knowledge';

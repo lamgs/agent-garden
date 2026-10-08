@@ -2,7 +2,14 @@
  * Redaction proof: secrets planted in every free-text field of every record type must not appear
  * anywhere in the bytes of the SQLite database (main file, WAL, and SHM), not even as fragments.
  */
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import {
+  appendFileSync,
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
@@ -13,6 +20,8 @@ import { ingest } from './pipeline';
 import { Redactor } from './redact';
 import { plantedSecrets } from './redact/planted-secrets';
 import { Store } from './store/store';
+import { ClaudeCodeAdapter } from './adapters/claude-code/adapter';
+import { materializeKnowledgeFixture } from './adapters/claude-code/config/knowledge-fixture';
 
 const dir = mkdtempSync(join(tmpdir(), 'garden-proof-'));
 afterAll(() => rmSync(dir, { recursive: true, force: true }));
@@ -217,6 +226,103 @@ describe('redaction proof', () => {
 
     expect(Object.keys(report.redactions).length).toBeGreaterThanOrEqual(15);
     expect(report.records.step).toBe(3);
+  });
+
+  it('knowledge map (K): secrets in CLAUDE.md, memory files, file names, imports, and load attachments never reach the bytes', async () => {
+    const fx = materializeKnowledgeFixture(join(dir, 'k'), all);
+    // A secret in a file name and in an @import target (paths are stored, so they must be redacted).
+    const named = join(fx.memoryDir, `${secrets[4]!.secret}.md`);
+    writeFileSync(named, `---\nname: n\ntype: project\n---\n${all}\n`);
+    appendFileSync(join(fx.root, 'CLAUDE.md'), `\n- See @docs/${secrets[4]!.secret}.md\n`);
+    const path = join(dir, 'garden-k.db');
+    const store = new Store(path);
+    const adapter = new ClaudeCodeAdapter({
+      claudeHome: fx.claudeHome,
+      claudeJsonPath: fx.claudeJsonPath,
+      managedDir: fx.managedDir,
+    });
+    const report = await ingest(adapter, store, new Redactor(Buffer.alloc(32, 3)));
+    expect(report.records.knowledge).toBe(1);
+    expect(report.records.knowledge_usage).toBe(1);
+    expect(store.count('knowledge_sources')).toBeGreaterThan(15);
+    expect(store.count('knowledge_usage')).toBe(7);
+    // Every free-text knowledge field carries secrets too, through a direct record.
+    await ingest(
+      {
+        id: 'k',
+        version: '1',
+        async *read() {
+          yield { type: 'family' as const, value: { id: 'fam_k', name: 'k', projectRoot: '/k' } };
+          yield {
+            type: 'knowledge' as const,
+            value: {
+              scan: {
+                familyId: 'fam_k',
+                scannedAt: '2026-10-01T00:00:00Z',
+                memoryDir: `/m/${all}`,
+                externalImportsApproved: false,
+                warnings: [all],
+              },
+              sources: [
+                {
+                  id: 'ks1',
+                  familyId: 'fam_k',
+                  kind: 'rule' as const,
+                  scope: 'project' as const,
+                  path: `/r/${pick(5)}`,
+                  displayPath: all,
+                  name: 'x',
+                  bytes: 1,
+                  lines: 1,
+                  alwaysBytes: 0,
+                  loadMode: 'path_scoped' as const,
+                  loadNote: all,
+                  globs: [all],
+                  contentHash: 'h',
+                  passageHashes: ['a'.repeat(64) + ':10'],
+                },
+              ],
+              edges: [
+                {
+                  id: 'ke1',
+                  familyId: 'fam_k',
+                  fromId: 'ks1',
+                  kind: 'import' as const,
+                  target: all,
+                  resolved: false,
+                  beyondCap: false,
+                  reason: all,
+                },
+              ],
+              snapshots: [],
+            },
+          };
+        },
+        async inspect() {
+          return {
+            adapter: 'k',
+            roots: [],
+            recordTypes: {},
+            unknownFields: {},
+            versions: {},
+            warnings: [],
+          };
+        },
+      },
+      store,
+      new Redactor(Buffer.alloc(32, 3)),
+    );
+    expect(store.count('knowledge_edges')).toBeGreaterThan(1);
+    expect(leaks(dbBytes(path))).toEqual([]);
+    store.close();
+    expect(leaks(dbBytes(path))).toEqual([]);
+    // Passage hashes are keyed (16 hex), not the raw sha256 the scanner computed.
+    const s = new Store(path);
+    const ph = s.db
+      .prepare('SELECT passage_hashes_json AS p FROM knowledge_sources LIMIT 1')
+      .get() as { p: string };
+    for (const p of JSON.parse(ph.p) as string[]) expect(p).toMatch(/^[0-9a-f]{16}:\d+$/);
+    s.close();
   });
 
   it('data is still useful after redaction', () => {

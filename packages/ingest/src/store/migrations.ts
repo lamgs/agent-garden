@@ -89,4 +89,45 @@ export const MIGRATIONS: readonly string[] = [
   ALTER TABLE runs ADD COLUMN token_quality TEXT NOT NULL DEFAULT 'reported'
     CHECK (token_quality IN ('reported','output_estimated'));
   `,
+  /* 3: knowledge map (K). Paths, sizes, hashes, derived facts only; never file content. */ `
+  CREATE TABLE knowledge_scans (
+    family_id TEXT PRIMARY KEY REFERENCES harness_families(id), scanned_at TEXT NOT NULL,
+    memory_dir TEXT, external_imports_approved INTEGER NOT NULL, warnings_json TEXT NOT NULL
+  );
+
+  CREATE TABLE knowledge_sources (
+    id TEXT PRIMARY KEY, family_id TEXT NOT NULL REFERENCES harness_families(id),
+    kind TEXT NOT NULL, scope TEXT NOT NULL, path TEXT NOT NULL, display_path TEXT NOT NULL, name TEXT,
+    bytes INTEGER NOT NULL, lines INTEGER NOT NULL, always_bytes INTEGER NOT NULL,
+    load_mode TEXT NOT NULL CHECK (load_mode IN ('always','on_demand','path_scoped','not_loaded')),
+    load_note TEXT, import_depth INTEGER, globs_json TEXT, memory_type TEXT,
+    content_hash TEXT NOT NULL, passage_hashes_json TEXT NOT NULL,
+    last_changed_at TEXT, changed_via TEXT
+  );
+  CREATE INDEX knowledge_sources_family ON knowledge_sources(family_id);
+
+  CREATE TABLE knowledge_edges (
+    id TEXT PRIMARY KEY, family_id TEXT NOT NULL REFERENCES harness_families(id),
+    from_id TEXT NOT NULL, to_id TEXT,
+    kind TEXT NOT NULL CHECK (kind IN ('import','index_link','mention')),
+    target TEXT NOT NULL, resolved INTEGER NOT NULL, beyond_cap INTEGER NOT NULL, reason TEXT
+  );
+  CREATE INDEX knowledge_edges_family ON knowledge_edges(family_id);
+
+  CREATE TABLE knowledge_snapshots (
+    family_id TEXT NOT NULL REFERENCES harness_families(id), at TEXT NOT NULL,
+    commit_sha TEXT NOT NULL DEFAULT '', provenance TEXT NOT NULL CHECK (provenance IN ('git','current')),
+    layers_json TEXT NOT NULL,
+    PRIMARY KEY (family_id, at, commit_sha)
+  );
+
+  CREATE TABLE knowledge_usage (
+    session_id TEXT NOT NULL REFERENCES sessions(id), family_id TEXT NOT NULL,
+    path TEXT NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('session_load','nested_load','memory_recall','read')),
+    count INTEGER NOT NULL, first_at TEXT NOT NULL, last_at TEXT NOT NULL,
+    PRIMARY KEY (session_id, path, kind)
+  );
+  CREATE INDEX knowledge_usage_family ON knowledge_usage(family_id, path);
+  `,
 ];

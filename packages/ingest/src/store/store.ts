@@ -6,6 +6,11 @@ import type {
   HarnessFamily,
   HarnessVersion,
   ID,
+  KnowledgeEdge,
+  KnowledgeScan,
+  KnowledgeSnapshot,
+  KnowledgeSource,
+  KnowledgeUsage,
   Loop,
   Outcome,
   OutcomeLabel,
@@ -34,6 +39,14 @@ const parse = <T>(v: unknown): T | undefined =>
   typeof v === 'string' ? (JSON.parse(v) as T) : undefined;
 /** Values read back were redacted on the way in. */
 const red = (v: unknown): RedactedText => v as RedactedText;
+
+/** One bed's knowledge scan as written by putKnowledge. */
+export interface KnowledgeBundle {
+  scan: KnowledgeScan;
+  sources: KnowledgeSource[];
+  edges: KnowledgeEdge[];
+  snapshots: KnowledgeSnapshot[];
+}
 
 /**
  * The normalized store. Write methods take schema types whose free-form text is `RedactedText`,
@@ -251,6 +264,79 @@ export class Store {
 
   clearManualLabel(runId: ID): void {
     this.db.prepare('DELETE FROM manual_labels WHERE run_id = ?').run(runId);
+  }
+
+  // ---- knowledge map (K) ------------------------------------------------------------------------
+
+  /** Replace a bed's knowledge graph with a fresh scan (deleted files disappear). */
+  putKnowledge(k: KnowledgeBundle): void {
+    const fam = k.scan.familyId;
+    for (const t of ['knowledge_sources', 'knowledge_edges', 'knowledge_snapshots'])
+      this.db.prepare(`DELETE FROM ${t} WHERE family_id = ?`).run(fam);
+    this.upsert('knowledge_scans', {
+      family_id: fam,
+      scanned_at: k.scan.scannedAt,
+      memory_dir: opt(k.scan.memoryDir),
+      external_imports_approved: Number(k.scan.externalImportsApproved),
+      warnings_json: JSON.stringify(k.scan.warnings),
+    });
+    for (const s of k.sources)
+      this.upsert('knowledge_sources', {
+        id: s.id,
+        family_id: s.familyId,
+        kind: s.kind,
+        scope: s.scope,
+        path: s.path,
+        display_path: s.displayPath,
+        name: opt(s.name),
+        bytes: s.bytes,
+        lines: s.lines,
+        always_bytes: s.alwaysBytes,
+        load_mode: s.loadMode,
+        load_note: opt(s.loadNote),
+        import_depth: opt(s.importDepth),
+        globs_json: json(s.globs),
+        memory_type: opt(s.memoryType),
+        content_hash: s.contentHash,
+        passage_hashes_json: JSON.stringify(s.passageHashes),
+        last_changed_at: opt(s.lastChangedAt),
+        changed_via: opt(s.changedVia),
+      });
+    for (const e of k.edges)
+      this.upsert('knowledge_edges', {
+        id: e.id,
+        family_id: e.familyId,
+        from_id: e.fromId,
+        to_id: opt(e.toId),
+        kind: e.kind,
+        target: e.target,
+        resolved: Number(e.resolved),
+        beyond_cap: Number(e.beyondCap),
+        reason: opt(e.reason),
+      });
+    for (const n of k.snapshots)
+      this.upsert('knowledge_snapshots', {
+        family_id: n.familyId,
+        at: n.at,
+        commit_sha: n.commitSha ?? '',
+        provenance: n.provenance,
+        layers_json: JSON.stringify(n.layers),
+      });
+  }
+
+  /** Replace one session's knowledge-usage evidence (sessions are re-parsed whole). */
+  putKnowledgeUsage(sessionId: ID, rows: readonly KnowledgeUsage[]): void {
+    this.db.prepare('DELETE FROM knowledge_usage WHERE session_id = ?').run(sessionId);
+    for (const u of rows)
+      this.upsert('knowledge_usage', {
+        session_id: u.sessionId,
+        family_id: u.familyId,
+        path: u.path,
+        kind: u.kind,
+        count: u.count,
+        first_at: u.firstAt,
+        last_at: u.lastAt,
+      });
   }
 
   putFileState(f: FileState): void {

@@ -39,7 +39,7 @@ import {
   shortModel,
   truncate,
 } from '../format';
-import { plantHref, replantHref, replayHref, seasonsHref } from '../route';
+import { knowledgeHref, plantHref, replantHref, replayHref, seasonsHref } from '../route';
 import { PlantSprite, SoilPlot } from '../components/Specimen';
 import {
   BedTag,
@@ -227,6 +227,9 @@ function PlantBody({
             <HarnessFacts harness={v.harness} />
             <p className="seasons-link">
               <a href={seasonsHref(v.bed.id)}>Seasons of {v.bed.name}: outcomes per harness →</a>
+            </p>
+            <p className="quiet-link">
+              <a href={knowledgeHref(v.bed.id)}>Knowledge map of {v.bed.name} →</a>
             </p>
           </Card>
         </div>

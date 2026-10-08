@@ -18,6 +18,7 @@ import { PlantPage } from './views/PlantPage';
 import { ReplantPage } from './views/ReplantPage';
 import { SeasonsPage } from './views/SeasonsPage';
 import { ReplayRoute } from './replay/ReplayPage';
+import { KnowledgeRoute } from './views/KnowledgePage';
 import { useView } from './views/useView';
 import { ViewMessage } from './components/ui';
 
@@ -102,7 +103,7 @@ export function App() {
       // Pages: L = legend, T = jump to this page's table, Esc = legend first, then the garden.
       if (e.key === 'l' || e.key === 'L') setLegendOpen((o) => !o);
       else if (e.key === 't' || e.key === 'T') {
-        const el = document.querySelector<HTMLElement>('#runs, #shared, #numbers');
+        const el = document.querySelector<HTMLElement>('#runs, #shared, #numbers, #sources');
         el?.scrollIntoView({ block: 'start' });
         el?.querySelector<HTMLElement>('table')?.focus();
       } else if (e.key === 'Escape') {
@@ -319,6 +320,8 @@ function RoutedPage({
       </PageShell>
     );
   }
+  // Knowledge map (K)
+  if (route.view === 'knowledge') return <KnowledgeRoute bedId={route.bedId} days={days} />;
   return <ViewPage key={route.view} route={route} days={days} garden={garden} />;
 }
 

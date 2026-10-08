@@ -2,12 +2,19 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
-import type { Agent, HarnessVersion, LoopTier, Run, Step } from '@garden/core';
+import type { Agent, HarnessVersion, KnowledgeUsage, LoopTier, Run, Step } from '@garden/core';
 import { HEURISTIC_VERSION, scoreSignals } from '@garden/core';
 import type { Adapter, AdapterContext, Census, NormalizedRecord } from '../../adapter';
 import { stableId } from '../../ids';
 import type { Unredacted } from '../../redact';
-import { gitHarnessHistory, gitRoot, scanProjectConfig, scanUserConfig } from './config';
+import {
+  gitHarnessHistory,
+  gitRoot,
+  scanKnowledge,
+  scanProjectConfig,
+  scanUserConfig,
+} from './config';
+import type { RawKnowledge } from './config';
 import type {
   AgentDefinition,
   HarnessCommit,
@@ -52,6 +59,10 @@ export interface ClaudeCodeOptions {
   gardenYamlPath?: string;
   /** Re-parse every session even if unchanged. */
   full?: boolean;
+  /** Managed-policy directory (default: the platform's, e.g. /etc/claude-code). Tests point it at a fixture. */
+  managedDir?: string;
+  /** Home directory for `~/` in @imports (default: the parent of claudeHome). */
+  homeDir?: string;
 }
 
 interface Family {
@@ -192,6 +203,7 @@ export class ClaudeCodeAdapter implements Adapter {
         fam.current.warnings.forEach((w) => ctx.warn(`${fam.name} config: ${w}`));
         for (const a of fam.current.agents) definitions.set(a.name, a); // project shadows user
         yield { type: 'family', value: { id: fam.id, name: fam.name, projectRoot: fam.root } };
+        yield { type: 'knowledge', value: this.knowledge(fam, user) };
       }
 
       yield {
@@ -207,6 +219,11 @@ export class ClaudeCodeAdapter implements Adapter {
           ...(session.entrypoint ? { entrypoint: session.entrypoint } : {}),
           ...(session.gitBranch ? { gitBranch: session.gitBranch } : {}),
         },
+      };
+
+      yield {
+        type: 'knowledge_usage',
+        value: { sessionId: session.id, rows: knowledgeUsageRows(session, sessionFam.id) },
       };
 
       const outcomes = detectSessionOutcomes(session);
@@ -287,6 +304,24 @@ export class ClaudeCodeAdapter implements Adapter {
     }
     yield* this.configLoops(user);
     yield* this.declared();
+  }
+
+  /** Knowledge graph of a bed from its current files (K). */
+  private knowledge(fam: Family, user: ScannedConfig): RawKnowledge {
+    const k = scanKnowledge({
+      familyId: fam.id,
+      root: fam.root,
+      claudeHome: this.claudeHome,
+      claudeJsonPath: this.claudeJsonPath,
+      user,
+      project: fam.current,
+      commits: fam.commits,
+      history: fam.commits.map((c) => ({ at: c.at, sha: c.sha, layers: c.knowledgeLayers ?? {} })),
+      now: new Date().toISOString(),
+      ...(this.opts.managedDir ? { managedDir: this.opts.managedDir } : {}),
+      ...(this.opts.homeDir ? { homeDir: this.opts.homeDir } : {}),
+    });
+    return k;
   }
 
   /** Hooks are loop machinery: each configured hook is a loop on the verification clock. */
@@ -397,9 +432,12 @@ export class ClaudeCodeAdapter implements Adapter {
     };
     let runs = 0;
     let subagentRuns = 0;
+    const cwds = new Set<string>();
     for (const f of files) {
       try {
         const s = await parseSession(f.path);
+        if (s.runs.length) cwds.add(s.cwd);
+        for (const e of s.knowledge) add(census.recordTypes, { [`knowledge.usage.${e.kind}`]: 1 });
         add(census.recordTypes, s.census.recordTypes);
         add(census.unknownFields, s.census.unknownFields);
         add(census.versions, s.census.versions);
@@ -417,6 +455,19 @@ export class ClaudeCodeAdapter implements Adapter {
     census.recordTypes['config.user.skills'] = user.skills.length;
     census.recordTypes['config.user.hooks'] = user.hooks.length;
     census.recordTypes['config.user.mcp_servers'] = user.mcpServers.length;
+    // Knowledge map (K): shape of each bed's graph, counts only.
+    const fams = new Map([...cwds].map((c) => [this.family(c).id, this.family(c)]));
+    census.recordTypes['knowledge.beds'] = fams.size;
+    for (const fam of fams.values()) {
+      const k = this.knowledge(fam, user);
+      for (const src of k.sources)
+        add(census.recordTypes, { [`knowledge.source.${src.kind}.${src.loadMode}`]: 1 });
+      for (const e of k.edges)
+        add(census.recordTypes, {
+          [`knowledge.edge.${e.kind}.${e.resolved ? (e.beyondCap ? 'beyond_cap' : 'resolved') : 'dangling'}`]: 1,
+        });
+      add(census.recordTypes, { 'knowledge.snapshots': k.snapshots.length });
+    }
     census.warnings.push(...user.warnings);
     return census;
   }
@@ -449,6 +500,33 @@ export function canonicalProjectRoot(cwd: string): string {
     // fall through: use the worktree's own top level
   }
   return top;
+}
+
+/** Group a session's knowledge events into per-(path, kind) usage rows. */
+export function knowledgeUsageRows(
+  session: ParsedSession,
+  famId: string,
+): Unredacted<KnowledgeUsage>[] {
+  const rows = new Map<string, Unredacted<KnowledgeUsage>>();
+  for (const e of session.knowledge) {
+    const key = `${e.kind}\u0000${e.path}`;
+    const r = rows.get(key);
+    if (r) {
+      r.count++;
+      if (e.at < r.firstAt) r.firstAt = e.at;
+      if (e.at > r.lastAt) r.lastAt = e.at;
+    } else
+      rows.set(key, {
+        sessionId: session.id,
+        familyId: famId,
+        path: e.path,
+        kind: e.kind,
+        count: 1,
+        firstAt: e.at,
+        lastAt: e.at,
+      });
+  }
+  return [...rows.values()];
 }
 
 function harnessRecord(

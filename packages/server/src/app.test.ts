@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { AddressInfo } from 'node:net';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { ClaudeCodeAdapter, deriveAll, ingest, Redactor, Store } from '@garden/ingest';
+import { ClaudeCodeAdapter, deriveAll, ingest, MIGRATIONS, Redactor, Store } from '@garden/ingest';
 import { CSP, createApp } from './app';
 import { exportStatic } from './export';
 import { HOST, startServer } from './serve';
@@ -27,7 +27,7 @@ describe('API', () => {
   const app = () => createApp({ store, asOf: '2026-12-31T00:00:00Z' });
   it('health reports schema and counts', async () => {
     const r = await app().request('/api/health');
-    expect(await r.json()).toMatchObject({ ok: true, schemaVersion: 2 });
+    expect(await r.json()).toMatchObject({ ok: true, schemaVersion: MIGRATIONS.length });
   });
   it('garden returns a GardenView for the window', async () => {
     const r = await app().request('/api/garden?days=3650');

@@ -5,3 +5,11 @@
  */
 export { scanProjectConfig, scanUserConfig } from './scan';
 export { gitHarnessHistory, gitRoot } from './git';
+export {
+  scanKnowledge,
+  projectLayersAt,
+  memoryDirFor,
+  defaultManagedDir,
+  type RawKnowledge,
+  type KnowledgeScanOptions,
+} from './knowledge';

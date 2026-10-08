@@ -14,7 +14,25 @@
     "toolCount": 12,
     "mcpCount": 2,
     "hookCount": 1,
-    "instructionBytes": 974
+    "instructionBytes": 974,
+    "knowledge": {
+     "alwaysTokens": 500,
+     "layers": [
+      {
+       "layer": "user",
+       "tokens": 91
+      },
+      {
+       "layer": "project",
+       "tokens": 154
+      },
+      {
+       "layer": "listings",
+       "tokens": 255
+      }
+     ],
+     "findingCount": 3
+    }
    },
    "currentHarnessVersionId": "hv_dd04a057b7c4d059",
    "seasonCount": 1,
@@ -34,7 +52,25 @@
     "toolCount": 12,
     "mcpCount": 1,
     "hookCount": 1,
-    "instructionBytes": 721
+    "instructionBytes": 721,
+    "knowledge": {
+     "alwaysTokens": 436,
+     "layers": [
+      {
+       "layer": "user",
+       "tokens": 91
+      },
+      {
+       "layer": "project",
+       "tokens": 90
+      },
+      {
+       "layer": "listings",
+       "tokens": 255
+      }
+     ],
+     "findingCount": 3
+    }
    },
    "currentHarnessVersionId": "hv_67fd3e79b3e90eb0",
    "seasonCount": 1,
@@ -53,7 +89,25 @@
     "toolCount": 12,
     "mcpCount": 1,
     "hookCount": 1,
-    "instructionBytes": 763
+    "instructionBytes": 763,
+    "knowledge": {
+     "alwaysTokens": 471,
+     "layers": [
+      {
+       "layer": "user",
+       "tokens": 91
+      },
+      {
+       "layer": "project",
+       "tokens": 101
+      },
+      {
+       "layer": "listings",
+       "tokens": 279
+      }
+     ],
+     "findingCount": 3
+    }
    },
    "currentHarnessVersionId": "hv_6720d453793faf35",
    "seasonCount": 1,
@@ -73,7 +127,33 @@
     "toolCount": 12,
     "mcpCount": 8,
     "hookCount": 1,
-    "instructionBytes": 31948
+    "instructionBytes": 31948,
+    "knowledge": {
+     "alwaysTokens": 13037,
+     "layers": [
+      {
+       "layer": "user",
+       "tokens": 91
+      },
+      {
+       "layer": "project",
+       "tokens": 7985
+      },
+      {
+       "layer": "rules",
+       "tokens": 41
+      },
+      {
+       "layer": "memory",
+       "tokens": 4634
+      },
+      {
+       "layer": "listings",
+       "tokens": 286
+      }
+     ],
+     "findingCount": 13
+    }
    },
    "currentHarnessVersionId": "hv_ef9c336bb430210c",
    "seasonCount": 1,
@@ -95,7 +175,29 @@
     "toolCount": 12,
     "mcpCount": 1,
     "hookCount": 2,
-    "instructionBytes": 1859
+    "instructionBytes": 1859,
+    "knowledge": {
+     "alwaysTokens": 871,
+     "layers": [
+      {
+       "layer": "user",
+       "tokens": 91
+      },
+      {
+       "layer": "project",
+       "tokens": 436
+      },
+      {
+       "layer": "memory",
+       "tokens": 65
+      },
+      {
+       "layer": "listings",
+       "tokens": 279
+      }
+     ],
+     "findingCount": 5
+    }
    },
    "currentHarnessVersionId": "hv_6cfb7b6d5f2474ff",
    "seasonCount": 2,
@@ -115,7 +217,25 @@
     "toolCount": 12,
     "mcpCount": 1,
     "hookCount": 1,
-    "instructionBytes": 839
+    "instructionBytes": 839,
+    "knowledge": {
+     "alwaysTokens": 489,
+     "layers": [
+      {
+       "layer": "user",
+       "tokens": 91
+      },
+      {
+       "layer": "project",
+       "tokens": 120
+      },
+      {
+       "layer": "listings",
+       "tokens": 278
+      }
+     ],
+     "findingCount": 3
+    }
    },
    "currentHarnessVersionId": "hv_dc60b33078c0ebbe",
    "seasonCount": 4,
@@ -1169,6 +1289,46 @@
    },
    "bedId": "fam_e4f77dae0177d5e5",
    "reason": "MCP server “slack” is connected in legacy-monolith but was never called in the window. Its tool descriptions still cost context."
+  },
+  {
+   "id": "weed_d0e4b6ea44ef1510",
+   "kind": "over_cap",
+   "subject": {
+    "type": "knowledge_source",
+    "id": "ks_2ada296b17e51fb1"
+   },
+   "bedId": "fam_e4f77dae0177d5e5",
+   "reason": "MEMORY.md is 260 lines; only the first part is loaded. One short line per memory (`- [Title](file.md) — hook`); move detail into the topic files. Open the bed’s knowledge map for the evidence."
+  },
+  {
+   "id": "weed_235a0945424eaf4c",
+   "kind": "dangling_ref",
+   "subject": {
+    "type": "knowledge_source",
+    "id": "ks_71463b5eb0edf204"
+   },
+   "bedId": "fam_e4f77dae0177d5e5",
+   "reason": "CLAUDE.md points to @docs/legacy-runbook.md, which does not exist (+1 more like it). Fix the path or remove the reference. Open the bed’s knowledge map for the evidence."
+  },
+  {
+   "id": "weed_6ed2fbcf9d7368e9",
+   "kind": "duplicate_passage",
+   "subject": {
+    "type": "knowledge_source",
+    "id": "ks_6282e21f0b9736f6"
+   },
+   "bedId": "fam_e4f77dae0177d5e5",
+   "reason": "3 passages appear in both ~/.claude/CLAUDE.md and CLAUDE.md (+2 more like it). Delete the copy in CLAUDE.md: ~/.claude/CLAUDE.md already loads it in every bed. Open the bed’s knowledge map for the evidence."
+  },
+  {
+   "id": "weed_dc0e8a14d4bf58a3",
+   "kind": "orphan_memory",
+   "subject": {
+    "type": "knowledge_source",
+    "id": "ks_3299a71cb82bc0d1"
+   },
+   "bedId": "fam_e4f77dae0177d5e5",
+   "reason": "memory/2024_migration_notes.md is not referenced from MEMORY.md or any CLAUDE.md. Add a one-line pointer to MEMORY.md (`- [Title](file.md) — hook`) or to the CLAUDE.md that needs it, or delete it. Open the bed’s knowledge map for the evidence."
   }
  ],
  "playbooks": [

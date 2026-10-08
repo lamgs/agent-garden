@@ -228,3 +228,92 @@ agree with **[observed]** facts above, the observation wins.
   `claude_code.cost.usage`, `claude_code.session.count`. Events such as `claude_code.api_request`,
   `claude_code.tool_result`. Prompt text only with `OTEL_LOG_USER_PROMPTS=1` [COM, partly from docs
   excerpts]. → Basis for a future OTel adapter.
+
+## Knowledge sources: CLAUDE.md chain, imports, rules, auto memory (K, verified 2026-10-08)
+
+Official docs are blocked by the network policy here. Facts below come from the installed
+**Claude Code 2.1.293 binary** (`strings /opt/claude-code/bin/claude`, minified JS; function names
+are minifier output) **[bin]**, this container's real transcript **[observed]**, and web search
+excerpts of code.claude.com/docs/en/memory and third-party guides **[web]**. Confidence:
+**high** = read in the loader code, **medium** = read in strings/prompt text or one source,
+**low** = inferred. Fixture: `fixtures/knowledge/` (synthetic, every shape below).
+
+Load chain at session start (always loaded), in order [bin, high]:
+1. Managed: `<managed>/CLAUDE.md` and `<managed>/.claude/rules/**/*.md`. `<managed>` =
+   `/etc/claude-code` (Linux), `/Library/Application Support/ClaudeCode` (macOS),
+   `C:\Program Files\ClaudeCode` (Windows). Policy settings can also inject `claudeMd` text (not a file).
+2. User: `~/.claude/CLAUDE.md` and `~/.claude/rules/**/*.md`.
+3. Project, for every directory from the filesystem root down to the cwd: `CLAUDE.md`,
+   `.claude/CLAUDE.md`, `.claude/rules/**/*.md` (type Project), and `CLAUDE.local.md` (type Local,
+   only when the local settings source is enabled, the default). In a worktree nested inside its
+   main repo, directories between the main repo root and the worktree root are skipped.
+4. `--add-dir` directories: the same four files.
+5. Auto memory: `MEMORY.md` of the memory folder (type AutoMem).
+- Memory types in code and in the `InstructionsLoaded` hook: `User | Project | Local | Managed |
+  AutoMem`; hook `load_reason`: `session_start | nested_traversal | path_glob_match | include |
+  compact` [bin, high].
+- `AGENTS.md`: setting `instructionFiles`, default `claude-md-or-agents-md` = "a project with no
+  CLAUDE.md of its own gets its AGENTS.md files instead"; also `claude-md-and-agents-md`,
+  `claude-md`, `managed-only` [bin strings, medium].
+- `claudeMdExcludes` (picomatch globs on absolute paths) and `CLAUDE_CODE_DISABLE_CLAUDE_MDS`
+  remove files from the chain [bin, medium; not modeled].
+- Files are skipped when not regular or larger than 4 MiB (`bH=4194304`) [bin, medium: the
+  constant name is shared, the 4 MiB value sits next to the skip message].
+- Recommended size (warning only, behind a flag): per file max(40,000, 5% of the context window ×
+  4 chars) characters; total max(120,000, per-file) characters; Claude Code estimates 4 chars/token
+  (3 for some models) [bin, high]. Official guidance: under 200 lines per CLAUDE.md [web, medium].
+
+On demand [bin, high]:
+- Subdirectory `CLAUDE.md` / `.claude/CLAUDE.md` / `CLAUDE.local.md` / `.claude/rules` of a
+  directory the agent works in (e.g. a Read below the cwd) load as a `nested_memory` attachment.
+- Rules with `paths:` frontmatter (string or YAML list; a trailing `/**` is dropped; all-`**`
+  means unconditional) load when a touched file matches (picomatch). Malformed frontmatter → the
+  rule loads unconditionally [web, medium].
+
+`@path` imports [bin, high]:
+- Pattern `(?:^|\s)@((?:[^\s\\]|\\ )+)`; `#fragment` stripped; `\ ` = escaped space. Accepted when the
+  target starts with `./`, `~/`, `/` (not `/` alone) or `[a-zA-Z0-9._-]`, and not `@`.
+- Markdown is lexed first: matches inside code blocks and code spans are ignored; HTML comments
+  are stripped. Relative paths resolve against the importing file's directory; `~/` = home.
+- Depth: files at depth ≥ 5 are not loaded (`BJn=5`; root file depth 0, so 4 hops) [bin, high;
+  the web says "max depth 4 hops", consistent]. Cycles are cut by a processed-paths set.
+- Non-text extensions are skipped ("Skipping non-text file in @include").
+- Imports outside the working directory from project/local files load only when
+  `hasClaudeMdExternalIncludesApproved` (per project in `~/.claude.json`) is true; user-file imports
+  outside are allowed in the CLI [bin, high]. Imported files load with their importer.
+- Agent Garden: targets that do not look like files (no `./ ~/ /` prefix and no extension, e.g.
+  `@anthropic-ai/sdk`) are not reported as dangling (ours).
+
+Auto memory [bin, high unless noted]:
+- Folder: `autoMemoryDirectory` setting (user/local/policy; ignored in project settings; `~/`
+  expanded), else `<config home>/projects/<slug(canonical working-copy root)>/memory/`; slug = the
+  transcript slug (every non-alphanumeric → `-`) [medium for the canonical-root detail].
+  `CLAUDE_CODE_REMOTE_MEMORY_DIR` overrides the config home in remote sessions.
+- Index `MEMORY.md` is always loaded: trimmed, cut at **200 lines** (`X0=200`), then at the last
+  newline before **25,000 bytes** (`bne=25000`). The loader appends "MEMORY.md is N lines … Only
+  part of it was loaded …" when cut. Prompt text: "`MEMORY.md` is an index, not a memory — each
+  entry should be one line, under ~150 characters: `- [Title](file.md) — one-line hook`".
+- Topic files: `*.md` in the folder with frontmatter `name`, `description`, `type` (`user |
+  feedback | project | reference`); recalled when relevant (up to 5 per turn as a
+  `relevant_memories` attachment, first 4,096 bytes / 200 lines each: `Sne=4096`, `LTe=200`) or
+  read with Read. The memory scan lists the index first, then files by mtime, cap 200.
+- "its MEMORY.md is not read" when an agent-memory entry "leads out of the working copy or through a
+  dangling link" or "could not be resolved" [bin strings, medium: agent-scoped memory].
+
+Skills and agents [bin, high]: the skill listing (name + description) is in every session; each
+description is capped at 1,536 chars (`skillListingMaxDescChars`) and the listing at 1% of the
+context window (`skillListingBudgetFraction`); `SKILL.md` over 128 KB is skipped. The body loads on
+invocation. Agent definitions: the Agent tool lists name + description; the body is the
+subagent's prompt.
+
+How transcripts show loading:
+- `attachment.type = "instructions"`: `{files: [{path, type, content}], removed?, changed?,
+  reason?}`, `reason` ∈ session_start, compaction, policy_refresh, directory_added, settings_sync,
+  … **[observed]** in this container's transcript (one file, `type: "Project"`) and [bin] schema.
+  The parser keeps `path` only; `content` is dropped.
+- `attachment.type = "nested_memory"`: `{path, content: {path, type, content, globs?}, displayPath}`
+  [bin, high; not observed]. Rendered as "Loaded <path>".
+- `attachment.type = "relevant_memories"`: `{memories: [{path, content, mtimeMs, header, limit?}]}`
+  [bin, high; not observed].
+- Read tool calls on memory/instruction files: `tool_use.input.file_path` [observed].
+- `system` subtype `instruction_size_warning` is "never stored in the transcript" [bin].

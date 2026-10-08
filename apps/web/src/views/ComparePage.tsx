@@ -6,7 +6,14 @@ import { INK, type BedCompareView, type BedSnapshot, type GardenView } from '@ga
 import { formatCi, formatPoints, formatRatio, soilChanges } from '../compare-format';
 import type { ViewResult } from '../data/views';
 import { formatInt, formatUsd, pct } from '../format';
-import { compareHref, navigate, replantHref, plantHref, seasonsHref } from '../route';
+import {
+  compareHref,
+  knowledgeHref,
+  navigate,
+  replantHref,
+  plantHref,
+  seasonsHref,
+} from '../route';
 import { SoilPlot } from '../components/Specimen';
 import {
   BedTag,
@@ -129,6 +136,9 @@ function BedColumn({ snap, side }: { snap: BedSnapshot; side: 'left' | 'right' }
       <a className="quiet-link seasons-link" href={seasonsHref(snap.bed.id)}>
         Seasons of {snap.bed.name} →
       </a>
+      <p className="quiet-link">
+        <a href={knowledgeHref(snap.bed.id)}>Knowledge map →</a>
+      </p>
       <SoilPlot
         bed={snap.bed}
         plants={plants.map((p, i) => ({ plant: p, at: (i + 0.5) / Math.max(1, n) }))}

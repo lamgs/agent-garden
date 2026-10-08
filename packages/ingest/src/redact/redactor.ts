@@ -47,6 +47,14 @@ export class Redactor {
     return `[REDACTED:${kind}:${h}]`;
   }
 
+  /**
+   * Keyed digest of an already-hashed value (e.g. a normalized-passage sha256): equal inputs give
+   * equal outputs on this install, but nobody without the local key can confirm a guessed text.
+   */
+  keyedDigest(hash: string): string {
+    return createHmac('sha256', this.key).update(`digest:${hash}`).digest('hex').slice(0, 16);
+  }
+
   /** Redact a string. Runs every detector; specific detectors run before generic ones. */
   text(input: string, maxChars?: number): RedactedText {
     let out = input;

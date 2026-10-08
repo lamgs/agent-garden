@@ -14,6 +14,7 @@ import {
   type McpDef,
   skillName,
 } from './config';
+import { knowledgeAttachments } from './knowledge';
 import type { Era, ProjectSpec, Subject } from './projects';
 import type { Rng } from './rng';
 import type { DemoSecrets } from './secrets';
@@ -35,6 +36,8 @@ export interface Globals {
   interrupts: number;
   runs: number;
   subagentRuns: number;
+  /** ~/.claude of the demo home, for the knowledge-map records (K). */
+  claudeHome?: string;
 }
 
 export interface S {
@@ -81,6 +84,16 @@ export function startAttachments(s: S): void {
     skillCount: h.skills.length,
     isInitial: true,
   });
+  // Knowledge map (K): what was loaded at session start, plus nested loads and memory recalls.
+  if (s.g.claudeHome)
+    for (const a of knowledgeAttachments({
+      claudeHome: s.g.claudeHome,
+      root: s.root,
+      project: s.p.name,
+      claudeMd: s.era.claudeMd,
+      sessionId: s.w.opts.sessionId,
+    }))
+      s.w.fixedAttachment(a);
 }
 
 /** Prompt tokens before the first message: system prompt, CLAUDE.md chain, tool definitions. */
