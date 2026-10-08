@@ -1,11 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ID } from '@garden/core';
+import { BedPicker } from './components/BedPicker';
 import { GardenStage, type GardenStageHandle } from './components/GardenStage';
 import { Legend } from './components/Legend';
 import { PlantPanel } from './components/PlantPanel';
 import { TableView } from './components/TableView';
+import { HoverTipLayer } from './components/ui';
 import { loadGarden, SOURCE_LABEL, type Loaded } from './data/load';
+import type { ViewRoute } from './data/views';
 import type { ZoomLevel } from './garden/renderer';
+import { navigate, parseRoute, type Route } from './route';
+import { ComparePage } from './views/ComparePage';
+import { PageShell } from './views/PageShell';
+import { PlantPage } from './views/PlantPage';
+import { ReplantPage } from './views/ReplantPage';
+import { useView } from './views/useView';
+import { ViewMessage } from './components/ui';
 
 export const TAGLINE =
   "See every AI agent you run as a living garden: what's thriving, what's wilting, and which one to call.";
@@ -25,9 +35,29 @@ export function App() {
   const [legendOpen, setLegendOpen] = useState(false);
   const [tableOpen, setTableOpen] = useState(false);
   const [zoom, setZoom] = useState<ZoomLevel>('mid');
+  const [route, setRoute] = useState<Route>(() => parseRoute(window.location.hash));
+  /** null = closed; '' = open with no preselected bed. */
+  const [picker, setPicker] = useState<ID | '' | null>(null);
   const stage = useRef<GardenStageHandle>(null);
   const selRef = useRef<ID | null>(null);
   selRef.current = selected;
+  const stateRef = useRef({ route, legendOpen, picker });
+  stateRef.current = { route, legendOpen, picker };
+
+  useEffect(() => {
+    const onHash = () => {
+      setRoute(parseRoute(window.location.hash));
+      setPicker(null);
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  // A page view starts at the top and its title is announced via document.title.
+  useEffect(() => {
+    document.querySelector('[data-page]')?.scrollTo?.(0, 0);
+    document.title = route.view === 'garden' ? 'Agent Garden' : `Agent Garden · ${route.view}`;
+  }, [route]);
 
   useEffect(() => {
     let live = true;
@@ -44,6 +74,24 @@ export function App() {
     const t = e.target as HTMLElement | null;
     if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const { route: r, legendOpen: lo, picker: pk } = stateRef.current;
+    if (pk !== null) {
+      if (e.key === 'Escape') setPicker(null);
+      return;
+    }
+    if (r.view !== 'garden') {
+      // Pages: L = legend, T = jump to this page's table, Esc = legend first, then the garden.
+      if (e.key === 'l' || e.key === 'L') setLegendOpen((o) => !o);
+      else if (e.key === 't' || e.key === 'T') {
+        const el = document.querySelector<HTMLElement>('#runs, #shared, #numbers');
+        el?.scrollIntoView({ block: 'start' });
+        el?.querySelector<HTMLElement>('table')?.focus();
+      } else if (e.key === 'Escape') {
+        if (lo) setLegendOpen(false);
+        else navigate('#/');
+      }
+      return;
+    }
     if (e.key === 'l' || e.key === 'L') setLegendOpen((o) => !o);
     else if (e.key === 't' || e.key === 'T') setTableOpen((o) => !o);
     else if (e.key === 'Escape') {
@@ -63,6 +111,7 @@ export function App() {
   }, [onKey]);
 
   const fixed = data?.source !== 'api';
+  const onPage = route.view !== 'garden';
 
   return (
     <div className="app">
@@ -103,7 +152,7 @@ export function App() {
         </div>
       </header>
 
-      <main className={`stage${legendOpen ? ' legend-open' : ''}`}>
+      <main className={`stage${legendOpen ? ' legend-open' : ''}${onPage ? ' on-page' : ''}`}>
         {error ? (
           <div className="empty">
             <h2>No garden yet</h2>
@@ -111,16 +160,19 @@ export function App() {
           </div>
         ) : null}
         {data ? (
-          <GardenStage
-            ref={stage}
-            view={data.view}
-            selectedId={selected}
-            onSelect={setSelected}
-            onZoomLevel={setZoom}
-          />
+          <div className="garden-layer" inert={onPage} aria-hidden={onPage}>
+            <GardenStage
+              ref={stage}
+              view={data.view}
+              selectedId={selected}
+              onSelect={setSelected}
+              onZoomLevel={setZoom}
+              onBedLabel={(id) => setPicker(id)}
+            />
+          </div>
         ) : null}
 
-        <div className="toolbar" role="toolbar" aria-label="Garden controls">
+        <div className="toolbar" role="toolbar" aria-label="Garden controls" inert={onPage}>
           <button
             type="button"
             onClick={() => stage.current?.zoomBy(1.25)}
@@ -158,9 +210,14 @@ export function App() {
           >
             Table <kbd>T</kbd>
           </button>
+          <span className="toolbar-sep" />
+          <button type="button" onClick={() => setPicker('')} disabled={!data}>
+            Compare beds
+          </button>
         </div>
         <p className="hint">
-          Drag to pan · scroll or pinch to zoom · Tab through plants · Enter opens · Esc closes
+          Drag to pan · scroll or pinch to zoom · Tab through plants · Enter opens · click a bed
+          label to compare beds
         </p>
 
         {tableOpen && data ? (
@@ -176,8 +233,79 @@ export function App() {
             onSelect={setSelected}
           />
         ) : null}
+        {onPage ? <RoutedPage route={route} days={days} garden={data?.view ?? null} /> : null}
+        {picker !== null && data ? (
+          <BedPicker
+            view={data.view}
+            initialLeft={picker || null}
+            onClose={() => setPicker(null)}
+          />
+        ) : null}
         <Legend open={legendOpen} onClose={() => setLegendOpen(false)} />
+        {onPage ? <HoverTipLayer /> : null}
       </main>
     </div>
   );
+}
+
+function RoutedPage({
+  route,
+  days,
+  garden,
+}: {
+  route: Route;
+  days: number;
+  garden: Loaded['view'] | null;
+}) {
+  if (route.view === 'garden') return null;
+  if (route.view === 'unknown') {
+    return (
+      <PageShell crumb="Not found">
+        <ViewMessage title="No such page">
+          <p>
+            <code>#{route.hash}</code> is not a garden route. Pages are <code>#/plant/:id</code>,{' '}
+            <code>#/compare?left=&amp;right=</code>, and{' '}
+            <code>#/replant?agent=&amp;from=&amp;to=</code>.
+          </p>
+        </ViewMessage>
+      </PageShell>
+    );
+  }
+  return <ViewPage key={route.view} route={route} days={days} garden={garden} />;
+}
+
+function ViewPage({
+  route,
+  days,
+  garden,
+}: {
+  route: ViewRoute;
+  days: number;
+  garden: Loaded['view'] | null;
+}) {
+  const { result, reload } = useView(route, days);
+  switch (route.view) {
+    case 'plant':
+      return (
+        <PlantPage
+          result={result as Parameters<typeof PlantPage>[0]['result']}
+          garden={garden}
+          onReload={reload}
+        />
+      );
+    case 'compare':
+      return (
+        <ComparePage
+          result={result as Parameters<typeof ComparePage>[0]['result']}
+          garden={garden}
+        />
+      );
+    case 'replant':
+      return (
+        <ReplantPage
+          result={result as Parameters<typeof ReplantPage>[0]['result']}
+          garden={garden}
+        />
+      );
+  }
 }

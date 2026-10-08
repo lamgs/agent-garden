@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { GardenView, ID } from '@garden/core';
 import { describePlant, plantLabel } from '../describe';
 import { formatRate } from '../format';
+import { plantHref } from '../route';
 import { DescriptionBody } from './Tooltip';
 
 /** Side panel for a selected plant. M4 grows this into the full Plant view. */
@@ -40,6 +41,12 @@ export function PlantPanel({
         ×
       </button>
       <DescriptionBody d={d} />
+      <p className="panel-open">
+        <a className="open-plant" href={plantHref(p.id)}>
+          Open plant view →
+        </a>
+        <span className="muted"> runs, evidence, labels</span>
+      </p>
       {loops.length ? (
         <section>
           <h4>Watered by loops</h4>
