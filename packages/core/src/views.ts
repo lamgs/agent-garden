@@ -2,7 +2,7 @@
  * View data contracts: the only data shapes the web app knows about.
  * Built by pure functions from the store; also written as static JSON by `garden export --static`.
  */
-import type { Agent, HarnessDiff, ID, ISO, LoopTier, OutcomeLabel, StepKind } from './schema';
+import type { HarnessDiff, ID, ISO, LoopTier, OutcomeLabel, StepKind } from './schema';
 
 /** A rate that always carries how it was computed. */
 export interface Rate {
@@ -118,37 +118,149 @@ export interface RunRow {
   runId: ID;
   startedAt: ISO;
   durationMs: number;
+  /** Redacted, truncated first prompt. */
   taskPreview: string;
+  trigger: 'human' | 'automated' | 'subagent';
   outcome: {
     label: OutcomeLabel;
     score: number | null;
     source: 'heuristic' | 'manual';
+    heuristicLabel: OutcomeLabel;
     signals: { id: string; fired: boolean | null; weight: number; detail: string }[];
+    manual?: { label: OutcomeLabel; note?: string; at: ISO };
   };
   totalTokens: number;
   costUsd: number | null;
+  costEstimated: boolean;
   model: string | null;
+  toolCallCount: number;
+  errorCount: number;
+  /** Subagent runs this run spawned. */
+  childCount: number;
+}
+
+/** The harness a planting runs under, summarized for display. */
+export interface HarnessSummary {
+  versionId: ID;
+  validFrom: ISO;
+  provenance: 'git' | 'observed' | 'snapshot';
+  model?: string;
+  effort?: string;
+  permissionMode?: string;
+  instructionBytes: number;
+  toolCount: number;
+  tools: string[];
+  mcpServers: string[];
+  skillCount: number;
+  hookCount: number;
+  /** Commit subject when provenance is git. */
+  commitMessage?: string;
+  /** Changes from the previous version of this harness (summarizeDiff). */
+  changes: string[];
+}
+
+export interface SignalStat {
+  id: string;
+  weight: number;
+  description: string;
+  fired: number;
+  notFired: number;
+  notApplicable: number;
+}
+
+export interface PlantView {
+  plant: PlantSummary;
+  bed: BedSummary;
+  agent: {
+    id: ID;
+    name: string;
+    kind: 'main' | 'subagent';
+    definition?: {
+      scope: string;
+      description?: string;
+      tools?: string[];
+      model?: string;
+      path?: string;
+    };
+  };
+  harness: HarnessSummary | null;
+  capabilities: {
+    skills: { id: ID; name: string; invocations: number }[];
+    mcpServers: { name: string; calls: number }[];
+    /** Most-used tools in this planting's runs. */
+    tools: { name: string; calls: number }[];
+  };
+  /** Most recent first, capped; `runsTotal` is the full count in the window. */
+  runs: RunRow[];
+  runsTotal: number;
+  outcomeMix: Record<OutcomeLabel, number>;
+  /** How often each heuristic fired across this planting's runs: the evidence behind the rate. */
+  signalStats: SignalStat[];
+  /** Steps per loop tier across this planting's runs. */
+  tierBreakdown: Record<LoopTier, number>;
+  /** The same agent planted in other beds. */
+  otherBeds: PlantSummary[];
 }
 
 export interface BedSnapshot {
   bed: BedSummary;
   plants: PlantSummary[];
+  harness: HarnessSummary | null;
+}
+
+export interface RateDelta {
+  /** right − left, in rate points (−1..1); null if either side has no labeled runs. */
+  delta: number | null;
+  /** Wilson intervals don't overlap: a difference unlikely to be noise at this n. */
+  separated: boolean;
 }
 
 export interface BedCompareView {
   left: BedSnapshot;
   right: BedSnapshot;
+  /** left → right. */
   harnessDiff: HarnessDiff;
-  sharedAgents: { agentId: ID; left: PlantSummary; right: PlantSummary }[];
+  harnessChanges: string[];
+  sharedAgents: {
+    agentId: ID;
+    name: string;
+    left: PlantSummary;
+    right: PlantSummary;
+    success: RateDelta;
+    /** right ÷ left median cost per run. */
+    costRatio: number | null;
+  }[];
+  caveat: string;
 }
 
-export interface PlantView {
-  plant: PlantSummary;
-  agent: Agent;
-  capabilities: { tools: string[]; skills: ID[]; mcpServers: string[]; model?: string };
-  runs: RunRow[];
-  tierBreakdown: Record<LoopTier, number>;
-  otherBeds: PlantSummary[];
+/** The same agent in two beds: the "replant" comparison. */
+export interface ReplantView {
+  agent: { id: ID; name: string; kind: 'main' | 'subagent'; description?: string };
+  from: {
+    bed: BedSummary;
+    plant: PlantSummary | null;
+    harness: HarnessSummary | null;
+    recent: RunRow[];
+  };
+  to: {
+    bed: BedSummary;
+    plant: PlantSummary | null;
+    harness: HarnessSummary | null;
+    recent: RunRow[];
+  };
+  harnessDiff: HarnessDiff | null;
+  harnessChanges: string[];
+  success: RateDelta;
+  costRatio: number | null;
+  /** Signal-level differences: share of runs each heuristic fired in, per side. */
+  signals: { id: string; weight: number; fromShare: number | null; toShare: number | null }[];
+  caveat: string;
+}
+
+/** Body of POST /api/runs/:runId/label. */
+export interface LabelRequest {
+  label: OutcomeLabel | 'clear';
+  note?: string;
 }
 
 export interface ReplayFrame {

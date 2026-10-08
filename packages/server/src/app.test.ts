@@ -91,3 +91,170 @@ describe('static export', () => {
     );
   });
 });
+
+describe('plant, compare, replant views', () => {
+  const app = () => createApp({ store, asOf: '2026-12-31T00:00:00Z' });
+  const garden = async () =>
+    (await (await app().request('/api/garden?days=3650')).json()) as {
+      plants: { id: string; agentId: string; bedId: string; name: string }[];
+      beds: { id: string }[];
+    };
+  it('plant view carries evidence: outcome mix, signal stats, tiers, runs', async () => {
+    const g = await garden();
+    const p = g.plants[0]!;
+    const r = await app().request(`/api/plant/${p.id}?days=3650`);
+    expect(r.status).toBe(200);
+    const v = (await r.json()) as {
+      runs: { outcome: { source: string } }[];
+      runsTotal: number;
+      signalStats: { id: string; fired: number; notFired: number; notApplicable: number }[];
+      outcomeMix: Record<string, number>;
+      tierBreakdown: Record<string, number>;
+    };
+    expect(v.runs.length).toBe(Math.min(v.runsTotal, 200));
+    expect(Object.values(v.outcomeMix).reduce((a, b) => a + b, 0)).toBe(v.runsTotal);
+    for (const s of v.signalStats) expect(s.fired + s.notFired + s.notApplicable).toBe(v.runsTotal);
+    expect(Object.keys(v.tierBreakdown).sort()).toEqual([
+      'agent',
+      'application',
+      'hill_climbing',
+      'verification',
+    ]);
+    expect((await app().request('/api/plant/plt_nope?days=3650')).status).toBe(404);
+  });
+  it('compare and replant return 404 for unknown ids and a caveat otherwise', async () => {
+    const g = await garden();
+    const b = g.beds[0]!.id;
+    const c = (await (
+      await app().request(`/api/compare?left=${b}&right=${b}&days=3650`)
+    ).json()) as { caveat: string; harnessChanges: string[] };
+    expect(c.caveat).toMatch(/Correlation, not causation/);
+    expect(c.harnessChanges).toEqual([]);
+    expect((await app().request(`/api/compare?left=${b}&right=nope`)).status).toBe(404);
+    const p = g.plants[0]!;
+    const rv = (await (
+      await app().request(`/api/replant?agent=${p.agentId}&from=${b}&to=${b}&days=3650`)
+    ).json()) as { success: { delta: number | null } };
+    expect(rv.success.delta === null || rv.success.delta === 0).toBe(true);
+    expect((await app().request(`/api/replant?agent=nope&from=${b}&to=${b}`)).status).toBe(404);
+  });
+});
+
+describe('manual labels: UI → API → DB → recomputed views', () => {
+  const app = () =>
+    createApp({ store, asOf: '2026-12-31T00:00:00Z', redactor: new Redactor(Buffer.alloc(32, 4)) });
+  const post = (runId: string, body: unknown, headers: Record<string, string> = {}) =>
+    app().request(`/api/runs/${runId}/label`, {
+      method: 'POST',
+      headers: { origin: 'http://127.0.0.1:4310', 'content-type': 'application/json', ...headers },
+      body: JSON.stringify(body),
+    });
+
+  it('a manual label overrides the heuristic everywhere and can be cleared', async () => {
+    const g = (await (await app().request('/api/garden?days=3650')).json()) as {
+      plants: { id: string; success: { nManual: number; value: number | null } }[];
+    };
+    const plant = g.plants[0]!;
+    const pv = (await (await app().request(`/api/plant/${plant.id}?days=3650`)).json()) as {
+      runs: { runId: string; outcome: { label: string; heuristicLabel: string } }[];
+    };
+    const run = pv.runs[0]!;
+    const flipped = run.outcome.heuristicLabel === 'failure' ? 'success' : 'failure';
+    const r = await post(run.runId, { label: flipped, note: 'checked by hand' });
+    expect(r.status).toBe(200);
+    expect(((await r.json()) as { outcome: { source: string } }).outcome.source).toBe('manual');
+
+    const after = (await (await app().request(`/api/plant/${plant.id}?days=3650`)).json()) as {
+      plant: { success: { nManual: number } };
+      runs: {
+        runId: string;
+        outcome: {
+          label: string;
+          source: string;
+          heuristicLabel: string;
+          manual?: { note?: string };
+        };
+      }[];
+    };
+    const row = after.runs.find((x) => x.runId === run.runId)!;
+    expect(row.outcome).toMatchObject({
+      label: flipped,
+      source: 'manual',
+      heuristicLabel: run.outcome.heuristicLabel,
+    });
+    expect(row.outcome.manual?.note).toBe('checked by hand');
+    expect(after.plant.success.nManual).toBe(plant.success.nManual + 1);
+    const g2 = (await (await app().request('/api/garden?days=3650')).json()) as {
+      plants: { id: string; success: { nManual: number } }[];
+    };
+    expect(g2.plants.find((p) => p.id === plant.id)!.success.nManual).toBe(
+      plant.success.nManual + 1,
+    );
+
+    expect((await post(run.runId, { label: 'clear' })).status).toBe(200);
+    const cleared = (await (await app().request(`/api/plant/${plant.id}?days=3650`)).json()) as {
+      plant: { success: { nManual: number; value: number | null } };
+    };
+    expect(cleared.plant.success).toMatchObject({
+      nManual: plant.success.nManual,
+      value: plant.success.value,
+    });
+  });
+
+  it('redacts secrets in notes before they reach the store', async () => {
+    const runId = (store.db.prepare('SELECT id FROM runs LIMIT 1').get() as { id: string }).id;
+    const { plantedSecrets } = await import('@garden/ingest/planted-secrets');
+    const secret = plantedSecrets('note')[0]!;
+    expect((await post(runId, { label: 'success', note: secret.context })).status).toBe(200);
+    const note = (
+      store.db.prepare('SELECT note FROM manual_labels WHERE run_id = ?').get(runId) as {
+        note: string;
+      }
+    ).note;
+    expect(note).not.toContain(secret.secret);
+    expect(note).toContain('[REDACTED:');
+    await post(runId, { label: 'clear' });
+  });
+
+  it('rejects bad input and unknown runs', async () => {
+    const runId = (store.db.prepare('SELECT id FROM runs LIMIT 1').get() as { id: string }).id;
+    expect((await post(runId, { label: 'great' })).status).toBe(400);
+    expect((await post('run_nope', { label: 'success' })).status).toBe(404);
+    const noRedactor = createApp({ store });
+    const r = await noRedactor.request(`/api/runs/${runId}/label`, {
+      method: 'POST',
+      headers: { origin: 'http://localhost:4310', 'content-type': 'application/json' },
+      body: JSON.stringify({ label: 'success', note: 'x' }),
+    });
+    expect(r.status).toBe(501);
+  });
+});
+
+describe('local-only guards', () => {
+  const app = () => createApp({ store, redactor: new Redactor(Buffer.alloc(32, 4)) });
+  const runId = () => (store.db.prepare('SELECT id FROM runs LIMIT 1').get() as { id: string }).id;
+  it('refuses requests addressed to a non-loopback host (DNS rebinding)', async () => {
+    const r = await app().request('/api/garden', { headers: { host: 'evil.example:4310' } });
+    expect(r.status).toBe(403);
+    expect(
+      (await app().request('/api/health', { headers: { host: '127.0.0.1:4310' } })).status,
+    ).toBe(200);
+    expect((await app().request('/api/health', { headers: { host: '[::1]:4310' } })).status).toBe(
+      200,
+    );
+  });
+  it('refuses cross-origin or non-JSON writes (CSRF)', async () => {
+    const body = JSON.stringify({ label: 'success' });
+    const send = (headers: Record<string, string>) =>
+      app().request(`/api/runs/${runId()}/label`, { method: 'POST', headers, body });
+    expect((await send({ 'content-type': 'application/json' })).status).toBe(403); // no Origin
+    expect(
+      (await send({ origin: 'https://evil.example', 'content-type': 'application/json' })).status,
+    ).toBe(403);
+    expect((await send({ origin: 'null', 'content-type': 'application/json' })).status).toBe(403);
+    expect(
+      (await send({ origin: 'http://127.0.0.1:4310', 'content-type': 'text/plain' })).status,
+    ).toBe(415);
+    expect(store.getOutcome(runId())?.source).toBe('heuristic');
+  });
+});

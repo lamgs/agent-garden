@@ -3,7 +3,7 @@
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { main, dataDir, dbPath, str, type Command } from '@garden/ingest/cli';
-import { Store, loadGardenConfig } from '@garden/ingest';
+import { Redactor, Store, loadGardenConfig } from '@garden/ingest';
 import { DEFAULT_WINDOW_DAYS } from './app';
 import { exportStatic } from './export';
 import { DEFAULT_PORT, startServer } from './serve';
@@ -16,7 +16,14 @@ function common(o: Parameters<Command['run']>[0]) {
   const pricing = loadGardenConfig(yamlPath).pricing;
   const asOf = str(o, 'as-of');
   if (asOf && Number.isNaN(Date.parse(asOf))) throw new Error('--as-of must be an ISO date');
-  return { store, pricing, ...(asOf ? { asOf } : {}), webDist: str(o, 'web') ?? WEB_DIST };
+  const redactor = Redactor.fromKeyFile(join(dataDir(o), 'redaction.key'));
+  return {
+    store,
+    pricing,
+    redactor,
+    ...(asOf ? { asOf } : {}),
+    webDist: str(o, 'web') ?? WEB_DIST,
+  };
 }
 
 const extra: Record<string, Command> = {

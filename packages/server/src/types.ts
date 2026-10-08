@@ -1,4 +1,10 @@
-export type { HarnessBundle, OutcomeLabel, OutcomeSignalResult, GateSpec } from '@garden/core';
+export type {
+  HarnessBundle,
+  HarnessDiff,
+  OutcomeLabel,
+  OutcomeSignalResult,
+  GateSpec,
+} from '@garden/core';
 import type { GateSpec } from '@garden/core';
 export interface PlaybookStepRow {
   id: string;

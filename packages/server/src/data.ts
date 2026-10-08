@@ -2,7 +2,13 @@
  * Loads the rows a view needs from the store. All builders downstream are pure functions over
  * these rows, so they can be unit-tested without SQLite.
  */
-import type { HarnessBundle, OutcomeLabel, OutcomeSignalResult, PlaybookStepRow } from './types';
+import type {
+  HarnessBundle,
+  HarnessDiff,
+  OutcomeLabel,
+  OutcomeSignalResult,
+  PlaybookStepRow,
+} from './types';
 import type { Store } from '@garden/ingest';
 
 export interface RunRow {
@@ -27,6 +33,11 @@ export interface RunRow {
   /** Effective label: manual wins. */
   label: OutcomeLabel;
   manual: boolean;
+  heuristicLabel: OutcomeLabel;
+  score: number | null;
+  manualNote: string | null;
+  manualAt: string | null;
+  toolCallCount: number;
   signals: OutcomeSignalResult[];
   taskPreview: string;
   errorCount: number;
@@ -41,12 +52,21 @@ export interface GardenData {
     validTo: string | null;
     bundle: HarnessBundle;
     primaryAgentId: string | null;
+    provenance: 'git' | 'observed' | 'snapshot';
+    commitMessage: string | null;
+    diff: HarnessDiff | null;
   }[];
   agents: {
     id: string;
     name: string;
     kind: 'main' | 'subagent';
-    definition: { scope: string; description?: string } | null;
+    definition: {
+      scope: string;
+      description?: string;
+      tools?: string[];
+      model?: string;
+      path?: string;
+    } | null;
   }[];
   skills: { id: string; name: string; description: string | null; scope: string }[];
   runs: RunRow[];
@@ -87,7 +107,8 @@ export function loadGardenData(store: Store, from: string, to: string): GardenDa
   const all = <T>(sql: string, ...p: string[]) => db.prepare(sql).all(...p) as T[];
 
   const runs = all<Record<string, unknown>>(
-    `SELECT r.*, COALESCE(m.label, o.label, 'unknown') AS eff_label, m.run_id IS NOT NULL AS is_manual, o.signals_json
+    `SELECT r.*, COALESCE(m.label, o.label, 'unknown') AS eff_label, m.run_id IS NOT NULL AS is_manual, o.signals_json,
+            COALESCE(o.label, 'unknown') AS h_label, o.score AS h_score, m.note AS m_note, m.at AS m_at
        FROM runs r LEFT JOIN outcomes o ON o.run_id = r.id LEFT JOIN manual_labels m ON m.run_id = r.id
       WHERE r.started_at >= ? AND r.started_at <= ? ORDER BY r.started_at`,
     from,
@@ -113,6 +134,11 @@ export function loadGardenData(store: Store, from: string, to: string): GardenDa
     tokenQuality: r.token_quality as RunRow['tokenQuality'],
     label: r.eff_label as OutcomeLabel,
     manual: Boolean(r.is_manual),
+    heuristicLabel: r.h_label as OutcomeLabel,
+    score: r.h_score === null ? null : Number(r.h_score),
+    manualNote: r.m_note === null ? null : String(r.m_note),
+    manualAt: r.m_at === null ? null : String(r.m_at),
+    toolCallCount: Number(r.tool_call_count),
     signals: json<OutcomeSignalResult[]>(r.signals_json, []),
     taskPreview: String(r.task_preview),
     errorCount: Number(r.error_count),
@@ -175,6 +201,9 @@ export function loadGardenData(store: Store, from: string, to: string): GardenDa
       validTo: v.valid_to === null ? null : String(v.valid_to),
       bundle: json<HarnessBundle>(v.bundle_json, {} as HarnessBundle),
       primaryAgentId: v.primary_agent === null ? null : String(v.primary_agent),
+      provenance: v.provenance as 'git' | 'observed' | 'snapshot',
+      commitMessage: json<{ message?: string } | null>(v.commit_json, null)?.message ?? null,
+      diff: json<HarnessDiff | null>(v.diff_json, null),
     })),
     agents: all<Record<string, unknown>>(
       'SELECT id, name, kind, definition_json FROM agents ORDER BY name',
