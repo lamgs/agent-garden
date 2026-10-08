@@ -42,6 +42,20 @@
               "kind": "outcome_history",
               "text": "Similar past runs: 9 success, 0 partial, 1 failure → 79% Beta(2,2)-smoothed (n=10). All runs in the window: 210, 60% success (n=210)."
             }
+          ],
+          "plantings": [
+            {
+              "plantId": "plt_0afdf741a0daed53",
+              "outcome": 0.5,
+              "n": 0,
+              "confidence": 0.6227455425645788
+            },
+            {
+              "plantId": "plt_5f39547dea82bd11",
+              "outcome": 0.7857142857142857,
+              "n": 10,
+              "confidence": 0.7654387352713368
+            }
           ]
         },
         {
@@ -80,6 +94,44 @@
               "kind": "outcome_history",
               "text": "Similar past runs: 4 success, 0 partial, 6 failure → 43% Beta(2,2)-smoothed (n=10). All runs in the window: 1519, 65% success (n=1481)."
             }
+          ],
+          "plantings": [
+            {
+              "plantId": "plt_32694e53104271b2",
+              "outcome": 0.7142857142857143,
+              "n": 3,
+              "confidence": 0.37132424166354844
+            },
+            {
+              "plantId": "plt_f0f59a6a0dc03097",
+              "outcome": 0.5,
+              "n": 0,
+              "confidence": 0.2615987175262987
+            },
+            {
+              "plantId": "plt_7f307d08a4720190",
+              "outcome": 0.6111111111111112,
+              "n": 5,
+              "confidence": 0.3159077860535156
+            },
+            {
+              "plantId": "plt_74f6b9c8234e6f8e",
+              "outcome": 0.5,
+              "n": 10,
+              "confidence": 0.2615987175262987
+            },
+            {
+              "plantId": "plt_ff3cf3eb8c753cda",
+              "outcome": 0.42857142857142855,
+              "n": 10,
+              "confidence": 0.2300455057481516
+            },
+            {
+              "plantId": "plt_6598b12d6125172a",
+              "outcome": 0.6875,
+              "n": 4,
+              "confidence": 0.356535750399065
+            }
           ]
         },
         {
@@ -105,6 +157,20 @@
             {
               "kind": "outcome_history",
               "text": "No similar past runs with a known outcome: outcome is the Beta(2,2) prior, 50% (n=0). All runs in the window: 60, 50% success (n=60)."
+            }
+          ],
+          "plantings": [
+            {
+              "plantId": "plt_81ec76c7104d4e0b",
+              "outcome": 0.5,
+              "n": 0,
+              "confidence": 0.004341925710194145
+            },
+            {
+              "plantId": "plt_e56611089dfa3c3d",
+              "outcome": 0.5,
+              "n": 0,
+              "confidence": 0.004341925710194145
             }
           ]
         }
@@ -152,6 +218,20 @@
               "kind": "outcome_history",
               "text": "Similar past runs: 1 success, 0 partial, 9 failure → 21% Beta(2,2)-smoothed (n=10). All runs in the window: 210, 60% success (n=210)."
             }
+          ],
+          "plantings": [
+            {
+              "plantId": "plt_0afdf741a0daed53",
+              "outcome": 0.21428571428571427,
+              "n": 10,
+              "confidence": 0.6088366096881739
+            },
+            {
+              "plantId": "plt_5f39547dea82bd11",
+              "outcome": 0.8571428571428571,
+              "n": 10,
+              "confidence": 0.8782361204008078
+            }
           ]
         },
         {
@@ -190,6 +270,44 @@
               "kind": "outcome_history",
               "text": "Similar past runs: 3 success, 0 partial, 7 failure → 36% Beta(2,2)-smoothed (n=10). All runs in the window: 1519, 65% success (n=1481)."
             }
+          ],
+          "plantings": [
+            {
+              "plantId": "plt_32694e53104271b2",
+              "outcome": 0.7142857142857143,
+              "n": 3,
+              "confidence": 0.4746247445261185
+            },
+            {
+              "plantId": "plt_f0f59a6a0dc03097",
+              "outcome": 0.5,
+              "n": 0,
+              "confidence": 0.35143806428898733
+            },
+            {
+              "plantId": "plt_7f307d08a4720190",
+              "outcome": 0.6111111111111112,
+              "n": 5,
+              "confidence": 0.41394253689364
+            },
+            {
+              "plantId": "plt_74f6b9c8234e6f8e",
+              "outcome": 0.42857142857142855,
+              "n": 10,
+              "confidence": 0.3136515934865928
+            },
+            {
+              "plantId": "plt_ff3cf3eb8c753cda",
+              "outcome": 0.38461538461538464,
+              "n": 9,
+              "confidence": 0.2915328630980193
+            },
+            {
+              "plantId": "plt_6598b12d6125172a",
+              "outcome": 0.6875,
+              "n": 4,
+              "confidence": 0.45872408181556557
+            }
           ]
         },
         {
@@ -214,6 +332,14 @@
             {
               "kind": "outcome_history",
               "text": "No similar past runs with a known outcome: outcome is the Beta(2,2) prior, 50% (n=0). All runs in the window: 5, 80% success (n=5)."
+            }
+          ],
+          "plantings": [
+            {
+              "plantId": "plt_ff3cf3eb8c753cda",
+              "outcome": 0.5,
+              "n": 0,
+              "confidence": 0.007601557603161328
             }
           ]
         }
@@ -264,6 +390,14 @@
               "kind": "outcome_history",
               "text": "Similar past runs: 0 success, 10 partial, 0 failure → 50% Beta(2,2)-smoothed (n=10). All runs in the window: 30, 50% success (n=30)."
             }
+          ],
+          "plantings": [
+            {
+              "plantId": "plt_8143e4aa8474a2c2",
+              "outcome": 0.5,
+              "n": 10,
+              "confidence": 0.9832429571714628
+            }
           ]
         },
         {
@@ -302,6 +436,44 @@
               "kind": "outcome_history",
               "text": "Similar past runs: 4 success, 0 partial, 5 failure, 1 unknown (excluded) → 46% Beta(2,2)-smoothed (n=9). All runs in the window: 1519, 65% success (n=1481)."
             }
+          ],
+          "plantings": [
+            {
+              "plantId": "plt_32694e53104271b2",
+              "outcome": 0.5,
+              "n": 0,
+              "confidence": 0.0033044825591043124
+            },
+            {
+              "plantId": "plt_f0f59a6a0dc03097",
+              "outcome": 0.5,
+              "n": 0,
+              "confidence": 0.0033044825591043124
+            },
+            {
+              "plantId": "plt_7f307d08a4720190",
+              "outcome": 0.5,
+              "n": 0,
+              "confidence": 0.0033044825591043124
+            },
+            {
+              "plantId": "plt_74f6b9c8234e6f8e",
+              "outcome": 0.46153846153846156,
+              "n": 9,
+              "confidence": 0.0030156859069616
+            },
+            {
+              "plantId": "plt_ff3cf3eb8c753cda",
+              "outcome": 0.5,
+              "n": 0,
+              "confidence": 0.0033044825591043124
+            },
+            {
+              "plantId": "plt_6598b12d6125172a",
+              "outcome": 0.5,
+              "n": 0,
+              "confidence": 0.0033044825591043124
+            }
           ]
         },
         {
@@ -325,7 +497,8 @@
               "kind": "outcome_history",
               "text": "No similar past runs with a known outcome: outcome is the Beta(2,2) prior, 50% (n=0). No runs in the window."
             }
-          ]
+          ],
+          "plantings": []
         }
       ]
     },
@@ -370,6 +543,14 @@
               "kind": "outcome_history",
               "text": "Similar past runs: 0 success, 10 partial, 0 failure → 50% Beta(2,2)-smoothed (n=10). All runs in the window: 25, 50% success (n=25)."
             }
+          ],
+          "plantings": [
+            {
+              "plantId": "plt_3a3d0cfac546763d",
+              "outcome": 0.5,
+              "n": 10,
+              "confidence": 0.9825060858160983
+            }
           ]
         },
         {
@@ -408,6 +589,44 @@
               "kind": "outcome_history",
               "text": "Similar past runs: 5 success, 3 partial, 2 failure → 61% Beta(2,2)-smoothed (n=10). All runs in the window: 1519, 65% success (n=1481)."
             }
+          ],
+          "plantings": [
+            {
+              "plantId": "plt_32694e53104271b2",
+              "outcome": 0.5,
+              "n": 0,
+              "confidence": 0.008341872765118169
+            },
+            {
+              "plantId": "plt_f0f59a6a0dc03097",
+              "outcome": 0.5,
+              "n": 0,
+              "confidence": 0.008341872765118169
+            },
+            {
+              "plantId": "plt_7f307d08a4720190",
+              "outcome": 0.6071428571428571,
+              "n": 10,
+              "confidence": 0.010744880810369601
+            },
+            {
+              "plantId": "plt_74f6b9c8234e6f8e",
+              "outcome": 0.6666666666666666,
+              "n": 2,
+              "confidence": 0.01236381084848457
+            },
+            {
+              "plantId": "plt_ff3cf3eb8c753cda",
+              "outcome": 0.5416666666666666,
+              "n": 8,
+              "confidence": 0.009205525905426563
+            },
+            {
+              "plantId": "plt_6598b12d6125172a",
+              "outcome": 0.6666666666666666,
+              "n": 2,
+              "confidence": 0.01236381084848457
+            }
           ]
         },
         {
@@ -445,6 +664,20 @@
             {
               "kind": "outcome_history",
               "text": "Similar past runs: 0 success, 10 partial, 0 failure → 50% Beta(2,2)-smoothed (n=10). All runs in the window: 25, 50% success (n=25)."
+            }
+          ],
+          "plantings": [
+            {
+              "plantId": "plt_cef5c7f6dd6766cd",
+              "outcome": 0.5,
+              "n": 10,
+              "confidence": 0.010108026170817571
+            },
+            {
+              "plantId": "plt_88d143cd7476c408",
+              "outcome": 0.5,
+              "n": 10,
+              "confidence": 0.010108026170817571
             }
           ]
         }
@@ -499,6 +732,14 @@
               "kind": "outcome_history",
               "text": "Similar past runs: 4 success, 0 partial, 1 failure → 67% Beta(2,2)-smoothed (n=5). All runs in the window: 5, 80% success (n=5)."
             }
+          ],
+          "plantings": [
+            {
+              "plantId": "plt_ff3cf3eb8c753cda",
+              "outcome": 0.6666666666666666,
+              "n": 5,
+              "confidence": 0.7195634545541879
+            }
           ]
         },
         {
@@ -522,7 +763,8 @@
               "kind": "outcome_history",
               "text": "No similar past runs with a known outcome: outcome is the Beta(2,2) prior, 50% (n=0). No runs in the window."
             }
-          ]
+          ],
+          "plantings": []
         },
         {
           "kind": "skill",
@@ -558,6 +800,14 @@
             {
               "kind": "outcome_history",
               "text": "Similar past runs: 4 success, 0 partial, 0 failure → 75% Beta(2,2)-smoothed (n=4). All runs in the window: 4, 100% success (n=4)."
+            }
+          ],
+          "plantings": [
+            {
+              "plantId": "plt_ff3cf3eb8c753cda",
+              "outcome": 0.75,
+              "n": 4,
+              "confidence": 0.08488325831224944
             }
           ]
         }

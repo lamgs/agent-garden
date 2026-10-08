@@ -466,8 +466,14 @@ Verification:
   other plants and beds dimmed. The reasons surface the demo story: on similar invoice-totals
   tasks test-writer went 1 success / 9 failure → 21% outcome (n = 10).
 
+Follow-up (same day): **per-bed badges.** The outcome component is now also computed per planting
+(only that bed's similar runs), and each plant's badge and the results list show it. For "write unit
+tests for the invoice totals", test-writer reads 88% in shop-api (n=10) and 61% in legacy-monolith
+(n=10); before, both plants showed 61%. Unit test: two beds with opposite histories get opposite
+per-bed outcomes. The eval still ranks candidates (not plantings); its numbers are unchanged.
+
 Known gaps:
-- **Not bed-aware.** The router ranks agents and skills, not plantings. test-writer gets one
+- ~~Not bed-aware.~~ Fixed by per-bed badges (above). The router ranks agents and skills, not plantings. test-writer gets one
   confidence even though it thrives in shop-api and wilts in legacy-monolith. The outcome reason
   shows this, but the badge doesn't. A `bed` parameter (outcome kNN per planting) is the natural next step.
 - The eval is small (31 queries, 10 held out) and written by the person who built the router.

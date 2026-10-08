@@ -22,8 +22,12 @@ export function routerInputFrom(data: GardenData, garden: GardenView): RouterInp
     set.add(c.skillId);
     skillsByRun.set(c.runId, set);
   }
+  const plantOf = new Map(garden.plants.map((p) => [`${p.agentId}|${p.bedId}`, p.id]));
   const runs: RouterRunInput[] = data.runs.map((r) => ({
     id: r.id,
+    ...(plantOf.has(`${r.agentId}|${r.familyId}`)
+      ? { plantId: plantOf.get(`${r.agentId}|${r.familyId}`)! }
+      : {}),
     preview: r.taskPreview,
     label: r.label,
     candidateKeys: [

@@ -141,7 +141,16 @@ export const RouterBox = forwardRef<RouterBoxHandle, Props>(function RouterBox(
                   rank={i + 1}
                   method={result.method}
                   beds={[
-                    ...new Set(c.plantIds.map((p) => bedName.get(plantBed.get(p) ?? '') ?? '')),
+                    ...new Set(
+                      c.plantIds.map((p) => {
+                        const bed = bedName.get(plantBed.get(p) ?? '') ?? '';
+                        const own = c.plantings?.find((x) => x.plantId === p);
+                        // Per-bed confidence: the outcome part uses only that bed's similar runs.
+                        return bed && own && c.plantIds.length > 1
+                          ? `${bed} ${formatConfidence(own.confidence)} (n=${own.n})`
+                          : bed;
+                      }),
+                    ),
                   ].filter(Boolean)}
                   onSelect={
                     c.plantIds[0]

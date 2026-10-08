@@ -38,6 +38,8 @@ export interface RouterRunInput {
   /** Redacted, truncated task preview (from the store). */
   preview: string;
   label: OutcomeLabel;
+  /** The planting (agent in bed) that ran it, for per-bed outcomes. */
+  plantId?: ID;
   /** Candidate keys (`candidateKey(kind, id)`) this run counts for: its agent and any skill it invoked. */
   candidateKeys: string[];
 }
@@ -78,6 +80,8 @@ interface TaskDoc {
 interface CandidateTask {
   task: number;
   labels: OutcomeLabel[];
+  /** Planting of each run in `labels` (same order). */
+  plants: (ID | undefined)[];
   weight: number;
 }
 
@@ -128,7 +132,7 @@ export function buildRouterIndex(input: RouterInput): RouterIndex {
   // Unique task texts (stable order: first seen in the input order of runs, which is by start time).
   const taskIdx = new Map<string, number>();
   const taskTexts: string[] = [];
-  const perCandidate = new Map<string, Map<number, OutcomeLabel[]>>();
+  const perCandidate = new Map<string, Map<number, { label: OutcomeLabel; plantId?: ID }[]>>();
   let runsIndexed = 0;
   for (const r of input.runs) {
     const owners = r.candidateKeys.map((k) => byKey.get(k)).filter((c) => c !== undefined);
@@ -150,9 +154,13 @@ export function buildRouterIndex(input: RouterInput): RouterIndex {
       taskTexts.push(text);
     }
     for (const c of owners) {
-      const m = perCandidate.get(c.key) ?? new Map<number, OutcomeLabel[]>();
+      const m =
+        perCandidate.get(c.key) ?? new Map<number, { label: OutcomeLabel; plantId?: ID }[]>();
       perCandidate.set(c.key, m);
-      m.set(ti, [...(m.get(ti) ?? []), r.label]);
+      m.set(ti, [
+        ...(m.get(ti) ?? []),
+        { label: r.label, ...(r.plantId ? { plantId: r.plantId } : {}) },
+      ]);
     }
   }
 
@@ -169,10 +177,11 @@ export function buildRouterIndex(input: RouterInput): RouterIndex {
     add(tokenize(profiles[i]!), PROFILE_WEIGHT);
     const vec = embedder.embed(profiles[i]!);
     c.profileVec = vec.some((x) => x !== 0) ? vec : null;
-    for (const [task, labels] of perCandidate.get(c.key) ?? []) {
+    for (const [task, runs] of perCandidate.get(c.key) ?? []) {
+      const labels = runs.map((r) => r.label);
       const mean = labels.reduce((s, l) => s + RUN_WEIGHT[l], 0) / labels.length;
       const weight = mean * (1 + Math.log(labels.length));
-      c.tasks.push({ task, labels, weight });
+      c.tasks.push({ task, labels, plants: runs.map((r) => r.plantId), weight });
       add(tokenize(taskTexts[task]!), weight);
     }
     return tf;
@@ -203,6 +212,8 @@ interface Scored {
   score: number;
   neighbors: { task: number; sim: number; labels: OutcomeLabel[] }[];
   knn: { sum: number; n: number; counts: Record<OutcomeLabel, number> };
+  /** Outcome kNN restricted to each planting's own runs. */
+  perPlant: { plantId: ID; outcome: number; n: number; score: number }[];
 }
 
 /** Score every candidate (unsorted order = index order). Exposed for evaluation. */
@@ -216,7 +227,12 @@ export function scoreAll(index: RouterIndex, query: string, opts: RouteOptions =
 
   return index.candidates.map((entry, i) => {
     const sims = entry.tasks
-      .map((t) => ({ task: t.task, sim: cosine(q, index.tasks[t.task]!.vec), labels: t.labels }))
+      .map((t) => ({
+        task: t.task,
+        sim: cosine(q, index.tasks[t.task]!.vec),
+        labels: t.labels,
+        plants: t.plants,
+      }))
       .sort((a, b) => b.sim - a.sim || a.task - b.task);
     const top3 = sims.slice(0, 3);
     const taskSim = top3.length ? top3.reduce((s, x) => s + x.sim, 0) / top3.length : null;
@@ -233,7 +249,7 @@ export function scoreAll(index: RouterIndex, query: string, opts: RouteOptions =
     const neighbors: Scored['neighbors'] = [];
     for (const s of sims) {
       if (taken >= k || s.sim < minSim) break;
-      neighbors.push(s);
+      neighbors.push({ task: s.task, sim: s.sim, labels: s.labels });
       for (const l of s.labels) {
         if (taken >= k) break;
         taken++;
@@ -247,6 +263,28 @@ export function scoreAll(index: RouterIndex, query: string, opts: RouteOptions =
     }
     const outcome = betaSmoothed(sum, n);
     const lex = lexical[i] ?? 0;
+    const shared = w.lexical * lex + w.embedding * embedding;
+    // Same walk per planting, counting only that planting's runs: an agent can thrive in one bed
+    // and fail in another, and the badge on each plant should say which.
+    const perPlant = entry.input.plantIds.map((plantId) => {
+      let ps = 0;
+      let pn = 0;
+      let pt = 0;
+      for (const s of sims) {
+        if (pt >= k || s.sim < minSim) break;
+        s.labels.forEach((l, j) => {
+          if (pt >= k || s.plants[j] !== plantId) return;
+          pt++;
+          const c = successCredit(l);
+          if (c !== null) {
+            ps += c;
+            pn++;
+          }
+        });
+      }
+      const o = betaSmoothed(ps, pn);
+      return { plantId, outcome: o, n: pn, score: shared + w.outcome * o };
+    });
     return {
       entry,
       lexical: lex,
@@ -255,6 +293,7 @@ export function scoreAll(index: RouterIndex, query: string, opts: RouteOptions =
       score: w.lexical * lex + w.embedding * embedding + w.outcome * outcome,
       neighbors,
       knn: { sum, n, counts },
+      perPlant,
     };
   });
 }
@@ -355,6 +394,13 @@ export function route(index: RouterIndex, query: string, opts: RouteOptions = {}
       components: { lexical: s.lexical, embedding: s.embedding, outcome: s.outcome },
       confidence: applyCalibration(cal, s.score, m[i] ?? 0),
       reasons: reasonsFor(s, terms, index),
+      // The margin shifts with the planting's own score; calibration was fitted per candidate.
+      plantings: s.perPlant.map((p) => ({
+        plantId: p.plantId,
+        outcome: p.outcome,
+        n: p.n,
+        confidence: applyCalibration(cal, p.score, (m[i] ?? 0) + p.score - s.score),
+      })),
     })),
   };
 }
